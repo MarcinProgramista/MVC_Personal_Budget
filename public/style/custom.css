@@ -1,0 +1,16 @@
+body {
+    background-color: darkgoldenrod; /* jasne, czyste tło */
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.logo{
+    background-color: #000
+}
+.modal-content {
+    border-radius: 1rem;
+}
+
+.btn-primary {
+    border-radius: 8px;
+}
