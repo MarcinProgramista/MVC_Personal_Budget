@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up{% endblock %}
+{% block footer %}
+{% endblock %}
+{% block body %}
+<div class="container my-5">
+  <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
+
+    <!-- LEWA KOLUMNA Z OBRAZEM -->
+    <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
+     
+      <p class="fst-italic text-dark mb-4">
+        “Don’t tell me where your priorities are. Show me where you spend your money 
+        and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
+      </p>
+
+      <img src="/images/achievement-3404945_1920.jpg" 
+           alt="Motywacyjny obraz" 
+           class="img-fluid  border border-warning rounded shadow-lg form-image">
+    </div>
+
+    <!-- PRAWA KOLUMNA Z FORMULARZEM -->
+    <div class="col-md-5">
+      
+        <form method="post" action="/signup/create" class="registration-form text-warning bg-dark">
+          <h1 class="mb-4 text-center p-4">Rejestracja</h3>
+
+          <div class="form-group" style="padding-left: 100px;">
+            <label for="name" class="p-1"><i class="fas fa-user"></i></label>
+            <input type="text" class="form-control p-2 w-75" id="name" name="name" placeholder="Imię" required>
+          </div>
+
+           <div class="form-group" style="padding-left: 100px;">
+            <label for="email"><i class="far fa-envelope"></i></label>
+            <input type="email" class="form-control p-2 w-75" id="email" name="email" placeholder="E-mail" required>
+          </div>
+
+           <div class="form-group" style="padding-left: 100px;">
+            <label for="password"><i class="fas fa-key"></i></label>
+            <input type="password"  class="form-control p-2 w-75" id="password" name="password" placeholder="Password" required>
+          </div>
+
+          <div class="form-group" style="padding-left: 100px;">
+            <label for="password_confirm"><i class="fas fa-key"></i></label>
+            <input type="password"  class="form-control p-2 w-75" id="password_confirm" name="password_confirm" placeholder="Confirm password" required>
+          </div>
+          <div class="text-center">
+          <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">Sing in</button>
+          </div>
+        </form>
+      
+    </div>
+
+
+{% endblock %}

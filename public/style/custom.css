@@ -1,5 +1,5 @@
 body {
-    background-color: darkgoldenrod; /* jasne, czyste tło */
+    background-color: wheat; /* jasne, czyste tło */
     color: #333;
     font-family: 'Segoe UI', sans-serif;
 }
@@ -14,3 +14,48 @@ body {
 .btn-primary {
     border-radius: 8px;
 }
+
+/* Formularz rejestracji */
+.registration-form {
+    max-width: 500px;   /* maksymalna szerokość formularza */
+    margin: 40px auto;  /* wyśrodkowanie i odstęp od góry */
+    border-radius: 10px; /* lekko zaokrąglone rogi */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* cień dla desktopu */
+    transition: all 0.3s ease-in-out;
+   
+    
+}
+
+/* Hover - delikatne powiększenie formularza przy najechaniu */
+.registration-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Responsywność dla urządzeń mobilnych */
+@media (max-width: 576px) {
+    .registration-form {
+        margin: 20px 15px; /* mniejsze marginesy na telefonach */
+        padding: 20px;      /* zmniejszone paddingi */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* mocniejszy cień na małym ekranie */
+    }
+}
+
+.form-control:focus {
+  color: #212529;
+  background-color:   #ffc107;
+  border-color: black;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem  #ffc107;
+}
+
+
+.input {
+   background-color:  #ffc107;  
+}
+
+.input:focus {
+    
+    box-shadow: 0 0 10px #ffc107;
+     background-color: #ffc107;
+  }
