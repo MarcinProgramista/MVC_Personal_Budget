@@ -3,7 +3,25 @@
 {% block title %}Sign up{% endblock %}
 {% block footer %}
   <script>
-
+    $(document).ready(function(){
+      $("#formSignup").validate({
+        rules: {
+          name:"required",
+          email: {
+            required: true,
+            email: true
+          },
+          password: {
+            required: true,
+            minlength: 6
+          },
+          password_confirmantion: {
+            required: true,
+            equalTo:"#inputPassword"
+          }
+        }
+      });
+    });
   </script>
 {% endblock %}
 {% block body %}
@@ -35,7 +53,7 @@
             </ul>
         {% endif %}
         </div>
-        <form method="post" action="/signup/create" class="registration-form text-warning bg-dark">
+        <form method="post" action="/signup/create" class="registration-form text-warning bg-dark" id="formSignup">
           <h1 class="mb-4 text-center p-4">Sing up</h3>
 
           <div class="form-group" style="padding: 10px;">
