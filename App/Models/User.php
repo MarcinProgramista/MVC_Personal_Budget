@@ -80,10 +80,6 @@ class User extends \Core\Model
         }
         
         // Password
-        if($this->password != $this->password_confirmation){
-            $this->errors[]= 'Password and confirmation do not match';
-        }
-
         if (strlen($this->password) < 6) {
             $this->errors[] = 'Please enter at least 6 characters for the password';
         }
