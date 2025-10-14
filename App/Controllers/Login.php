@@ -2,21 +2,25 @@
 
 namespace App\Controllers;
 
-use \Core\View;
-use \App\Models\User;
+use Core\View;
+use App\Models\User;
 
 /**
  * Login Controller
  */
-class Login extends \Core\Controller{
+class Login extends \Core\Controller
+{
     /**
      * Show the login page
-     * 
+     *
      * @return void
      */
-    public function newAction(){{
-        View::renderTemplate('Login/new.html');
-    }}
+    public function newAction()
+    {
+        {
+            View::renderTemplate('Login/new.html');
+        }
+    }
     /**
      * Log in a user
      *
@@ -27,14 +31,12 @@ class Login extends \Core\Controller{
         $user = User::authenticate($_POST['email'], $_POST['password']);
         if ($user) {
 
-          header('Location: http://' . $_SERVER['HTTP_HOST']. '/', true, 303);
-          exit;
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . '/', true, 303);
+            exit;
         } else {
-             View::renderTemplate('Login/new.html', [
+            View::renderTemplate('Login/new.html', [
                 'email' => $_POST['email'],
             ]);
         }
-
     }
 }
-

@@ -10,7 +10,7 @@ use PDO;
  * PHP version 7.0
  */
 class User extends \Core\Model
-{   
+{
     public int $id;
     public string $name;
     public string $email;
@@ -27,8 +27,9 @@ class User extends \Core\Model
      * 
      * @return void
      */
-    public function __construct($data=[]){
-        foreach($data as $key => $value){
+    public function __construct($data = [])
+    {
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
@@ -38,19 +39,20 @@ class User extends \Core\Model
      * 
      * @return boolen True if the user was saved, false otherwise 
      */
-    public function save(){
+    public function save()
+    {
         $this->validate();
-        
-        if(empty($this->errors)) {
+
+        if (empty($this->errors)) {
             $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
 
             $sql = 'INSERT INTO users (name, email, password_hash)
                     VALUES (:name, :email, :password_hash)';
-            
+
             $db = static::getDB();
             $stmt = $db->prepare($sql);
 
-            
+
             $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
             $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
             $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
@@ -65,7 +67,8 @@ class User extends \Core\Model
      *
      * @return void
      */
-    public function validate(){
+    public function validate()
+    {
         // Name
         if ($this->name == '') {
             $this->errors[] = 'Name is required';
@@ -78,7 +81,7 @@ class User extends \Core\Model
         if (static::emailExists($this->email)) {
             $this->errors[] = 'email already taken';
         }
-        
+
         // Password
         if (strlen($this->password) < 6) {
             $this->errors[] = 'Please enter at least 6 characters for the password';
@@ -104,8 +107,8 @@ class User extends \Core\Model
     {
         return static::findByEmail($email) !== false;
     }
- 
-   /**
+
+    /**
      * Find a user model by email address
      *
      * @param string $email email address to search for
@@ -147,5 +150,4 @@ class User extends \Core\Model
 
         return false;
     }
-
 }
