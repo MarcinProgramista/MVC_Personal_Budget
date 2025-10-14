@@ -114,4 +114,6 @@ class User extends \Core\Model
 
         return $stmt->fetch() !== false;
     }
+ 
+
 }
