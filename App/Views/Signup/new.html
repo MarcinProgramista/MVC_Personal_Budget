@@ -21,16 +21,34 @@
           name:"required",
           email: {
             required: true,
-            email: true
+            email: true,
+            remote:'/account/validate-email'
           },
           password: {
             required: true,
             minlength: 6,
             validPassowrd:true,
           },
-          password_confirmantion: {
+          password_confirmation: {
             required: true,
             equalTo:"#inputPassword"
+          }
+        },
+        messages:{
+          email:{
+            required:'<div style="color: red; padding-top: 10px;">Email is required<div>',
+            remote:'<div style="color: red; padding-top: 10px;">Email is already taken<div>'
+          },
+          name:{
+            required:'<div style="color: red; padding-top: 10px;">Name is required<div>',
+          },
+          password:{
+            required:'<div style="color: red; padding-top: 10px;">Password is required<div>',
+            minlength: '<div style="color: red; padding-top: 10px;">Password must has at least 6 characters<div>',
+          },
+          password_confirmation:{
+            required:'<div style="color: red; padding-top: 10px;">Password is required<div>',
+            equalTo:'<div style="color: red; padding-top: 10px;">Password is not match<div>',
           }
         }
       });
