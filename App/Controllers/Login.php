@@ -24,7 +24,9 @@ class Login extends \Core\Controller{
      */
     public function createAction()
     {
-        echo($_REQUEST['email'] . " " . $_REQUEST['password']);
+        $user = User::findByEmail($_POST['email'], $_POST['password']);
+        var_dump($user);
+
     }
 }
 
