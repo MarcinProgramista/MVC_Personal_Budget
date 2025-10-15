@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use \Core\View;
+use Core\View;
 
 /**
  * Home controller
@@ -11,7 +11,6 @@ use \Core\View;
  */
 class Home extends \Core\Controller
 {
-
     /**
      * Show the index page
      *

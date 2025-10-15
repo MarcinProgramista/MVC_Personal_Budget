@@ -1,44 +1,60 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Moja aplikacja{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link 
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
-        rel="stylesheet" 
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
-        crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- Własne style -->
-     <link rel="stylesheet" href="/css/all.css" >
+    <link rel="stylesheet" href="/css/all.css">
     <link rel="stylesheet" href="/style/custom.css">
 </head>
 
 <body>
     <section class="p-3 bg-dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 mt-4 pb-3">
-                <h2 class="text-uppercase text-center mx-auto "><span class="text-warning"><i class="fas fa-wallet pr-2"></i>Personal</span> <span class="text-white">Budget</span></h2>
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Lewa kolumna: nagłówek -->
+                <div class="col-md-6 text-start">
+                    <h2 class="text-uppercase"><span class="text-warning"><i
+                                class="fas fa-wallet pr-2"></i>Personal</span>
+                        <span class="text-white">Budget</span>
+                    </h2>
+                </div>
+
+                <!-- Prawa kolumna: przyciski -->
+                <div class="col-md-6 text-end">
+                    {% if session.user_id %}
+                    <span class="text-white">Welcome,
+                        {{ session.user_name|capitalize|e}}
+                    </span>
+                    <a href="/logout" class="btn btn-outline-light ms-2">Log out</a>
+
+                    {% else %}
+                    <a href="/login" class="btn btn-outline-warning me-2">Log in</a>
+                    <a href="/signup/new" class="btn btn-warning">Sign up</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
     {% block body %}
     {% endblock %}
 
     <!-- Bootstrap JS (wymagane dla modalnych okien) -->
-    <script 
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
-        crossorigin="anonymous">  
-    </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+        </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     {% block footer %}
     {% endblock %}
 </body>
+
 </html>
