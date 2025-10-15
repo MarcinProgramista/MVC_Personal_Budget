@@ -9,7 +9,6 @@ namespace Core;
  */
 abstract class Controller
 {
-
     /**
      * Parameters from the matched route
      * @var array
@@ -69,5 +68,18 @@ abstract class Controller
      */
     protected function after()
     {
+    }
+
+    /**
+    * Redirect to a different page
+    *
+    * @param string $url  The relative URL
+    *
+    * @return void
+    */
+    public function redirect($url)
+    {
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . $url, true, 303);
+        exit;
     }
 }
