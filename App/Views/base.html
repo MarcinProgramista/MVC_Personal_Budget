@@ -15,10 +15,10 @@
     <link rel="stylesheet" href="/style/custom.css">
 </head>
 
-<body>
-    <section class="p-3 bg-dark">
+<body class="{% block body_class %}{% endblock %}">
+    <section class="p-1 bg-dark">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row ">
                 <!-- Lewa kolumna: nagłówek -->
                 <div class="col-md-6 text-start">
                     <h2 class="text-uppercase"><span class="text-warning"><i
