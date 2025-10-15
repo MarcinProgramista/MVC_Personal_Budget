@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use \Core\View;
-use \App\Models\User;
+use Core\View;
+use App\Models\User;
 
 /**
  * Signup controller
@@ -12,25 +12,27 @@ class Signup extends \Core\Controller
 {
     /**
      * Show the signup page
-     * 
+     *
      * @return void
-     *  
+     *
      */
-    public function newAction(){
+    public function newAction()
+    {
         View::renderTemplate('Signup/new.html');
     }
-    
+
     /**
      * Sing up a new user
-     * 
+     *
      * @return void
      */
-    public function createAction(){
+    public function createAction()
+    {
         $user = new User($_POST);
-        if($user->save()){
-           header('Location: http://' . $_SERVER['HTTP_HOST'] . '/signup/success', true, 303);
+        if ($user->save()) {
+            $this->redirect('/signup/success');
         } else {
-            View::renderTemplate('Signup/new.html',[
+            View::renderTemplate('Signup/new.html', [
                 'user' => $user
             ]);
         }
@@ -45,5 +47,5 @@ class Signup extends \Core\Controller
     {
         View::renderTemplate('Signup/success.html');
     }
-    
+
 }
