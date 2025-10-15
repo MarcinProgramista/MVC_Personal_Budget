@@ -2,7 +2,7 @@
 
 {% block title %}Home{% endblock %}
 {% block footer %}
-< {% endblock %} {% block body %} {% if session.user_id %} <div class="container py-5">
+< {% endblock %} {% block body %} {% if is_logged_in %} <div class="container py-5">
     <h1 class="text-center">Welcome, {{ session.user_name|capitalize }}!</h1>
     <p class="text-center text-muted">User with ID {{ session.user_id }} is logged in.</p>
     </div>
