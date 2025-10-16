@@ -13,6 +13,16 @@ use App\Auth;
 class Items extends \Core\Controller
 {
     /**
+     * Require the user to be authenticated before giving access to all methods in the controller
+     *
+     * @return void
+     */
+    protected function before()
+    {
+        $this->requireLogin();
+    }
+
+    /**
     * Items index
     *
     * @return void
@@ -22,6 +32,26 @@ class Items extends \Core\Controller
 
         $this->requireLogin();
         View::renderTemplate('Items/index.html');
+    }
+
+    /**
+     * Add a new item
+     *
+     * @return void
+     */
+    public function newAction()
+    {
+        echo "new action";
+    }
+
+    /**
+     * Show an item
+     *
+     * @return void
+     */
+    public function showAction()
+    {
+        echo "show action";
     }
 
 }
