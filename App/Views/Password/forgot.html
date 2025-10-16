@@ -3,7 +3,6 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-
 <div class="container my-5">
     <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
 
@@ -13,7 +12,7 @@
                 “Don’t tell me where your priorities are. Show me where you spend your money
                 and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
             </p>
-            <img src="/images/02.jpg" alt="Motywacyjny obraz"
+            <img src="/images/large.jpg" alt="Motywacyjny obraz"
                 class="img-fluid border border-warning rounded shadow-lg form-image">
         </div>
 
@@ -32,7 +31,7 @@
 
             <form method="post" action="/login/create" class="registration-form text-warning bg-dark" id="fromLogin">
 
-                <h1 class="mb-4 text-center p-4">Log in</h1>
+                <h1 class="mb-4 text-center p-4">Request password reset</h1>
 
                 <div class="form-group" style="padding: 10px;">
                     <label for="inputEmail"><i class="far fa-envelope"></i></label>
@@ -40,29 +39,14 @@
                         placeholder="E-mail address" required>
                 </div>
 
-                <!-- Pole hasła -->
-                <div class="form-group" style="padding: 10px;">
-                    <label for="inputPassword"><i class="fas fa-key"></i></label>
-                    <input type="password" class="form-control p-2 w-100" id="inputPassword" name="password"
-                        placeholder="Password" required>
-                </div>
-                <div class="form-group" style="padding: 10px;">
-                    <label> <input type="checkbox" name="remember_me" {% if remember_me %} checked="checked" {% endif
-                            %} />
-                        Remember me</label>
 
-                </div>
                 <div class="text-center">
 
-                    <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">Log in</button>
-                </div>
-                <div class="text-center">
-                    <a class="text-center p-2 text-light" href="/password/forgot">Fogot password?</a>
+                    <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">Send password reset</button>
                 </div>
 
             </form>
         </div>
     </div>
 </div>
-
 {% endblock %}
