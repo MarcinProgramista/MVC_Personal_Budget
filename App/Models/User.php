@@ -5,6 +5,7 @@ namespace App\Models;
 use PDO;
 use App\Token;
 use App\Mail;
+use Core\View;
 
 /**
  * Example user model
@@ -250,12 +251,27 @@ class User extends \Core\Model
      *
      * @return void
      */
+    // protected function sendPasswordResetEmail()
+    // {
+    //     $url = 'http://' .  $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
+    //     $text = 'Please click on the following link to reset your password: '.  $url;
+    //     $html = "Please click <a href=\"$url\">here</a> to reset your password.";
+    //     Mail::send($this->email, 'Password reset', $text, $html);
+
+    // }
+
+    /**
+     * Send password reset instructions in an email to the user
+     *
+     * @return void
+     */
     protected function sendPasswordResetEmail()
     {
-        $url = 'http://' .  $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
-        $text = 'Please click on the following link to reset your password: '.  $url;
-        $html = "Please click <a href=\"$url\">here</a> to reset your password.";
-        Mail::send($this->email, 'Password reset', $text, $html);
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
 
+        $text = View::getTemplate('Password/reset_email.txt', ['url' => $url]);
+        $html = View::getTemplate('Password/reset_email.html', ['url' => $url]);
+
+        Mail::send($this->email, 'Password reset', $text, $html);
     }
 }

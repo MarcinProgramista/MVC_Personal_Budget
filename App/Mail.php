@@ -20,7 +20,7 @@ class Mail
      *
      * @return bool True if sent successfully, false otherwise
      */
-    public static function send(string $to, string $subject, string $text, ?string $html = null): bool
+    public static function send(string $to, string $subject, ?string $text  = null, ?string $html = null): bool
     {
         try {
             // Create Mailgun client
