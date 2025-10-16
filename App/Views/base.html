@@ -29,7 +29,7 @@
 
                 <!-- Prawa kolumna: przyciski -->
                 <div class="col-md-6 text-end">
-                    {% if is_logged_in %}
+                    {% if current_user %}
                     <span class="text-white">Welcome,
                         {{ session.user_name|capitalize|e}}
                     </span>
