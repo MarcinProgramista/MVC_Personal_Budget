@@ -1,12 +1,20 @@
 {
     "require": {
         "twig/twig": "~3.0",
-        "phpmailer/phpmailer": "^7.0"
+        "phpmailer/phpmailer": "^7.0",
+        "mailgun/mailgun-php": "^4.3",
+        "symfony/http-client": "^7.3",
+        "nyholm/psr7": "^1.8"
     },
     "autoload": {
         "psr-4": {
             "Core\\": "Core/",
             "App\\": "App/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }
