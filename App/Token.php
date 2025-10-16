@@ -14,6 +14,7 @@ class Token
      * @var string
      */
     protected $token;
+    public string $remember_token;
 
     /**
      * Class constructor. Create a new random token or assign an existing one if passed in.
