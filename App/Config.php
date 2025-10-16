@@ -9,34 +9,38 @@ namespace App;
  */
 class Config
 {
-
     /**
      * Database host
      * @var string
      */
-    const DB_HOST = 'localhost';
+    public const DB_HOST = 'localhost';
 
     /**
      * Database name
      * @var string
      */
-    const DB_NAME = 'mvclogin';
+    public const DB_NAME = 'mvclogin';
 
     /**
      * Database user
      * @var string
      */
-    const DB_USER = 'marcin';
+    public const DB_USER = 'marcin';
 
     /**
      * Database password
      * @var string
      */
-    const DB_PASSWORD = '';
+    public const DB_PASSWORD = '';
 
     /**
      * Show or hide error messages on screen
      * @var boolean
      */
-    const SHOW_ERRORS = true;
+    public const SHOW_ERRORS = true;
+    /**
+     * Secret key for hashing
+     * @var boolean
+     */
+    public const SECRET_KEY = 'dFqSEJZA2O1tVAFhS4ZkEavgqR7VH9MC';
 }
