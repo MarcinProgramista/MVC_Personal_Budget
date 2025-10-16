@@ -43,4 +43,13 @@ class Config
      * @var boolean
      */
     public const SECRET_KEY = '';
+
+    /**
+     * Mailgun domian
+     */
+    public const MAILGUN_DOMAIN = "";
+    /**
+     * Mailgun sercet key
+     */
+    public const MAILGUN_API_KEY = "";
 }
