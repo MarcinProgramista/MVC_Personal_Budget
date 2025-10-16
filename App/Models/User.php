@@ -18,6 +18,8 @@ class User extends \Core\Model
     public string $password;
     public string $password_confirmation;
     public string $password_hash;
+    public int $expiry_timestamp;
+    public string $remember_token;
 
     public array $errors = [];
 
@@ -183,13 +185,14 @@ class User extends \Core\Model
     {
         $token = new Token();
         $hashed_token = $token->getHash();
-        $expiry_timestamp = time() + 60 * 60 * 24 * 30;
+        $this->remember_token = $token->getValue();
+        $this->expiry_timestamp = time() + 60 * 60 * 24 * 30;
         $sql = 'INSERT INTO remembered_logins(token_hash, user_id, expires_at) VALUES (:token_hash, :user_id, :expires_at)';
         $db = static::getDB();
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':token_hash', $hashed_token, PDO::PARAM_STR);
         $stmt->bindValue(':user_id', $this->id, PDO::PARAM_INT);
-        $stmt->bindValue(':expires_at', date('Y-m-d H:i:s', $expiry_timestamp), PDO::PARAM_STR);
+        $stmt->bindValue(':expires_at', date('Y-m-d H:i:s', $this->expiry_timestamp), PDO::PARAM_STR);
 
         return $stmt->execute();
 
