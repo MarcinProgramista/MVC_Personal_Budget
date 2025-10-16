@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\User;
 use Core\View;
 
 /**
@@ -17,5 +18,16 @@ class Password extends \Core\Controller
     public function forgotAction()
     {
         View::renderTemplate('Password/forgot.html');
+    }
+
+    /**
+     * Send the password rest link to the supplied email
+     *
+     * @return void
+     */
+    public function requestResetAction()
+    {
+        User::sendPasswordReset($_POST['email']);
+        View::renderTemplate('Password/reset_requested.html');
     }
 }
