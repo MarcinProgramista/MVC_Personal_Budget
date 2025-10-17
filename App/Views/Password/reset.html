@@ -103,13 +103,14 @@
                 {% endif %}
             </div>
 
-            <form method="post" class="registration-form text-warning bg-dark" id="formPassword">
+            <form method="post" action="/password/reset-password" class="registration-form text-warning bg-dark"
+                id="formPassword">
 
                 <h1 class="mb-4 text-center p-4">Reset password</h1>
-
+                <input type="hidden" name="token" value="{{ token }}" />
                 <!-- Pole hasła -->
-                <div class="form-group" style="padding: 10px;">
-                    <label for="inputPassword"><i class="fas fa-key"></i></label>
+                <div class="form-group text-danger" style="padding: 10px;">
+                    <label class="text-warning" for="inputPassword"><i class="fas fa-key"></i></label>
                     <input type="password" class="form-control p-2 w-100" id="inputPassword" name="password"
                         placeholder="Password" required>
                 </div>
