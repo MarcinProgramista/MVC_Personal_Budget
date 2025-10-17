@@ -20,6 +20,7 @@ class User extends \Core\Model
     public string $password;
     public string $password_confirmation;
     public string $password_hash;
+    public string $hashed_token;
     public int $expiry_timestamp;
     public string $remember_token;
     public ?string $password_reset_hash = '';
@@ -273,5 +274,36 @@ class User extends \Core\Model
         $html = View::getTemplate('Password/reset_email.html', ['url' => $url]);
 
         Mail::send($this->email, 'Password reset', $text, $html);
+    }
+
+    /**
+     * Find a user model by password reset token and expiry
+     *
+     * @param string $token The password reset token
+     *
+     * @return mixed User object if found and token valid, null otherwise
+     */
+    public static function findByPasswordReset($token)
+    {
+        $token = new Token($token);
+        $hashed_token = $token->getHash();
+
+        $sql = 'SELECT * FROM users
+                WHERE password_reset_hash = :token_hash';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':token_hash', $hashed_token, PDO::PARAM_STR);
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $stmt->execute();
+
+        $user = $stmt->fetch();
+
+        if ($user) {
+            if (strtotime($user->password_reset_expires_at) > time()) {
+                return $user;
+            }
+        }
     }
 }
