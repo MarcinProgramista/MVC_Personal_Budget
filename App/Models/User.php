@@ -26,9 +26,10 @@ class User extends \Core\Model
     public ?string $password_reset_hash = '';
     public ?string $password_reset_expires_at = null;
     public ?string $password_reset_token = null;
-    public string $activation_token;
-    public string $activation_hash;
+    public ?string $activation_hash = null;
+    public ?string $activation_token = null;
     public bool $is_active;
+
     public array $errors = [];
 
     /**
@@ -362,5 +363,27 @@ class User extends \Core\Model
         $html = View::getTemplate('Signup/activation_email.html', ['url' => $url]);
 
         Mail::send($this->email, 'Account Activation', $text, $html);
+    }
+
+    /**
+     * Activate the user account with the specified activation token
+     *
+     * @param string $value Activation token from the URL
+     *
+     * @return void
+     */
+    public static function activate($value)
+    {
+        $token = new Token($value);
+        $hashed_token = $token->getHash();
+        $sql = 'UPDATE users
+                SET is_active = 1,
+                    activation_hash = null
+                WHERE activation_hash = :hashed_token';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':hashed_token', $hashed_token, PDO::PARAM_STR);
+
+        $stmt->execute();
     }
 }
