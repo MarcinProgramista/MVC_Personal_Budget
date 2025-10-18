@@ -16,36 +16,87 @@
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-    <section class="p-1 bg-dark">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
 
-            <div class="row ">
-                <!-- Lewa kolumna: nagłówek -->
-                <div class="col-md-6 text-start">
-                    <h2 class="text-uppercase"><span class="text-warning"><i
-                                class="fas fa-wallet pr-2"></i>Personal</span>
-                        <span class="text-white">Budget</span>
-                    </h2>
-                </div>
+            <!-- Lewa strona: logo -->
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="text-warning me-2"><i class="fas fa-wallet"></i></span>
+                <span class="d-none d-lg-inline text-uppercase">
+                    <span class="text-warning">Personal</span> <span class="text-white">Budget</span>
+                </span>
+                <span class="d-lg-none text-white">Personal Budget</span>
+            </a>
 
-                <!-- Prawa kolumna: przyciski -->
-                <div class="col-md-6 text-end">
+            <!-- Toggler (hamburger) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Zawartość nawigacji (środek + prawa strona) -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+
+                {# ŚRODKOWA SEKCJA: wyświetlana tylko dla zalogowanych #}
+                {% if current_user %}
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/incomes/index">
+                            <i class="fas fa-money-bill-wave me-1"></i> Add income
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/expenses/index">
+                            <i class="fas fa-shopping-basket me-1"></i> Add expense
+                        </a>
+                    </li>
+
+                    {% if balance %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-calendar-alt me-1"></i> Choose balance period
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/balances/index">Current month</a></li>
+                            <li><a class="dropdown-item" href="/balances/show-last-month">Last month</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal">Choose period</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/balances/index">
+                            <i class="fas fa-chart-pie me-1"></i> Balance overview
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/profile/show">
+                            <i class="fas fa-cog me-1"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
+
+                {# PRAWA STRONA: logowanie / wylogowanie (zawsze po prawej) #}
+                <div class="d-flex ms-lg-auto align-items-center">
                     {% if current_user %}
-                    <span class="text-white">Welcome,
-                        {{ session.user_name|capitalize|e}}
-                    </span>
-                    <a href="/logout" class="btn btn-outline-light ms-2">Log out</a>
-
+                    <span class="text-white me-3">Welcome, {{ session.user_name|capitalize|e }}</span>
+                    <a href="/logout" class="btn btn-outline-light">Log out</a>
                     {% else %}
                     <a href="/login" class="btn btn-outline-warning me-2">Log in</a>
                     <a href="/signup/new" class="btn btn-warning">Sign up</a>
                     {% endif %}
                 </div>
+
             </div>
         </div>
-    </section>
-    {% for message in flash_messages %}
-    <div class="container">
+    </nav>
+
+    {% for message in flash_messages %} <div class="container">
         <div class="row pt-3">
             <div class="col-12 text-center mx-auto  alert alert-{{ message.type }}">
                 {{ message.body}}
