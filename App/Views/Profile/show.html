@@ -16,6 +16,12 @@
         <!-- PRAWA KOLUMNA Z FORMULARZEM -->
         <div class="col-md-5">
             <h1 class="mb-4 text-center p-4">Profile</h1>
+            <dl>
+                <dt>Name</dt>
+                <dd>{{ user.name|capitalize|e }}</dd>
+                <dt>email</dt>
+                <dd>{{ user.email }}</dd>
+            </dl>
         </div>
     </div>
 </div>
