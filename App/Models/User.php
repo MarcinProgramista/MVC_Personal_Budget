@@ -394,18 +394,11 @@ class User extends \Core\Model
         $this->name = $data['name'];
         $this->email = $data['email'];
 
-        $this->id = $data['id'];
         if ($data['password'] !== '') {
             $this->password = $data['password'];
         }
-        $_SESSION['user_name'] = $this->name;
-        //Wyświetlenie danych dla debugowania
-        echo '<pre>';
-        echo "ID: $this->id\n";
-        echo "Name:$this->name\n";
-        echo "Email: $this->email\n";
-        echo "Passdword: $this->password\n";
-        echo '</pre>';
+
+
 
         $this->validate();
 

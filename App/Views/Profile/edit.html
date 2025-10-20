@@ -34,7 +34,6 @@
                     }
                 },
                 password: {
-                    required: true,
                     minlength: 6,
                     validPassword: true
                 }
@@ -121,7 +120,8 @@
                 {% endif %}
             </div>
 
-            <form method="post" action="/signup/create" class="registration-form text-warning bg-dark" id="formProfile">
+            <form method="post" action="/profile/update" class="registration-form text-warning bg-dark"
+                id="formProfile">
 
                 <h1 class="mb-4 text-center p-4">Profile</h1>
 
@@ -141,7 +141,8 @@
                 <div class="form-group" style="padding: 10px;">
                     <label for="inputPassword"><i class="fas fa-key"></i></label>
                     <input type="password" class="form-control p-2 w-100" id="inputPassword" name="password"
-                        placeholder="Password" required>
+                        placeholder="Password" aria-describedby="helpBlock">
+                    <span id="helpBlock">Leave blank to keep current password</span>
                 </div>
 
                 <div class="text-center">
