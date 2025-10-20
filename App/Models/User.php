@@ -98,18 +98,20 @@ class User extends \Core\Model
         if (static::emailExists($this->email, $this->id ?? null)) {
             $this->errors[] = 'email already taken';
         }
-
         // Password
-        if (strlen($this->password) < 6) {
-            $this->errors[] = 'Please enter at least 6 characters for the password';
-        }
+        if (isset($_POST['password']) && $_POST['password'] !== '') {
 
-        if (preg_match('/.*[a-z]+.*/i', $this->password) == 0) {
-            $this->errors[] = 'Password needs at least one letter';
-        }
+            if (strlen($this->password) < 6) {
+                $this->errors[] = 'Please enter at least 6 characters for the password';
+            }
 
-        if (preg_match('/.*\d+.*/i', $this->password) == 0) {
-            $this->errors[] = 'Password needs at least one number';
+            if (preg_match('/.*[a-z]+.*/i', $this->password) == 0) {
+                $this->errors[] = 'Password needs at least one letter';
+            }
+
+            if (preg_match('/.*\d+.*/i', $this->password) == 0) {
+                $this->errors[] = 'Password needs at least one number';
+            }
         }
     }
 
@@ -386,4 +388,51 @@ class User extends \Core\Model
 
         $stmt->execute();
     }
+
+    public function updateProfile($data)
+    {
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+
+        $this->id = $data['id'];
+        if ($data['password'] !== '') {
+            $this->password = $data['password'];
+        }
+        $_SESSION['user_name'] = $this->name;
+        //Wyświetlenie danych dla debugowania
+        echo '<pre>';
+        echo "ID: $this->id\n";
+        echo "Name:$this->name\n";
+        echo "Email: $this->email\n";
+        echo "Passdword: $this->password\n";
+        echo '</pre>';
+
+        $this->validate();
+
+        if (empty($this->errors)) {
+            $sql = 'UPDATE users
+                    SET 
+                        name = :name,
+                        email = :email';
+            if (isset($data['password']) && $data['password'] !== '') {
+                $sql .= ',  password_hash = :password_hash';
+
+            }
+            $sql .= "\nWHERE id = :id";
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':name', $this->name, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+            if (isset($data['password']) && $data['password'] !== '') {
+                $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+                $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+
+            }
+
+            return $stmt->execute();
+        }
+        return false;
+    }
+
 }
