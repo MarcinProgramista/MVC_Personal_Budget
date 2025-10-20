@@ -38,7 +38,11 @@ class Profile extends Authenticated
 
         if ($user->updateProfile($_POST)) {
             Flash::addMessage('Changes saved');
-            $this->redirect('profile/show');
+            $this->redirect('/profile/show');
+        } else {
+            View::renderTemplate('Profile/edit.html', [
+            'user' =>  $user
+        ]);
         }
 
     }
