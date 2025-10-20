@@ -16,7 +16,7 @@
     // }, '<div style="color: red; padding-top: 10px;">Password must contain at least one letter and one number.</div>');
 
     $(document).ready(function () {
-
+        var userId = '{{ user.id }}'
         // Form validation
         $("#formProfile").validate({
             rules: {
@@ -24,7 +24,14 @@
                 email: {
                     required: true,
                     email: true,
-                    remote: '/account/validate-email'
+                    remote: {
+                        url: '/account/validate-email',
+                        data: {
+                            ignore_id: function () {
+                                return userId;
+                            }
+                        }
+                    }
                 },
                 password: {
                     required: true,
@@ -97,7 +104,7 @@
                 “Don’t tell me where your priorities are. Show me where you spend your money
                 and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
             </p>
-            <img src="/images/achievement-3404945_1920.jpg" alt="Motywacyjny obraz"
+            <img src="/images/settings.jpg" alt="Motywacyjny obraz"
                 class="img-fluid border border-warning rounded shadow-lg form-image">
         </div>
 
