@@ -28,6 +28,7 @@ class User extends \Core\Model
     public ?string $password_reset_token = null;
     public ?string $activation_hash = null;
     public ?string $activation_token = null;
+    public ?string $password_reset_expiry = null;
     public bool $is_active;
 
     public array $errors = [];
