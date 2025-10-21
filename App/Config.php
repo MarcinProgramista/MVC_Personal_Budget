@@ -31,7 +31,7 @@ class Config
      * Database password
      * @var string
      */
-    public const DB_PASSWORD = '';
+    public const DB_PASSWORD = '123456';
 
     /**
      * Show or hide error messages on screen
