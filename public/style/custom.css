@@ -109,3 +109,10 @@ form#formSignup .hideShowPassword-wrapper {
     width: 100% !important;
     height: 70px;
 }
+
+.fixed-btn-width {
+    width: 450px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+}

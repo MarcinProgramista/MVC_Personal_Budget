@@ -46,7 +46,37 @@ class Profile extends Authenticated
         }
 
     }
+public function getUserDataAction()
+{
+    try {
+        $name = $_GET['name'] ?? '';
+
+        header('Content-Type: application/json');
+
+        if (!$name) {
+            // brak nazwy
+            echo json_encode(['nameError' => 'Name is required']);
+            return;
+        }
 
 
+        $user = User::findByName($name); // <- metoda w modelu User
+
+        if ($user) {
+            echo json_encode([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email
+            ]);
+        } else {
+            echo json_encode(['error' => 'User not found']);
+        }
+
+    } catch (\Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
+        error_log($e->getMessage()); // <- zapisuje błąd w /opt/lampp/logs/error_log
+    }
+}
 
 }

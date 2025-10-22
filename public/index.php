@@ -36,6 +36,8 @@ $router->add('login', ['controller' => 'Login', 'action' => 'new']);
 $router->add('logout', ['controller' => 'Login', 'action' => 'destroy']);
 $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'action' => 'reset']);
 $router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'Signup', 'action' => 'activate']);
+$router->add('profile/get-user-data', ['controller' => 'Profile', 'action' => 'getUserData', 'method' => 'GET']);
+
 $router->add('profile/update', ['controller' => 'Profile', 'action' => 'update', 'method' => 'POST']);
 
 $router->add('{controller}/{action}');
