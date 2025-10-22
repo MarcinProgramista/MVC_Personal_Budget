@@ -75,10 +75,79 @@ class User extends \Core\Model
             $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
             $stmt->bindValue(':activation_hash', $hashed_token, PDO::PARAM_STR);
 
-            return $stmt->execute();
+            $stmt->execute();
+            $this->addIncomesCategoryAssignedToUser($this->name, $password_hash);
+            $this->addExpensesCategoryAssignedToUser($this->name, $password_hash);
+            $this->addPaymentMethodsAssignedToUser($this->name, $password_hash);
+
+            return true;
         }
         return false;
     }
+
+    /**
+     * Assigne incomes categories default to user
+     *
+     * @return void
+     */
+    protected function addIncomesCategoryAssignedToUser($name, $password_hash)
+    {
+        $sql = 'INSERT INTO incomes_category_assigned_to_users (user_id,name) 
+            SELECT users.id , incomes_category_default.name 
+            FROM users, incomes_category_default 
+            WHERE users.name = :name AND users.password_hash = :password_hash';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+
+        return $stmt->execute();
+    }
+
+    /**
+     * Assigne expense categories default to user
+     *
+     * @return void
+     */
+    protected function addExpensesCategoryAssignedToUser($name, $password_hash)
+    {
+        $sql = 'INSERT INTO expenses_category_assigned_to_users (user_id,name) 
+                  SELECT users.id ,expenses_category_default.name 
+                  FROM users , expenses_category_default 
+                  WHERE users.name = :name AND users.password_hash = :password_hash';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+
+        return $stmt->execute();
+    }
+
+    /**
+     * Assigne method payment default to user
+     *
+     * @return void
+     */
+    protected function addPaymentMethodsAssignedToUser($name, $password_hash)
+    {
+        $sql = 'INSERT INTO payment_methods_assigned_to_users (user_id,name) 
+              SELECT users.id ,payment_methods_default.name
+              FROM users, payment_methods_default 
+              WHERE users.name = :name AND users.password_hash = :password_hash';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
+
+        return $stmt->execute();
+    }
+
 
     /**
      * Validate current property values, adding valiation error messages to the errors array property test
@@ -149,6 +218,28 @@ class User extends \Core\Model
         $db = static::getDB();
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+
+    /**
+     * Find a user model by name address
+     *
+     * @param string $email email address to search for
+     *
+     * @return mixed User object if found, false otherwise
+     */
+    public static function findByName($name)
+    {
+        $sql = 'SELECT * FROM users WHERE name = :name';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
 
         $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
 
@@ -354,10 +445,10 @@ class User extends \Core\Model
     }
 
     /**
-    * Send password reset instructions in an email to the user
-    *
-    * @return void
-    */
+     * Send password reset instructions in an email to the user
+     *
+     * @return void
+     */
     public function sendActivationEmail()
     {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_token;
@@ -410,7 +501,6 @@ class User extends \Core\Model
                         email = :email';
             if (isset($data['password']) && $data['password'] !== '') {
                 $sql .= ',  password_hash = :password_hash';
-
             }
             $sql .= "\nWHERE id = :id";
             $db = static::getDB();
@@ -421,12 +511,10 @@ class User extends \Core\Model
             if (isset($data['password']) && $data['password'] !== '') {
                 $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
                 $stmt->bindValue(':password_hash', $password_hash, PDO::PARAM_STR);
-
             }
 
             return $stmt->execute();
         }
         return false;
     }
-
 }

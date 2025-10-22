@@ -6,15 +6,6 @@
 <script src="/js/hideShowPassword.min.js"></script>
 <script src="/js/app.js"></script>
 <script>
-    // // Custom validator for password
-    // $.validator.addMethod('validPassowrd', function (value, element) {
-    //     if (value !== '') {
-    //         if (value.match(/.*[a-z]+.*/i) == null) return false;
-    //         if (value.match(/.*\d+.*/i) == null) return false;
-    //     }
-    //     return true;
-    // }, '<div style="color: red; padding-top: 10px;">Password must contain at least one letter and one number.</div>');
-
     $(document).ready(function () {
         var userId = '{{ user.id }}'
         // Form validation
@@ -71,9 +62,11 @@
             }
         });
 
+
+
     });
 </script>
-
+<script src="/js/profile.js"></script>
 <style>
     .hideShowPassword-wrapper {
         position: relative !important;
@@ -150,6 +143,7 @@
                 </div>
 
             </form>
+            <div id="userData" class="mt-3"></div>
         </div>
     </div>
 </div>

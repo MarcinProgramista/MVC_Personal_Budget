@@ -4,14 +4,16 @@
 
 {% block body %}
 <div class="container my-5">
-    {% if user.errors is not empty %}
-    <p>Errors:</p>
-    <ul>
-        {% for error in user.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
+    {% if user.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for error in user.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
+
     <div class="row justify-content-center align-items-center g-3">
 
         <!-- LEWA KOLUMNA Z OBRAZEM -->
@@ -22,21 +24,60 @@
 
         <!-- PRAWA KOLUMNA Z DANYMI UŻYTKOWNIKA -->
         <div class="col-md-5">
-            <h1 class="mb-4 text-center p-4 text-warning">Profile</h1>
-            <dl class="text-white">
-                <dt>Name</dt>
-                <dd id="userName">{{ user.name|capitalize|e }}</dd>
-                <dt>Email</dt>
-                <dd id="userEmail">{{ user.email|e }}</dd>
-            </dl>
-            <div class="text-center mt-4">
-                <a href="/profile/edit"> <button class="btn btn-warning">Edit
-                        profile</button></a>
+
+            <!-- 🔘 Przycisk pokazujący dane -->
+            <div class="text-center mb-3">
+                🔘 <button id="toggleProfileBtn" class="btn btn-dark text-warning" style="width: 95%;">
+                    <i class="fas fa-user me-1"></i> Show profile details
+                </button>
             </div>
+
+            <!-- 🔽 Sekcja z płynnym pojawianiem -->
+            <div id="profileData" class="fade-section">
+                <h1 class="mb-4 text-center p-4 text-warning">Profile</h1>
+                <dl class="text-dark">
+                    <dt>Name</dt>
+                    <dd id="userName">{{ user.name|capitalize|e }}</dd>
+                    <dt>Email</dt>
+                    <dd id="userEmail">{{ user.email|e }}</dd>
+                </dl>
+                <div class="text-center mt-4">
+                    <a href="/profile/edit">
+                        <button class="btn btn-warning icon-btn">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
+<!-- ✨ Styl animacji -->
+<style>
+    .fade-section {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.6s ease;
+    }
 
+    .fade-section.show {
+        opacity: 1;
+        max-height: 500px;
+        /* wystarczająco duża wartość, aby zmieścić treść */
+    }
 
+    .icon-btn {
+        width: 45px;
+        height: 45px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+</style>
+
+<script src="/js/profile.js"></script>
 {% endblock %}
