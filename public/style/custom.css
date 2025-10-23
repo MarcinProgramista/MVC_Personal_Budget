@@ -116,3 +116,127 @@ form#formSignup .hideShowPassword-wrapper {
     letter-spacing: 0.5px;
     border-radius: 10px;
 }
+
+/* Płynne rozwijanie sekcji */
+.fade-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.fade-section.show {
+    opacity: 1;
+    max-height: 1000px;
+    /* wystarczająco dużo */
+    transform: scaleY(1);
+}
+
+.fade-section-list {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Styl listy */
+.custom-list {
+    margin-top: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.custom-list .list-group-item {
+    background-color: transparent;
+    color: grey;
+    border: 1px solid #212529;
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-list .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.custom-list .list-group-item i {
+    color: grey;
+}
+
+/* Płynne rozwijanie sekcji */
+.fade-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.fade-section.show {
+    opacity: 1;
+    max-height: 1000px;
+    /* wystarczająco dużo */
+    transform: scaleY(1);
+}
+
+.fade-section-list {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Styl listy */
+.custom-list {
+    margin-top: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.custom-list .list-group-item {
+    background-color: transparent;
+    color: grey;
+    border: 1px solid #212529;
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-list .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.custom-list .list-group-item i {
+    color: grey;
+}

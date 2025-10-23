@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Profile{% endblock %}
-
+{% block extra_styles %}
+<link rel="stylesheet" href="/style/custom.css">
+{% endblock %}
 {% block body %}
 <div class="container my-5">
     {% if user.errors %}
@@ -14,10 +16,12 @@
     </div>
     {% endif %}
 
-    <div class="row justify-content-center align-items-center g-3">
+    <div class="row justify-content-center align-items-center" style="column-gap:50px;">
+
 
         <!-- LEWA KOLUMNA Z OBRAZEM -->
         <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
+            <h1 class="mb-4 text-center p-4 text-dark">Settings</h1>
             <img src="/images/settings.jpg" alt="Profile"
                 class="img-fluid border border-warning rounded shadow-lg form-image">
         </div>
@@ -25,59 +29,114 @@
         <!-- PRAWA KOLUMNA Z DANYMI UŻYTKOWNIKA -->
         <div class="col-md-5">
 
-            <!-- 🔘 Przycisk pokazujący dane -->
-            <div class="text-center mb-3">
-                🔘 <button id="toggleProfileBtn" class="btn btn-dark text-warning" style="width: 95%;">
-                    <i class="fas fa-user me-1"></i> Show profile details
-                </button>
-            </div>
+            <!-- 🔘 Przycisk pokazujący dane użytkownika -->
+            <div class="border border-dark rounded shadow-lg mb-3">
+                <div class="d-flex align-items-center" style="width: 100%; column-gap: 10px;">
+                    <button id="toggleProfileBtn"
+                        class="btn btn-dark text-warning d-flex justify-content-between align-items-center flex-grow-1"
+                        style="width: 100%;">
+                        <!-- Lewa strona -->
+                        <span><i class="fas fa-user me-1"></i> User</span>
+                        <!-- Prawa strona -->
+                        <span id="toggleProfileArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+                    </button>
 
-            <!-- 🔽 Sekcja z płynnym pojawianiem -->
-            <div id="profileData" class="fade-section">
-                <h1 class="mb-4 text-center p-4 text-warning">Profile</h1>
-                <dl class="text-dark">
-                    <dt>Name</dt>
-                    <dd id="userName">{{ user.name|capitalize|e }}</dd>
-                    <dt>Email</dt>
-                    <dd id="userEmail">{{ user.email|e }}</dd>
-                </dl>
-                <div class="text-center mt-4">
-                    <a href="/profile/edit">
-                        <button class="btn btn-warning icon-btn">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    </a>
+                </div>
+                <!-- 🔽 Sekcja z profilem -->
+                <div id="profileData" class="fade-section hidden" style="width: 100%;">
+
+                    <dl class="text-dark p-2">
+                        <dt>Name</dt>
+                        <dd id="userName">{{ user.name|capitalize|e }}</dd>
+                        <dt>Email</dt>
+                        <dd id="userEmail">{{ user.email|e }}</dd>
+                    </dl>
+                    <div class="text-center">
+                        <a href="/profile/edit">
+                            <button class="btn btn-warning icon-btn">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
 
+
+            <!-- 🔘 Przycisk pokazujący listę expenses-->
+            <div class="border border-dark rounded shadow-lg mb-3">
+                <div class="d-flex align-items-center " style="width: 100%; column-gap: 10px;">
+                    <button id="toggleListBtn"
+                        class="btn btn-dark text-warning d-flex justify-content-between align-items-center flex-grow-1">
+                        <span><i class="fas fa-list me-1"></i> Expense categories</span>
+                        <span id="toggleArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+                    </button>
+                </div>
+                <!-- 🔽 Sekcja z listą -->
+                <div id="expenseListContainer" class="fade-section hidden d-flex justify-content-center"
+                    style="width: 100%;">
+
+                    <ul id="expenseCategoriesList" class="list-group custom-list " style="width: 95%; margin: 1 auto;">
+                        {% for expenseCategory in expenseCategories %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center  text-dark">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold">{{ expenseCategory.name }}</span>
+                                {% if expenseCategory.cash_limit %}
+                                <small class="text-muted">Limited: {{ expenseCategory.cash_limit }}PLN</small>
+                                {% endif %}
+                            </div>
+
+                            <span>
+                                <i class="fas fa-pencil-alt text-success me-2"></i>
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </span>
+                        </li>
+
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <!-- 🔘 Przycisk pokazujący listę incomes-->
+            <div class="border border-dark rounded shadow-lg mb-3">
+                <div class="d-flex align-items-center " style="width: 100%; column-gap: 10px;">
+                    <button id="toggleListIncomesBtn"
+                        class="btn btn-dark text-warning d-flex justify-content-between align-items-center flex-grow-1">
+                        <span><i class="fas fa-list me-1"></i> Income categories</span>
+                        <span id="toggleIncomesArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+                    </button>
+                </div>
+                <!-- 🔽 Sekcja z listą -->
+                <div id="incomeListContainer" class="fade-section hidden d-flex align-items-center  d-flex flex-column"
+                    style="width: 100%;">
+
+                    <ul id="incomeCategoriesList" class="list-group custom-list " style="width: 95%; margin: 1 auto; ">
+                        {% for incomeCategory in incomeCategories %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
+                            {{ incomeCategory.name }}
+
+                            <span>
+                                <i class="fas fa-pencil-alt text-success me-2"></i>
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </span>
+                        </li>
+
+                        {% endfor %}
+                    </ul>
+                    <div class="d-flex align-items-center" style="width: 95%;">
+                        <button
+                            class="btn btn-dark text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1">
+                            <!-- Ikona po lewej -->
+                            <span class="position-absolute start-0 ms-3">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <!-- Tekst na środku -->
+                            <span>Add category</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- ✨ Styl animacji -->
-<style>
-    .fade-section {
-        opacity: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: all 0.6s ease;
-    }
-
-    .fade-section.show {
-        opacity: 1;
-        max-height: 500px;
-        /* wystarczająco duża wartość, aby zmieścić treść */
-    }
-
-    .icon-btn {
-        width: 45px;
-        height: 45px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-</style>
 
 <script src="/js/profile.js"></script>
 {% endblock %}
