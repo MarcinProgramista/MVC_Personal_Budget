@@ -73,7 +73,7 @@
                     </button>
                 </div>
                 <!-- 🔽 Sekcja z listą -->
-                <div id="expenseListContainer" class="fade-section hidden d-flex justify-content-center"
+                <div id="expenseListContainer" class="fade-section hidden d-flex align-items-center  d-flex flex-column"
                     style="width: 100%;">
 
                     <ul id="expenseCategoriesList" class="list-group custom-list " style="width: 95%; margin: 1 auto;">
@@ -94,6 +94,17 @@
 
                         {% endfor %}
                     </ul>
+                    <div class="d-flex align-items-center" style="width: 95%;">
+                        <button
+                            class="btn btn-dark text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1">
+                            <!-- Ikona po lewej -->
+                            <span class="position-absolute start-0 ms-3">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <!-- Tekst na środku -->
+                            <span>Add category</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <!-- 🔘 Przycisk pokazujący listę incomes-->
