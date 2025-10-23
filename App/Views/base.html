@@ -42,20 +42,20 @@
                 {% if current_user %}
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/incomes/index">
+                        <a class="nav-link text-warning" href="/incomes/index">
                             <i class="fas fa-money-bill-wave me-1"></i> Add income
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/expenses/index">
+                        <a class="nav-link text-warning" href="/expenses/index">
                             <i class="fas fa-shopping-basket me-1"></i> Add expense
                         </a>
                     </li>
 
                     {% if balance %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+                        <a class="nav-link dropdown-toggle text-warning" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-calendar-alt me-1"></i> Choose balance period
                         </a>
@@ -68,14 +68,14 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/balances/index">
+                        <a class="nav-link text-warning" href="/balances/index">
                             <i class="fas fa-chart-pie me-1"></i> Balance overview
                         </a>
                     </li>
                     {% endif %}
 
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/profile/show">
+                        <a class="nav-link text-warning" href="/profile/show">
                             <i class="fas fa-cog me-1"></i> Settings
                         </a>
                     </li>

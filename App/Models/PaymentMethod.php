@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\User;
+
+use PDO;
+
+/**
+ * Example user model
+ *
+ * PHP version 7.0
+ */
+class PaymentMethod extends \Core\Model
+{
+    public int $id;
+    public string $name;
+    public int $user_id;
+    public string $cash_limit;
+    public int $is_limit_active;
+
+    /**
+     * Class constructor
+     *
+     * @param array $data  Initial property values
+     *
+     * @return void
+     */
+    public function __construct($data = [])
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        };
+    }
+
+    /**
+     * Get all Payment methods assigned to user as an associative array
+     *
+     * @return array
+     */
+    public static function getAllPaymentMethodAssignedToUser($id)
+    {
+        $sql = 'SELECT id,name FROM payment_methods_assigned_to_users WHERE user_id = :id';
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
+}
