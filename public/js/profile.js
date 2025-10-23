@@ -40,23 +40,52 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleProfileBtn = document.getElementById("toggleProfileBtn");
+    const profileData = document.getElementById("profileData");
+    const toggleProfileArrow = document.getElementById("toggleProfileArrow");
+
+    if (toggleProfileBtn && profileData && toggleProfileArrow) {
+        toggleProfileBtn.addEventListener("click", function () {
+            profileData.classList.toggle("show");
+            toggleProfileArrow.innerHTML = profileData.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
+});
+
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleBtn = document.getElementById("toggleProfileBtn");
-    const profileData = document.getElementById("profileData");
+    const toggleListBtn = document.getElementById("toggleListBtn");
+    const expenseListContainer = document.getElementById("expenseListContainer");
+    const toggleArrow = document.getElementById("toggleArrow");
 
-    toggleBtn.addEventListener("click", function () {
-        if (profileData.classList.contains("show")) {
-            profileData.classList.remove("show");
-            toggleBtn.innerHTML = '<i class="fas fa-user me-1"></i> Show profile details';
-        } else {
-            profileData.classList.add("show");
-            toggleBtn.innerHTML = '<i class="fas fa-user me-1"></i> Hide profile details';
-        }
-    });
+    if (toggleListBtn && expenseListContainer) {
+        toggleListBtn.addEventListener("click", function () {
+            expenseListContainer.classList.toggle("show");
+            // obrót strzałki w zależności od stanu
+            toggleArrow.innerHTML = expenseListContainer.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
 
-    // Ustawienie początkowego stanu z ikoną
-    toggleBtn.innerHTML = '<i class="fas fa-user me-1"></i> Show profile details';
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleListIncomesBtn = document.getElementById("toggleListIncomesBtn");
+    const incomeListContainer = document.getElementById("incomeListContainer");
+    const toggleArrow = document.getElementById("toggleIncomesArrow"); // <-- unikalne
+
+    if (toggleListIncomesBtn && incomeListContainer && toggleArrow) {
+        toggleListIncomesBtn.addEventListener("click", function () {
+            incomeListContainer.classList.toggle("show");
+            toggleArrow.innerHTML = incomeListContainer.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
 });
 
