@@ -89,3 +89,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleListPaymentMethodBtn = document.getElementById("toggleListPaymentMethodBtn");
+    const paymentMethodListContainer = document.getElementById("paymentMethodListContainer");
+    const togglePaymentArrow = document.getElementById("togglePaymentArrow");
+
+    if (toggleListPaymentMethodBtn && paymentMethodListContainer && togglePaymentArrow) {
+        toggleListPaymentMethodBtn.addEventListener("click", function () {
+
+
+            const isVisible = paymentMethodListContainer.classList.toggle("show");
+            paymentMethodListContainer.classList.toggle("hidden", !isVisible);
+
+            togglePaymentArrow.innerHTML = isVisible
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    } else {
+        console.warn("❌ Nie znaleziono któregoś elementu!");
+    }
+});

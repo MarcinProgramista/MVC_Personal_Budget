@@ -8,6 +8,7 @@ use Core\View;
 use App\Models\User;
 use App\Models\ExpenseCategory;
 use App\Models\IncomeCategory;
+use App\Models\PaymentMethod;
 
 class Profile extends Authenticated
 {
@@ -18,12 +19,14 @@ class Profile extends Authenticated
         $user = User::findByID($user->id);
         $expenseCategories = ExpenseCategory::getAllExpenseAssignedToUser($user->id);
         $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user->id);
+        $paymentMethod = PaymentMethod::getAllPaymentMethodAssignedToUser($user->id);
 
-        //var_dump($expenseCategories);
+
         View::renderTemplate('Profile/show.html', [
             'user' => $user,
             'expenseCategories' => $expenseCategories,
-            'incomeCategories' => $incomeCategories
+            'incomeCategories' => $incomeCategories,
+            'paymentMethods' => $paymentMethod,
         ]);
     }
 

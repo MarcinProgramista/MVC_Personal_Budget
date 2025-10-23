@@ -240,3 +240,11 @@ form#formSignup .hideShowPassword-wrapper {
 .custom-list .list-group-item i {
     color: grey;
 }
+
+.hidden {
+    display: none;
+}
+
+.fade-section.show {
+    display: flex !important;
+}
