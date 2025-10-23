@@ -94,17 +94,19 @@
 
                         {% endfor %}
                     </ul>
+                    <!-- 🔘 Sekcja z przyciskiem Add category -->
                     <div class="d-flex align-items-center" style="width: 95%;">
-                        <button
-                            class="btn btn-dark text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1">
-                            <!-- Ikona po lewej -->
+                        <button id="addExpenseCategoryBtn"
+                            class="btn btn-dark text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1"
+                            data-bs-toggle="modal" data-bs-target="#addExpenseCategoryModal">
                             <span class="position-absolute start-0 ms-3">
                                 <i class="fas fa-plus"></i>
                             </span>
-                            <!-- Tekst na środku -->
                             <span>Add category</span>
                         </button>
                     </div>
+
+
                 </div>
             </div>
             <!-- 🔘 Przycisk pokazujący listę incomes-->
@@ -187,5 +189,8 @@
     </div>
 </div>
 
+
 <script src="/js/profile.js"></script>
+
+{% include "Profile/add_expense_category_modal.html" %}
 {% endblock %}

@@ -1,0 +1,29 @@
+<div class="modal fade" id="addExpenseCategoryModal" tabindex="-1" aria-labelledby="addExpenseCategoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: wheat;">
+            <form id="addExpenseCategoryForm">
+                <div class="modal-header bg-dark text-warning">
+                    <h5 class="modal-title" id="addExpenseCategoryModalLabel">Add Expense Category</h5>
+                    <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="inputName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="inputName" name="name" required>
+                        <div class="invalid-feedback" id="categoryError">Please enter a category name.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="inputCashLimit" class="form-label">Cash Limit (optional)</label>
+                        <input type="number" class="form-control" id="inputCashLimit" name="cash_limit" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer bg-dark">
+                    <button type="submit" class="btn btn-warning">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
