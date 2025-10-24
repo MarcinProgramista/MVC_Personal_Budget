@@ -183,3 +183,141 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteModalEl = document.getElementById('deleteExpenseCategoryModal');
+    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
+    let selectedCategoryId = null;
+
+    // Delegacja zdarzeń: kliknięcia na ikony kosza
+    document.getElementById('expenseCategoriesList')?.addEventListener('click', (e) => {
+        const icon = e.target.closest('.delete-expense-category');
+        if (!icon) return;
+
+        const id = icon.dataset.id;
+        const name = icon.dataset.name;
+
+        selectedCategoryId = id;
+        document.getElementById('deleteCategoryName').textContent = `"${name}"`;
+        document.getElementById('deleteCategoryId').value = id;
+
+        if (deleteModal) deleteModal.show();
+    });
+
+    // Obsługa przycisku potwierdzenia usunięcia
+    document.getElementById('confirmDeleteCategoryBtn')?.addEventListener('click', async () => {
+        const id = selectedCategoryId;
+        if (!id) return;
+
+        try {
+            const res = await fetch('/category-expense/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Znajdujemy ikonę kosza po id i usuwamy cały li
+                const li = document.querySelector(`.delete-expense-category[data-id="${id}"]`)?.closest('li');
+                if (li) li.remove();
+                deleteModal.hide();
+            } else {
+                alert(data.error || 'Something went wrong.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error.');
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("🧩 Edit Expense Category JS loaded");
+
+    const editModalEl = document.getElementById('editExpenseCategoryModal');
+    const editModal = new bootstrap.Modal(editModalEl);
+
+    // 🔹 Obsługa kliknięcia na ikonę edycji
+    document.querySelectorAll('.edit-expense-category').forEach(icon => {
+        icon.addEventListener('click', () => {
+            const id = icon.dataset.id;
+            const name = icon.dataset.name;
+            const cashLimit = icon.dataset.cash_limit || '';
+
+            console.log(`📝 Editing category: ID=${id}, Name=${name}, Limit=${cashLimit}`);
+
+            // Ustaw dane w modalu
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = name;
+            document.getElementById('editCategoryLimit').value = cashLimit;
+
+            // Pokaż modal
+            editModal.show();
+        });
+    });
+
+    // 🔹 Obsługa przycisku "Save Changes"
+    document.getElementById('saveEditCategoryBtn')?.addEventListener('click', async () => {
+        const id = document.getElementById('editCategoryId').value.trim();
+        const name = document.getElementById('editCategoryName').value.trim();
+        const cashLimit = document.getElementById('editCategoryLimit').value.trim();
+
+        if (!id || !name) {
+            alert("Category name cannot be empty.");
+            return;
+        }
+
+        try {
+            const res = await fetch('/category-expense/edit-category', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id,
+                    name,
+                    cash_limit: cashLimit
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // 🔹 Aktualizuj element listy bez przeładowania
+                const li = document.querySelector(`.edit-expense-category[data-id="${id}"]`).closest('li');
+                if (li) {
+                    li.querySelector('.fw-bold').textContent = name;
+
+                    const limitElem = li.querySelector('small.text-muted');
+                    if (cashLimit) {
+                        if (limitElem) {
+                            limitElem.textContent = `Limited: ${cashLimit} PLN`;
+                        } else {
+                            const small = document.createElement('small');
+                            small.className = 'text-muted';
+                            small.textContent = `Limited: ${cashLimit} PLN`;
+                            li.querySelector('.d-flex.flex-column').appendChild(small);
+                        }
+                    } else if (limitElem) {
+                        limitElem.remove();
+                    }
+
+                    // 🔹 zaktualizuj dataset w ikonie
+                    const icon = li.querySelector('.edit-expense-category');
+                    icon.dataset.name = name;
+                    icon.dataset.cash_limit = cashLimit;
+                }
+
+                // ✅ Zamknij modal
+                editModal.hide();
+            } else {
+                alert(data.message || 'Update failed.');
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert('Server error.');
+        }
+    });
+});
+

@@ -86,4 +86,46 @@ class Profile extends Authenticated
             error_log($e->getMessage()); // <- zapisuje błąd w /opt/lampp/logs/error_log
         }
     }
+
+    /**
+     * Edit an existing expense category (AJAX)
+     */
+    public function editCategoryAction()
+    {
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $id = $data['id'] ?? null;
+        $name = trim($data['name'] ?? '');
+        $cashLimit = $data['cash_limit'] ?? null;
+
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+            return;
+        }
+
+        if (!$id || $name === '') {
+            echo json_encode(['success' => false, 'message' => 'Invalid category data.']);
+            return;
+        }
+
+        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit);
+
+        if ($updated) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Category updated successfully.',
+                'category' => [
+                    'id' => $id,
+                    'name' => $name,
+                    'cash_limit' => $cashLimit,
+                    'is_limit_active' => $cashLimit ? 1 : 0
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
+        }
+    }
 }

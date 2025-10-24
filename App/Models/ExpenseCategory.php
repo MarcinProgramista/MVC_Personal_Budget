@@ -99,4 +99,45 @@ class ExpenseCategory extends \Core\Model
         }
         return false;
     }
+
+    /**
+     * Delete an expense category by ID for a specific user
+     *
+     * @param int $id Category ID
+     * @param int $userId User ID
+     * @return bool True on success, false on failure
+     */
+    public static function deleteCategoryById(int $id, int $userId): bool
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare(
+            'DELETE FROM expenses_category_assigned_to_users WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+    /**
+     * Update expense category by ID for a specific user
+     */
+    public static function updateCategory(int $userId, int $id, string $name, ?string $cashLimit): bool
+    {
+        $db = static::getDB();
+
+        $stmt = $db->prepare(
+            'UPDATE expenses_category_assigned_to_users 
+         SET name = :name, cash_limit = :cash_limit, is_limit_active = :is_limit_active 
+         WHERE id = :id AND user_id = :user_id'
+        );
+
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':cash_limit', $cashLimit ?: null, PDO::PARAM_STR);
+        $stmt->bindValue(':is_limit_active', $cashLimit ? 1 : 0, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
