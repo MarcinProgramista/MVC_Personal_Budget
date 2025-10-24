@@ -76,24 +76,31 @@
                 <div id="expenseListContainer" class="fade-section hidden d-flex align-items-center  d-flex flex-column"
                     style="width: 100%;">
 
-                    <ul id="expenseCategoriesList" class="list-group custom-list " style="width: 95%; margin: 1 auto;">
+                    <ul id="expenseCategoriesList" class="list-group custom-list" style="width: 95%; margin: 1 auto;">
                         {% for expenseCategory in expenseCategories %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center  text-dark">
+                        <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
                             <div class="d-flex flex-column">
                                 <span class="fw-bold">{{ expenseCategory.name }}</span>
                                 {% if expenseCategory.cash_limit %}
-                                <small class="text-muted">Limited: {{ expenseCategory.cash_limit }}PLN</small>
+                                <small class="text-muted">Limited: {{ expenseCategory.cash_limit }} PLN</small>
                                 {% endif %}
                             </div>
 
                             <span>
-                                <i class="fas fa-pencil-alt text-success me-2"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
+                                <i class="fas fa-pencil-alt text-success me-2 edit-expense-category" role="button"
+                                    data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
+                                    data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"></i>
+
+
+                                <i class="fas fa-trash-alt text-danger delete-expense-category"
+                                    data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"></i>
                             </span>
                         </li>
-
                         {% endfor %}
                     </ul>
+
+
+
                     <!-- 🔘 Sekcja z przyciskiem Add category -->
                     <div class="d-flex align-items-center" style="width: 95%;">
                         <button id="addExpenseCategoryBtn"
@@ -193,4 +200,7 @@
 <script src="/js/profile.js"></script>
 
 {% include "Profile/add_expense_category_modal.html" %}
+{% include "Profile/delete_expense_category_modal.html" %}
+{% include "Profile/edit_expense_category_modal.html" %}
+
 {% endblock %}

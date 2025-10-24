@@ -17,7 +17,6 @@ class CategoryExpense extends Authenticated
         $name = trim($_POST['name'] ?? '');
         $cashLimit = $_POST['cash_limit'] ?? null;
 
-        // 🔹 Walidacja podstawowa
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
             return;
@@ -28,7 +27,6 @@ class CategoryExpense extends Authenticated
             return;
         }
 
-        // 🔹 Sprawdzenie, czy kategoria już istnieje dla użytkownika
         $existing = ExpenseCategory::existCategoryName($name, $userId);
 
         if ($existing && isset($existing->user_id) && $existing->user_id == $userId) {
@@ -36,7 +34,6 @@ class CategoryExpense extends Authenticated
             return;
         }
 
-        // 🔹 Próba dodania nowej kategorii
         $newId = ExpenseCategory::addCategory($userId, $name, $cashLimit);
 
         if ($newId) {
@@ -52,6 +49,78 @@ class CategoryExpense extends Authenticated
             ]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to add category.']);
+        }
+    }
+
+    /**
+     * Delete expense category (AJAX)
+     */
+    public function deleteAction()
+    {
+        header('Content-Type: application/json');
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $input = json_decode(file_get_contents('php://input'), true);
+        $id = $input['id'] ?? null;
+
+        if (!$userId) {
+            echo json_encode(['success' => false, 'error' => 'User not logged in.']);
+            return;
+        }
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
+            return;
+        }
+
+        $deleted = ExpenseCategory::deleteCategoryById((int)$id, $userId);
+
+        if ($deleted) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to delete category.']);
+        }
+    }
+
+    /**
+     * Edit an existing expense category (AJAX)
+     */
+    public function editCategoryAction()
+    {
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $id = $data['id'] ?? null;
+        $name = trim($data['name'] ?? '');
+        $cashLimit = $data['cash_limit'] ?? null;
+
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+            return;
+        }
+
+        if (!$id || $name === '') {
+            echo json_encode(['success' => false, 'message' => 'Invalid category data.']);
+            return;
+        }
+
+        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit);
+
+        if ($updated) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Category updated successfully.',
+                'category' => [
+                    'id' => $id,
+                    'name' => $name,
+                    'cash_limit' => $cashLimit,
+                    'is_limit_active' => $cashLimit ? 1 : 0
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
         }
     }
 }
