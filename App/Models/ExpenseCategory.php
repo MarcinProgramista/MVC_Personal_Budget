@@ -57,7 +57,7 @@ class ExpenseCategory extends \Core\Model
      *
      * @param string $email email address to search for
      *
-     * @return mixed User object if found, false otherwise
+     * @return mixed Category object if found, false otherwise
      */
     public static function existCategoryName($name, $userId)
     {
