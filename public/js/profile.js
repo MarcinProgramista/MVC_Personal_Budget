@@ -110,6 +110,78 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('addIncomeCategoryForm');
+    const inputName = document.getElementById('inputCategoryName');
+    const categoryError = document.getElementById('incomeCategoryError');
+
+    // ✅ jeśli formularz lub pole nie istnieje, zakończ
+    if (!form || !inputName || !categoryError) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        inputName.classList.remove('is-invalid');
+        categoryError.textContent = '';
+
+        const name = inputName.value.trim();
+
+        if (!name) {
+            inputName.classList.add('is-invalid');
+            categoryError.textContent = 'Category name is required.';
+            return;
+        }
+
+        try {
+            const res = await fetch('/category-income/add-income-category', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${encodeURIComponent(name)}`
+            });
+
+            const data = await res.json();
+            console.log('✅ Server response:', data);
+
+            if (data.success) {
+                // Sukces: można np. dodać kategorię do listy w UI i zamknąć modal
+                const modalEl = document.getElementById('addIncomeCategoryModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+
+                // Opcjonalnie: dodanie do listy kategorii dynamicznie
+                const list = document.getElementById('incomeCategoriesList');
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
+                li.innerHTML = `
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">${data.category.name}</span>
+                    </div>
+                    <span>
+                        <i class="fas fa-pencil-alt text-success me-2"></i>
+                        <i class="fas fa-trash-alt text-danger"></i>
+                    </span>
+                `;
+                list.appendChild(li);
+
+                // Reset formularza
+                form.reset();
+
+            } else {
+                // Wyświetlenie błędu walidacji z serwera
+                inputName.classList.add('is-invalid');
+                categoryError.textContent = data.message || 'Error occurred';
+            }
+
+        } catch (err) {
+            console.error(err);
+            inputName.classList.add('is-invalid');
+            categoryError.textContent = 'Network error.';
+        }
+    });
+
+});
+
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -234,10 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("🧩 Edit Expense Category JS loaded");
+
 
     const editModalEl = document.getElementById('editExpenseCategoryModal');
     const editModal = new bootstrap.Modal(editModalEl);
+
+    const formError = document.getElementById('editCategoryFormError') || createEditFormError();
 
     // 🔹 Obsługa kliknięcia na ikonę edycji
     document.querySelectorAll('.edit-expense-category').forEach(icon => {
@@ -247,6 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const cashLimit = icon.dataset.cash_limit || '';
 
             console.log(`📝 Editing category: ID=${id}, Name=${name}, Limit=${cashLimit}`);
+
+            // Reset komunikatu błędu
+            formError.textContent = '';
 
             // Ustaw dane w modalu
             document.getElementById('editCategoryId').value = id;
@@ -265,25 +342,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const cashLimit = document.getElementById('editCategoryLimit').value.trim();
 
         if (!id || !name) {
-            alert("Category name cannot be empty.");
+            formError.textContent = "Category name cannot be empty.";
             return;
+        } else {
+            formError.textContent = '';
         }
 
         try {
             const res = await fetch('/category-expense/edit-category', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id,
-                    name,
-                    cash_limit: cashLimit
-                })
+                body: JSON.stringify({ id, name, cash_limit: cashLimit })
             });
 
             const data = await res.json();
 
             if (data.success) {
-                // 🔹 Aktualizuj element listy bez przeładowania
+                // 🔹 Aktualizuj element listy
                 const li = document.querySelector(`.edit-expense-category[data-id="${id}"]`).closest('li');
                 if (li) {
                     li.querySelector('.fw-bold').textContent = name;
@@ -302,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         limitElem.remove();
                     }
 
-                    // 🔹 zaktualizuj dataset w ikonie
+                    // Aktualizacja dataset w ikonie
                     const icon = li.querySelector('.edit-expense-category');
                     icon.dataset.name = name;
                     icon.dataset.cash_limit = cashLimit;
@@ -310,14 +385,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // ✅ Zamknij modal
                 editModal.hide();
+
+                // 🔹 Pokaż toast powiadomienie
+                showToast(`Category "${name}" updated successfully!`);
             } else {
-                alert(data.message || 'Update failed.');
+                formError.textContent = data.message || 'Update failed.';
             }
 
         } catch (err) {
             console.error(err);
-            alert('Server error.');
+            formError.textContent = 'Server error.';
         }
     });
+
+    // 🔹 Funkcja do tworzenia elementu błędu w modalu
+    function createEditFormError() {
+        const modalBody = document.querySelector('#editExpenseCategoryModal .modal-body');
+        const p = document.createElement('p');
+        p.id = 'editCategoryFormError';
+        p.className = 'text-danger mt-2';
+        modalBody.appendChild(p);
+        return p;
+    }
+
+    // 🔹 Funkcja toast powiadomień
+    function showToast(message) {
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.top = '20px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = 1055;
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast align-items-center text-white bg-success border-0 show';
+        toastEl.setAttribute('role', 'alert');
+        toastEl.style.minWidth = '200px';
+        toastEl.style.marginBottom = '10px';
+        toastEl.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.remove()"></button>
+            </div>
+        `;
+        toastContainer.appendChild(toastEl);
+
+        // Automatyczne znikanie po 3 sek.
+        setTimeout(() => toastEl.remove(), 3000);
+    }
 });
+
 
