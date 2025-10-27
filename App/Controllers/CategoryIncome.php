@@ -45,4 +45,30 @@ class CategoryIncome extends Authenticated
             echo json_encode(['success' => false, 'message' => 'Failed to add category.']);
         }
     }
+
+    public function getCategoryIdAction()
+    {
+        header('Content-Type: application/json');
+
+        $userId = $_SESSION['user_id'] ?? null; // <- odkomentuj prawdziwe ID użytkownika
+        $name = trim($_GET['name'] ?? '');
+
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+            return;
+        }
+
+        if ($name === '') {
+            echo json_encode(['success' => false, 'message' => 'Category name is required.']);
+            return;
+        }
+
+        $id = IncomeCategory::getCategoryIdByName($name, $userId);
+        $anotherId = IncomeCategory::getCategoryIdByName('Another', $userId);
+        if ($id) {
+            echo json_encode(['success' => true, 'category_id' => $id, 'name' => $name, 'another_id' => $anotherId]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Category not found.']);
+        }
+    }
 }

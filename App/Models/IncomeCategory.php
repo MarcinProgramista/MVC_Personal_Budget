@@ -94,4 +94,27 @@ class IncomeCategory extends \Core\Model
         }
         return false;
     }
+
+    /**
+     * Get Id Category
+     * 
+     * @param int $userId
+     * @param string $name
+     * @return int return Id
+     */
+    public static function getCategoryIdByName($name, $userId)
+    {
+        $sql = 'SELECT id FROM incomes_category_assigned_to_users WHERE name = :name AND user_id = :user_id LIMIT 1';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+
+        return $result ? (int)$result['id'] : null;
+    }
 }

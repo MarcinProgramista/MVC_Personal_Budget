@@ -438,5 +438,28 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toastEl.remove(), 3000);
     }
 });
+// profile.js
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteModalEl = document.getElementById('deleteIncomeCategoryModal');
+    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
+    let selectedCategoryId = null;
+
+    // Delegacja zdarzeń: kliknięcia na ikony kosza
+    document.getElementById('incomeCategoriesList')?.addEventListener('click', (e) => {
+        const icon = e.target.closest('.delete-income-category');
+        if (!icon) return;
+
+        const id = icon.dataset.id;
+        const name = icon.dataset.name;
+
+        // selectedCategoryId = id;
+        // document.getElementById('deleteCategoryName').textContent = `"${name}"`;
+        // document.getElementById('deleteCategoryId').value = id;
+
+        if (deleteModal) deleteModal.show();
+    });
+});
+
+
 
 
