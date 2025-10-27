@@ -248,3 +248,10 @@ form#formSignup .hideShowPassword-wrapper {
 .fade-section.show {
     display: flex !important;
 }
+
+/* 🔥 Animacja usuwania kategorii income*/
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(-10px);
+}
