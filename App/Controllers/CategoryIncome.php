@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\IncomeCategory;
+use App\Models\Income;
 
 class CategoryIncome extends Authenticated
 {
@@ -46,12 +47,15 @@ class CategoryIncome extends Authenticated
         }
     }
 
-    public function getCategoryIdAction()
+    public function deleteAction()
     {
         header('Content-Type: application/json');
 
-        $userId = $_SESSION['user_id'] ?? null; // <- odkomentuj prawdziwe ID użytkownika
-        $name = trim($_GET['name'] ?? '');
+        $userId = $_SESSION['user_id'] ?? null;
+        $input = json_decode(file_get_contents('php://input'), true); // ← kluczowa linia
+
+        $name = trim($input['name'] ?? '');
+        $id = $input['id'] ?? null;
 
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
@@ -63,12 +67,15 @@ class CategoryIncome extends Authenticated
             return;
         }
 
-        $id = IncomeCategory::getCategoryIdByName($name, $userId);
-        $anotherId = IncomeCategory::getCategoryIdByName('Another', $userId);
-        if ($id) {
-            echo json_encode(['success' => true, 'category_id' => $id, 'name' => $name, 'another_id' => $anotherId]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Category not found.']);
+        if (!$id) {
+            echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
+            return;
         }
+
+        $anotherId = IncomeCategory::getCategoryIdByName('Another', $userId);
+        Income::updateCategoryForAnother($id, $userId, $anotherId);
+        $deleted = IncomeCategory::deleteCategoryById((int)$id, $userId);
+
+        echo json_encode(['success' => $deleted]);
     }
 }

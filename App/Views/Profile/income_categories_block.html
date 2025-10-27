@@ -18,7 +18,7 @@
                 <span>
                     <i class="fas fa-pencil-alt text-success me-2"></i>
                     <i class="fas fa-trash-alt text-danger delete-income-category" data-id="{{ incomeCategory.id }}"
-                        data-name="{{ incomeCategory.name }}"></i>
+                        data-name="{{ incomeCategory.name|escape }}"></i>
                 </span>
             </li>
             {% endfor %}

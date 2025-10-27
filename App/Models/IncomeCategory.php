@@ -117,4 +117,23 @@ class IncomeCategory extends \Core\Model
 
         return $result ? (int)$result['id'] : null;
     }
+
+    /**
+     * Delete an expense category by ID for a specific user
+     *
+     * @param int $id Category ID
+     * @param int $userId User ID
+     * @return bool True on success, false on failure
+     */
+    public static function deleteCategoryById(int $id, int $userId): bool
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare(
+            'DELETE FROM incomes_category_assigned_to_users WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
