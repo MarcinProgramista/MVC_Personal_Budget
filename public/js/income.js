@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ "Globalny" nasłuchiwacz dla przycisku Delete
     document.body.addEventListener('click', async (e) => {
-        const btn = e.target.closest('#confirmDeleteCategoryBtn');
+        const btn = e.target.closest('#confirmDeleteIncomeCategoryBtn');
         if (!btn) return;
 
         console.log("🧨 Kliknięto DELETE w modalu!", selectedCategoryId, selectedCategoryName);

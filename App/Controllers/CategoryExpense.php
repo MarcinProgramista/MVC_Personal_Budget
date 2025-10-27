@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ExpenseCategory;
+use App\Models\Expense;
 
 class CategoryExpense extends Authenticated
 {
@@ -72,7 +73,8 @@ class CategoryExpense extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
-
+        $anotherId = ExpenseCategory::getCategoryIdByName('Another', $userId);
+        Expense::updateCategoryForAnother($id, $userId, $anotherId);
         $deleted = ExpenseCategory::deleteCategoryById((int)$id, $userId);
 
         if ($deleted) {

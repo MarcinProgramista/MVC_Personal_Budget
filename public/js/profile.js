@@ -257,53 +257,58 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const deleteModalEl = document.getElementById('deleteExpenseCategoryModal');
-    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
-    let selectedCategoryId = null;
+    // Expense categories
+    const deleteExpenseModalEl = document.getElementById('deleteExpenseCategoryModal');
+    const deleteExpenseModal = deleteExpenseModalEl ? new bootstrap.Modal(deleteExpenseModalEl) : null;
+    let selectedExpenseCategoryId = null;
+    let selectedExpenseCategoryName = null;
 
-    // Delegacja zdarzeń: kliknięcia na ikony kosza
     document.getElementById('expenseCategoriesList')?.addEventListener('click', (e) => {
         const icon = e.target.closest('.delete-expense-category');
         if (!icon) return;
 
-        const id = icon.dataset.id;
-        const name = icon.dataset.name;
+        selectedExpenseCategoryId = icon.dataset.id;
+        selectedExpenseCategoryName = icon.dataset.name;
 
-        selectedCategoryId = id;
-        document.getElementById('deleteCategoryName').textContent = `"${name}"`;
-        document.getElementById('deleteCategoryId').value = id;
+        document.getElementById('deleteCategoryName').textContent = `"${selectedExpenseCategoryName}"`;
+        document.getElementById('deleteCategoryId').value = selectedExpenseCategoryId;
 
-        if (deleteModal) deleteModal.show();
+        if (deleteExpenseModal) deleteExpenseModal.show();
     });
 
-    // Obsługa przycisku potwierdzenia usunięcia
     document.getElementById('confirmDeleteCategoryBtn')?.addEventListener('click', async () => {
-        const id = selectedCategoryId;
-        if (!id) return;
+        if (!selectedExpenseCategoryId) return;
 
         try {
             const res = await fetch('/category-expense/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
+                body: JSON.stringify({
+                    id: selectedExpenseCategoryId,
+                    name: selectedExpenseCategoryName
+                })
             });
 
             const data = await res.json();
 
             if (data.success) {
-                // Znajdujemy ikonę kosza po id i usuwamy cały li
-                const li = document.querySelector(`.delete-expense-category[data-id="${id}"]`)?.closest('li');
+                const li = document.querySelector(`.delete-expense-category[data-id="${selectedExpenseCategoryId}"]`)?.closest('li');
                 if (li) li.remove();
-                deleteModal.hide();
+
+                deleteExpenseModal.hide();
+                document.body.classList.remove('modal-open');
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
             } else {
-                alert(data.error || 'Something went wrong.');
+                alert(data.message || 'Failed to delete category.');
             }
         } catch (err) {
             console.error(err);
             alert('Server error.');
         }
     });
+
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
