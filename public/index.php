@@ -15,6 +15,8 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 /**
  * Error and Exception handling
  */
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 set_error_handler('Core\Error::errorHandler');
 set_exception_handler('Core\Error::exceptionHandler');
