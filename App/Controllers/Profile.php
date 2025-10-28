@@ -100,7 +100,7 @@ class Profile extends Authenticated
         $id = $data['id'] ?? null;
         $name = trim($data['name'] ?? '');
         $cashLimit = $data['cash_limit'] ?? null;
-
+        $is_limit_active = $data['is_limit_active'];
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
             return;
@@ -111,7 +111,7 @@ class Profile extends Authenticated
             return;
         }
 
-        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit);
+        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
 
         if ($updated) {
             echo json_encode([

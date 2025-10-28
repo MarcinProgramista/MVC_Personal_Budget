@@ -16,7 +16,8 @@ class IncomeCategory extends \Core\Model
     public int $id;
     public string $name;
     public int $user_id;
-
+    public ?string $cash_limit = null;
+    public int $is_limit_active;
     /**
      * Class constructor
      *
@@ -78,15 +79,19 @@ class IncomeCategory extends \Core\Model
      * @param string $name
      * @return bool|int Returns inserted ID on success, false on failure
      */
-    public static function addIncomeCategory($userId, $name)
+    public static function addIncomeCategory($userId, $name, $is_limit_active, $cashLimit = null)
     {
         $db = static::getDB();
+
         $stmt = $db->prepare(
-            'INSERT INTO incomes_category_assigned_to_users (user_id, name) 
-         VALUES (:user_id, :name)'
+            'INSERT INTO incomes_category_assigned_to_users (user_id, name, cash_limit, is_limit_active) 
+         VALUES (:user_id, :name, :cash_limit, :is_limit_active)'
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':cash_limit', $cashLimit !== '' ? $cashLimit : null, PDO::PARAM_STR);
+
+        $stmt->bindValue(':is_limit_active', $is_limit_active ? 1 : 0, PDO::PARAM_INT);
 
 
         if ($stmt->execute()) {

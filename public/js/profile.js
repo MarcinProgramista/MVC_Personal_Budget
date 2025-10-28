@@ -110,151 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('addIncomeCategoryForm');
-    const inputName = document.getElementById('inputCategoryName');
-    const categoryError = document.getElementById('incomeCategoryError');
-
-    // ✅ jeśli formularz lub pole nie istnieje, zakończ
-    if (!form || !inputName || !categoryError) return;
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        inputName.classList.remove('is-invalid');
-        categoryError.textContent = '';
-
-        const name = inputName.value.trim();
-
-        if (!name) {
-            inputName.classList.add('is-invalid');
-            categoryError.textContent = 'Category name is required.';
-            return;
-        }
-
-        try {
-            const res = await fetch('/category-income/add-income-category', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `name=${encodeURIComponent(name)}`
-            });
-
-            const data = await res.json();
-            console.log('✅ Server response:', data);
-
-            if (data.success) {
-                // Sukces: można np. dodać kategorię do listy w UI i zamknąć modal
-                const modalEl = document.getElementById('addIncomeCategoryModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-
-                // Opcjonalnie: dodanie do listy kategorii dynamicznie
-                const list = document.getElementById('incomeCategoriesList');
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
-                li.innerHTML = `
-                    <div class="d-flex flex-column">
-                        <span class="fw-bold">${data.category.name}</span>
-                    </div>
-                    <span>
-                        <i class="fas fa-pencil-alt text-success me-2"></i>
-                        <i class="fas fa-trash-alt text-danger"></i>
-                    </span>
-                `;
-                list.appendChild(li);
-
-                // Reset formularza
-                form.reset();
-
-            } else {
-                // Wyświetlenie błędu walidacji z serwera
-                inputName.classList.add('is-invalid');
-                categoryError.textContent = data.message || 'Error occurred';
-            }
-
-        } catch (err) {
-            console.error(err);
-            inputName.classList.add('is-invalid');
-            categoryError.textContent = 'Network error.';
-        }
-    });
-
-});
 
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('addExpenseCategoryForm');
-    const inputName = document.getElementById('inputName');
-    const inputCashLimit = document.getElementById('inputCashLimit');
-    const categoryError = document.getElementById('categoryError');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Resetowanie błędu
-        inputName.classList.remove('is-invalid');
-        categoryError.textContent = '';
-
-        const name = inputName.value.trim();
-        const cashLimit = inputCashLimit.value;
-
-        if (!name) {
-            inputName.classList.add('is-invalid');
-            categoryError.textContent = 'Category name is required.';
-            return;
-        }
-
-        try {
-            const res = await fetch('/category-expense/add-expense-category', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `name=${encodeURIComponent(name)}&cash_limit=${encodeURIComponent(cashLimit)}`
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                // Sukces: można np. dodać kategorię do listy w UI i zamknąć modal
-                const modalEl = document.getElementById('addExpenseCategoryModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-
-                // Opcjonalnie: dodanie do listy kategorii dynamicznie
-                const list = document.getElementById('expenseCategoriesList');
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
-                li.innerHTML = `
-                    <div class="d-flex flex-column">
-                        <span class="fw-bold">${data.category.name}</span>
-                        ${data.category.cash_limit ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>` : ''}
-                    </div>
-                    <span>
-                        <i class="fas fa-pencil-alt text-success me-2"></i>
-                        <i class="fas fa-trash-alt text-danger"></i>
-                    </span>
-                `;
-                list.appendChild(li);
-
-                // Reset formularza
-                form.reset();
-
-            } else {
-                // Wyświetlenie błędu walidacji z serwera
-                inputName.classList.add('is-invalid');
-                categoryError.textContent = data.message || 'Error occurred';
-            }
-
-        } catch (err) {
-            console.error(err);
-            inputName.classList.add('is-invalid');
-            categoryError.textContent = 'Network error';
-        }
-    });
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Expense categories
@@ -311,10 +171,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-
-
     const editModalEl = document.getElementById('editExpenseCategoryModal');
     const editModal = new bootstrap.Modal(editModalEl);
+
+    // Funkcja tworząca element do wyświetlania błędów
+    function createEditFormError() {
+        const modalBody = document.querySelector('#editExpenseCategoryModal .modal-body');
+        const p = document.createElement('p');
+        p.id = 'editCategoryFormError';
+        p.className = 'text-danger mt-2';
+        modalBody.appendChild(p);
+        return p;
+    }
 
     const formError = document.getElementById('editCategoryFormError') || createEditFormError();
 
@@ -324,16 +192,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = icon.dataset.id;
             const name = icon.dataset.name;
             const cashLimit = icon.dataset.cash_limit || '';
+            const isLimitActive = parseInt(icon.dataset.is_limit_active) === 1;
 
-            console.log(`📝 Editing category: ID=${id}, Name=${name}, Limit=${cashLimit}`);
+            console.log(`📝 Editing category: ID=${id}, Name=${name}, Limit=${cashLimit}, Active=${isLimitActive}`);
 
-            // Reset komunikatu błędu
+            // Reset błędu
             formError.textContent = '';
 
-            // Ustaw dane w modalu
+            // Ustaw dane w polach
             document.getElementById('editCategoryId').value = id;
             document.getElementById('editCategoryName').value = name;
-            document.getElementById('editCategoryLimit').value = cashLimit;
+            const limitInput = document.getElementById('editCategoryLimit');
+            const checkbox = document.getElementById('editCategoryLimitActive');
+
+            limitInput.value = cashLimit;
+            checkbox.checked = isLimitActive;
+            limitInput.disabled = !isLimitActive;
+            limitInput.placeholder = isLimitActive ? "Enter limit or leave empty" : "Limit is blocked now";
+
+            // 🔄 Obsługa zmiany checkboxa
+            checkbox.onchange = () => {
+                limitInput.disabled = !checkbox.checked;
+                limitInput.placeholder = checkbox.checked ? "Enter limit or leave empty" : "Limit is blocked now";
+                if (!checkbox.checked) limitInput.value = '';
+            };
 
             // Pokaż modal
             editModal.show();
@@ -345,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('editCategoryId').value.trim();
         const name = document.getElementById('editCategoryName').value.trim();
         const cashLimit = document.getElementById('editCategoryLimit').value.trim();
+        const isLimitActive = document.getElementById('editCategoryLimitActive').checked ? 1 : 0;
 
         if (!id || !name) {
             formError.textContent = "Category name cannot be empty.";
@@ -357,19 +240,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/category-expense/edit-category', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, name, cash_limit: cashLimit })
+                body: JSON.stringify({ id, name, cash_limit: cashLimit, is_limit_active: isLimitActive })
             });
 
             const data = await res.json();
 
             if (data.success) {
-                // 🔹 Aktualizuj element listy
+                // 🔹 Aktualizacja listy w UI
                 const li = document.querySelector(`.edit-expense-category[data-id="${id}"]`).closest('li');
                 if (li) {
+                    // Zaktualizuj nazwę
                     li.querySelector('.fw-bold').textContent = name;
 
+                    // Zaktualizuj limit
                     const limitElem = li.querySelector('small.text-muted');
-                    if (cashLimit) {
+                    if (isLimitActive && cashLimit) {
                         if (limitElem) {
                             limitElem.textContent = `Limited: ${cashLimit} PLN`;
                         } else {
@@ -382,36 +267,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         limitElem.remove();
                     }
 
-                    // Aktualizacja dataset w ikonie
+                    // Zaktualizuj dataset w ikonie
                     const icon = li.querySelector('.edit-expense-category');
                     icon.dataset.name = name;
                     icon.dataset.cash_limit = cashLimit;
+                    icon.dataset.is_limit_active = isLimitActive;
                 }
 
-                // ✅ Zamknij modal
+                // Zamknij modal
                 editModal.hide();
 
-                // 🔹 Pokaż toast powiadomienie
+                // Pokaż toast powiadomienie
                 showToast(`Category "${name}" updated successfully!`);
             } else {
                 formError.textContent = data.message || 'Update failed.';
             }
-
         } catch (err) {
             console.error(err);
             formError.textContent = 'Server error.';
         }
     });
-
-    // 🔹 Funkcja do tworzenia elementu błędu w modalu
-    function createEditFormError() {
-        const modalBody = document.querySelector('#editExpenseCategoryModal .modal-body');
-        const p = document.createElement('p');
-        p.id = 'editCategoryFormError';
-        p.className = 'text-danger mt-2';
-        modalBody.appendChild(p);
-        return p;
-    }
 
     // 🔹 Funkcja toast powiadomień
     function showToast(message) {
@@ -439,10 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         toastContainer.appendChild(toastEl);
 
-        // Automatyczne znikanie po 3 sek.
         setTimeout(() => toastEl.remove(), 3000);
     }
 });
+
 // profile.js
 document.addEventListener('DOMContentLoaded', () => {
     const deleteModalEl = document.getElementById('deleteCategoryModal');

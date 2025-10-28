@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 🧹 Zamknij modal poprawnie
                 deleteModal.hide();
+                // 🔹 Pokaż toast powiadomienie
+                showToast(`Category "${selectedCategoryName}" deleted successfully!`);
                 document.body.classList.remove('modal-open');
                 document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
 
@@ -64,5 +66,37 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("💥 Błąd fetch:", err);
             alert('Server error.');
         }
+
+
     });
+
+    // 🔹 Funkcja toast powiadomień
+    function showToast(message) {
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.top = '20px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = 1055;
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast align-items-center text-white bg-success border-0 show';
+        toastEl.setAttribute('role', 'alert');
+        toastEl.style.minWidth = '200px';
+        toastEl.style.marginBottom = '10px';
+        toastEl.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.remove()"></button>
+            </div>
+        `;
+        toastContainer.appendChild(toastEl);
+
+        // Automatyczne znikanie po 3 sek.
+        setTimeout(() => toastEl.remove(), 3000);
+    }
 });

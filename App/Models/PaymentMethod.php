@@ -16,7 +16,7 @@ class PaymentMethod extends \Core\Model
     public int $id;
     public string $name;
     public int $user_id;
-    public string $cash_limit;
+    public ?string $cash_limit = null;
     public int $is_limit_active;
 
     /**
@@ -50,5 +50,54 @@ class PaymentMethod extends \Core\Model
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $results;
+    }
+
+    /**
+     * Add new method payment category for a user
+     *
+     * @param int $userId
+     * @param string $name
+     * @param string|null $cashLimit
+     * @return bool|int Returns inserted ID on success, false on failure
+     */
+    public static function addCategory($userId, $name, $is_limit_active, $cashLimit = null)
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare(
+            'INSERT INTO payment_methods_assigned_to_users (user_id, name, cash_limit, is_limit_active) 
+         VALUES (:user_id, :name, :cash_limit, :is_limit_active)'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':cash_limit', $cashLimit !== '' ? $cashLimit : null, PDO::PARAM_STR);
+
+        $stmt->bindValue(':is_limit_active', $is_limit_active ? 1 : 0, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            return (int)$db->lastInsertId();
+        }
+        return false;
+    }
+
+    /**
+     * Find a user model by name address
+     *
+     * @param string $name name address to search for
+     *
+     * @return mixed Category object if found, false otherwise
+     */
+    public static function existMethodPaymentName($name, $userId)
+    {
+        $sql = 'SELECT * FROM payment_methods_assigned_to_users WHERE name = :name AND user_id = :user_id LIMIT 1';
+
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+        $stmt->execute();
+
+        return $stmt->fetch();
     }
 }

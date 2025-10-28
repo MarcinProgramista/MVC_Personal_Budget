@@ -56,10 +56,44 @@ body {
     border-color: black;
     outline: 0;
     box-shadow: 0 0 0 0.25rem #ffc107;
+    width: 150px;
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
 }
 
+#editCategoryName {
+    background-color: #ffc107;
 
-.input {
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
+}
+
+#editCategoryLimit {
+    background-color: #ffc107;
+
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
+}
+
+.form-control.input {
     background-color: #ffc107;
 }
 
@@ -186,15 +220,17 @@ form#formSignup .hideShowPassword-wrapper {
     overflow: hidden;
     transform: scaleY(0.95);
     transform-origin: top;
-    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
 }
 
 .fade-section.show {
     opacity: 1;
-    max-height: 1000px;
-    /* wystarczająco dużo */
+    max-height: 2000px;
+    /* duża wartość wystarczająca dla całej listy */
     transform: scaleY(1);
 }
+
+
 
 .fade-section-list {
     opacity: 0;

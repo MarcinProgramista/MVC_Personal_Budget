@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\ExpenseCategory;
 use App\Models\Expense;
+use App\Models\PaymentMethod;
+use App\Models\IncomeCategory;
 
 class CategoryExpense extends Authenticated
 {
@@ -14,30 +16,26 @@ class CategoryExpense extends Authenticated
     {
         header('Content-Type: application/json');
 
-        $userId = $_SESSION['user_id'] ?? null;
-        $name = trim($_POST['name'] ?? '');
-        $cashLimit = $_POST['cash_limit'] ?? null;
+        try {
+            $userId = $_SESSION['user_id'] ?? null;
+            if (!$userId) throw new \Exception('User not logged in');
+            $name = trim($_POST['name'] ?? '');
+            $cashLimit = $_POST['cash_limit'] ?? null;
+            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
 
-        if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
-            return;
-        }
+            if (!$userId) throw new \Exception('User not logged in');
+            if ($name === '') throw new \Exception('Category name is required');
 
-        if ($name === '') {
-            echo json_encode(['success' => false, 'message' => 'Category name is required.']);
-            return;
-        }
+            $existing = ExpenseCategory::existCategoryName($name, $userId);
+            if ($existing) {
+                echo json_encode(['success' => false, 'field' => 'name', 'message' => 'This category already exists.']);
+                exit;
+                return;
+            }
 
-        $existing = ExpenseCategory::existCategoryName($name, $userId);
+            $newId = ExpenseCategory::addCategory($userId, $name, $isLimitActive, $cashLimit);
+            if (!$newId) throw new \Exception('Failed to add category');
 
-        if ($existing && isset($existing->user_id) && $existing->user_id == $userId) {
-            echo json_encode(['success' => false, 'message' => 'This category already exists.']);
-            return;
-        }
-
-        $newId = ExpenseCategory::addCategory($userId, $name, $cashLimit);
-
-        if ($newId) {
             echo json_encode([
                 'success' => true,
                 'message' => 'Category added successfully!',
@@ -45,13 +43,17 @@ class CategoryExpense extends Authenticated
                     'id' => $newId,
                     'name' => $name,
                     'cash_limit' => $cashLimit,
-                    'is_limit_active' => $cashLimit ? 1 : 0
+                    'is_limit_active' => $isLimitActive
                 ]
             ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add category.']);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            error_log("💥 Error adding expense category: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+
 
     /**
      * Delete expense category (AJAX)
@@ -97,6 +99,7 @@ class CategoryExpense extends Authenticated
         $id = $data['id'] ?? null;
         $name = trim($data['name'] ?? '');
         $cashLimit = $data['cash_limit'] ?? null;
+        $is_limit_active = $data['is_limit_active'] ?? null;
 
         if (!$userId) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
@@ -108,8 +111,7 @@ class CategoryExpense extends Authenticated
             return;
         }
 
-        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit);
-
+        $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
         if ($updated) {
             echo json_encode([
                 'success' => true,
@@ -118,11 +120,35 @@ class CategoryExpense extends Authenticated
                     'id' => $id,
                     'name' => $name,
                     'cash_limit' => $cashLimit,
-                    'is_limit_active' => $cashLimit ? 1 : 0
+                    'is_limit_active' => (int)$is_limit_active
                 ]
             ]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
         }
+    }
+    public function checkNameAction()
+    {
+        header('Content-Type: application/json');
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $name = trim($_POST['name'] ?? '');
+
+        if (!$userId || $name === '') {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+
+        $exists = false;
+
+        if ($this instanceof CategoryExpense) {
+            $exists = ExpenseCategory::existCategoryName($name, $userId) ? true : false;
+        } elseif ($this instanceof CategoryIncome) {
+            $exists = IncomeCategory::existCategoryIncomeName($name, $userId) ? true : false;
+        } elseif ($this instanceof MethodPayment) {
+            $exists = PaymentMethod::existMethodPaymentName($name, $userId) ? true : false;
+        }
+
+        echo json_encode(['exists' => $exists]);
     }
 }
