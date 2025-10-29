@@ -318,27 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// profile.js
-document.addEventListener('DOMContentLoaded', () => {
-    const deleteModalEl = document.getElementById('deleteCategoryModal');
-    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
-    let selectedCategoryId = null;
 
-    // Delegacja zdarzeń: kliknięcia na ikony kosza
-    document.getElementById('expenseCategoriesList')?.addEventListener('click', (e) => {
-        const icon = e.target.closest('.delete-expense-category');
-        if (!icon) return;
-
-        const id = icon.dataset.id;
-        const name = icon.dataset.name;
-
-        selectedCategoryId = id;
-        document.getElementById('deleteCategoryName').textContent = `"${name}"`;
-        document.getElementById('deleteCategoryId').value = id;
-
-        if (deleteModal) deleteModal.show();
-    });
-});
 
 
 

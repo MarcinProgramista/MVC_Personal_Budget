@@ -40,7 +40,7 @@ class PaymentMethod extends \Core\Model
      */
     public static function getAllPaymentMethodAssignedToUser($id)
     {
-        $sql = 'SELECT id,name FROM payment_methods_assigned_to_users WHERE user_id = :id';
+        $sql = 'SELECT * FROM payment_methods_assigned_to_users WHERE user_id = :id';
         $db = static::getDB();
 
         $stmt = $db->prepare($sql);
@@ -99,5 +99,23 @@ class PaymentMethod extends \Core\Model
         $stmt->execute();
 
         return $stmt->fetch();
+    }
+    /**
+     * Delete an method payment by ID for a specific user
+     *
+     * @param int $id Category ID
+     * @param int $userId User ID
+     * @return bool True on success, false on failure
+     */
+    public static function deleteCategoryById(int $id, int $userId): bool
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare(
+            'DELETE FROM payment_methods_assigned_to_users WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
     }
 }

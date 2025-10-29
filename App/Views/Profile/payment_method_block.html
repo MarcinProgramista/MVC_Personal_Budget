@@ -15,8 +15,11 @@
             <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
                 {{ paymentMethod.name }}
                 <span>
-                    <i class="fas fa-pencil-alt text-success me-2"></i>
-                    <i class="fas fa-trash-alt text-danger"></i>
+                    <i class="fas fa-pencil-alt text-success me-2" role="button"></i>
+                    <i class="fas fa-trash-alt text-danger open-delete-category-modal" role="button" data-type="payment"
+                        data-id="{{ paymentMethod.id }}" data-name="{{ paymentMethod.name }}"
+                        data-user_id="{{ paymentMethod.user_id }}"></i>
+
                 </span>
             </li>
             {% endfor %}

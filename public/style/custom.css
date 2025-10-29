@@ -291,3 +291,9 @@ form#formSignup .hideShowPassword-wrapper {
     transition: opacity 0.4s ease, transform 0.4s ease;
     transform: translateX(-10px);
 }
+
+#deleteCategoryName {
+    color: red !important;
+    font-weight: bold;
+    display: block !important;
+}
