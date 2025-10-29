@@ -123,4 +123,47 @@ class MethodPayment extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Failed to delete category.']);
         }
     }
+
+
+    /**
+     * Edit an existing expense category (AJAX)
+     */
+    public function editCategoryAction()
+    {
+        header('Content-Type: application/json');
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $id = $data['id'] ?? null;
+        $name = trim($data['name'] ?? '');
+        $cashLimit = $data['cash_limit'] ?? null;
+        $is_limit_active = $data['is_limit_active'] ?? null;
+
+        if (!$userId) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+            return;
+        }
+
+        if (!$id || $name === '') {
+            echo json_encode(['success' => false, 'message' => 'Invalid category data.']);
+            return;
+        }
+
+        $updated = PaymentMethod::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
+        if ($updated) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Payment method updated successfully.',
+                'category' => [
+                    'id' => $id,
+                    'name' => $name,
+                    'cash_limit' => $cashLimit,
+                    'is_limit_active' => (int)$is_limit_active
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
+        }
+    }
 }
