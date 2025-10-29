@@ -130,6 +130,8 @@ class CategoryExpense extends Authenticated
             echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
         }
     }
+
+
     public function checkNameAction()
     {
         header('Content-Type: application/json');
