@@ -118,4 +118,30 @@ class PaymentMethod extends \Core\Model
 
         return $stmt->execute();
     }
+
+    /**
+     * Update method payment by ID for a specific user
+     */
+    public static function updateCategory(int $userId, int $id, string $name, ?string $cashLimit, $is_limit_active): bool
+    {
+        $db = static::getDB();
+
+        $stmt = $db->prepare(
+            'UPDATE payment_methods_assigned_to_users 
+         SET name = :name, cash_limit = :cash_limit, is_limit_active = :is_limit_active 
+         WHERE id = :id AND user_id = :user_id'
+        );
+
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        if ($cashLimit === '' || $cashLimit === null) {
+            $stmt->bindValue(':cash_limit', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindValue(':cash_limit', $cashLimit, PDO::PARAM_STR);
+        }
+        $stmt->bindValue(':is_limit_active', $is_limit_active ? 1 : 0, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
