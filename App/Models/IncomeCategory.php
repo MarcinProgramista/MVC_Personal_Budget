@@ -39,7 +39,7 @@ class IncomeCategory extends \Core\Model
      */
     public static function getAllIncomesAssignedToUser($id)
     {
-        $sql = 'SELECT id,name FROM incomes_category_assigned_to_users WHERE user_id = :id';
+        $sql = 'SELECT * FROM incomes_category_assigned_to_users WHERE user_id = :id';
         $db = static::getDB();
 
         $stmt = $db->prepare($sql);

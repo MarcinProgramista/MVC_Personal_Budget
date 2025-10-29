@@ -62,29 +62,32 @@ class CategoryExpense extends Authenticated
     {
         header('Content-Type: application/json');
 
-        $userId = $_SESSION['user_id'] ?? null;
         $input = json_decode(file_get_contents('php://input'), true);
-        $id = $input['id'] ?? null;
 
-        if (!$userId) {
-            echo json_encode(['success' => false, 'error' => 'User not logged in.']);
+        $id = $input['id'] ?? null;
+        $user_id = $input['user_id'] ?? null;
+
+        if (!$user_id) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
             return;
         }
 
         if (!$id) {
-            echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
+            echo json_encode(['success' => false, 'message' => 'Category ID not provided.']);
             return;
         }
-        $anotherId = ExpenseCategory::getCategoryIdByName('Another', $userId);
-        Expense::updateCategoryForAnother($id, $userId, $anotherId);
-        $deleted = ExpenseCategory::deleteCategoryById((int)$id, $userId);
+
+        $anotherId = ExpenseCategory::getCategoryIdByName('Another', $user_id);
+        Expense::updateCategoryForAnother($id, $user_id, $anotherId);
+        $deleted = ExpenseCategory::deleteCategoryById((int)$id, (int)$user_id);
 
         if ($deleted) {
             echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to delete category.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete category.']);
         }
     }
+
 
     /**
      * Edit an existing expense category (AJAX)

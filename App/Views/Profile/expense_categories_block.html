@@ -21,9 +21,11 @@
                 <span>
                     <i class="fas fa-pencil-alt text-success me-2 edit-expense-category" role="button"
                         data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
-                        data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"></i>
-                    <i class="fas fa-trash-alt text-danger delete-expense-category" data-id="{{ expenseCategory.id }}"
-                        data-name="{{ expenseCategory.name }}"></i>
+                        data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"
+                        data-user_id="{{ expenseCategory.user_id }}" data-type="expense"></i>
+                    <i class="fas fa-trash-alt text-danger open-delete-category-modal"
+                        data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
+                        data-user_id="{{ expenseCategory.user_id }}" data-type="expense"></i>
                 </span>
             </li>
             {% endfor %}

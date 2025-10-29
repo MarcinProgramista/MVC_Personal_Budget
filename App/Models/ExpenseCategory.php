@@ -41,7 +41,7 @@ class ExpenseCategory extends \Core\Model
      */
     public static function getAllExpenseAssignedToUser($id)
     {
-        $sql = 'SELECT id,name, cash_limit, is_limit_active FROM expenses_category_assigned_to_users WHERE user_id = :id';
+        $sql = 'SELECT * FROM expenses_category_assigned_to_users WHERE user_id = :id';
         $db = static::getDB();
 
         $stmt = $db->prepare($sql);

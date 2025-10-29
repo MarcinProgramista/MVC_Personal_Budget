@@ -18,8 +18,9 @@
                 <span>
                     <i class="fas fa-pencil-alt text-success me-2 edit-income-category" role="button"
                         data-id="{{ incomeCategory.id }}" data-name="{{ incomeCategory.name|escape }}"></i>
-                    <i class="fas fa-trash-alt text-danger delete-income-category" data-id="{{ incomeCategory.id }}"
-                        data-name="{{ incomeCategory.name|escape }}"></i>
+                    <i class="fas fa-trash-alt text-danger open-delete-category-modal" data-id="{{ incomeCategory.id }}"
+                        data-name="{{ incomeCategory.name|escape }}" data-user_id="{{ incomeCategory.user_id }}"
+                        data-type="income"></i>
                 </span>
             </li>
             {% endfor %}
