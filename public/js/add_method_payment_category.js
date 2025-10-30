@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    const form = document.getElementById('addCategoryForm');
+    const form = document.getElementById('addCategoryMForm');
     const nameInput = document.getElementById('categoryMethodPyamentName');
     const checkbox = document.getElementById('categoryMethodPyamentLimitActive');
     const cashLimitInput = document.getElementById('categoryMethodPyamentCashLimit');
@@ -135,32 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 🔹 Toast
-    function showToast(message) {
-        let toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'toastContainer';
-            toastContainer.style.position = 'fixed';
-            toastContainer.style.top = '20px';
-            toastContainer.style.right = '20px';
-            toastContainer.style.zIndex = 1055;
-            document.body.appendChild(toastContainer);
-        }
 
-        const toastEl = document.createElement('div');
-        toastEl.className = 'toast align-items-center text-white bg-success border-0 show';
-        toastEl.setAttribute('role', 'alert');
-        toastEl.style.minWidth = '200px';
-        toastEl.style.marginBottom = '10px';
-        toastEl.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.parentElement.remove()"></button>
-            </div>
-        `;
-        toastContainer.appendChild(toastEl);
-        setTimeout(() => toastEl.remove(), 3000);
-    }
 });
 
