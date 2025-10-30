@@ -19,7 +19,12 @@ class CategoryIncome extends Authenticated
             $userId = $_SESSION['user_id'] ?? null;
             $name = trim($_POST['name'] ?? '');
             $cashLimit = $_POST['cash_limit'] ?? null;
-            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
+            if ($cashLimit === '' || strtolower($cashLimit) === 'null') {
+                $cashLimit = null;
+            }
+
+            $is_limit_active = isset($_POST['is_limit_active']) && (int)$_POST['is_limit_active'] === 1 ? 1 : 0;
+
 
             if (!$userId) {
                 throw new \Exception('User not logged in');
@@ -45,7 +50,7 @@ class CategoryIncome extends Authenticated
                 $cashLimit = null;
             }
 
-            $newId = IncomeCategory::addIncomeCategory($userId, $name, $isLimitActive, $cashLimit);
+            $newId = IncomeCategory::addIncomeCategory($userId, $name, $is_limit_active, $cashLimit);
 
             if (!$newId) {
                 $stmtError = error_get_last();
@@ -59,7 +64,7 @@ class CategoryIncome extends Authenticated
                     'id' => $newId,
                     'name' => $name,
                     'cash_limit' => $cashLimit,
-                    'is_limit_active' => $isLimitActive
+                    'is_limit_active' => $is_limit_active
                 ]
             ]);
         } catch (\Throwable $e) {
@@ -69,6 +74,61 @@ class CategoryIncome extends Authenticated
                 'success' => false,
                 'message' => 'Server error: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Edit an existing expense category (AJAX)
+     */
+    public function editCategoryAction()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $userId = $_SESSION['user_id'] ?? null;
+            $id = $_POST['id'] ?? null;
+            $name = trim($_POST['name'] ?? '');
+            $cashLimit = $_POST['cash_limit'] ?? null;
+            $is_limit_active = $_POST['is_limit_active'] ?? null;
+
+            if (!$userId) {
+                throw new \Exception('User not logged in.');
+            }
+
+            if (!$id) {
+                throw new \Exception('Category ID not provided.');
+            }
+
+            if ($name === '') {
+                throw new \Exception('Category name cannot be empty.');
+            }
+
+            $existing = IncomeCategory::existCategoryName($name, $userId, $id);
+            if ($existing) {
+                echo json_encode(['success' => false, 'field' => 'name', 'message' => 'This category name already exists.']);
+                return;
+            }
+
+
+            $updated = IncomeCategory::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
+            if ($updated) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Category updated successfully.',
+                    'category' => [
+                        'id' => $id,
+                        'name' => $name,
+                        'cash_limit' => $cashLimit,
+                        'is_limit_active' => (int)$is_limit_active
+                    ]
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
+            }
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            error_log("💥 Error editing income category: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 

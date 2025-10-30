@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const modalEl = document.getElementById('editCategoryExpenseModal');
+    const modalEl = document.getElementById('editCategoryIncomeModal');
     if (!modalEl) {
-        console.error('❌ Modal element not found: #editCategoryExpenseModal');
+        console.error('❌ Modal element not found: #editCategoryIncomeModal');
         return;
     }
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    const form = document.getElementById('editCategoryExpenseForm');
-    const nameInput = document.getElementById('categoryEditExpenseName');
-    const checkbox = document.getElementById('categoryEditExpenseLimitActive');
-    const cashLimitInput = document.getElementById('categoryEditExpenseCashLimit');
-    const categoryError = document.getElementById('categoryEditExpenseError');
+    const form = document.getElementById('editCategoryIncomeForm');
+    const nameInput = document.getElementById('categoryEditIncomeName');
+    const checkbox = document.getElementById('categoryEditIncomeLimitActive'); // poprawione
+    const cashLimitInput = document.getElementById('categoryEditIncomeCashLimit'); // poprawione
+    const categoryError = document.getElementById('categoryEditIncomeError');
 
-    // 🔹 Zamknij wszystkie inne otwarte modale przed otwarciem nowego
+    // Zamknij wszystkie inne otwarte modale przed otwarciem nowego
     function closeAllOtherModals() {
         const openModals = document.querySelectorAll('.modal.show');
         openModals.forEach(m => {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🔹 Checkbox — aktywacja/dezaktywacja pola limitu
+    // Checkbox - aktywacja/ dezaktywacja pola limitu
     checkbox.addEventListener('change', () => {
         cashLimitInput.disabled = !checkbox.checked;
         cashLimitInput.placeholder = checkbox.checked
@@ -30,39 +30,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!checkbox.checked) cashLimitInput.value = '';
     });
 
-    // 🔹 Otwieranie modala
-    // 🔹 Otwieranie modala edycji kategorii wydatków
-    // 🔹 Otwieranie modala edycji kategorii wydatków
-    document.querySelectorAll('.open-edit-expense-category-modal[data-type="expense"]').forEach(btn => {
+    // Otwierania modala 
+    document.querySelectorAll('.open-edit-income-category-modal[data-type="income"]').forEach(btn => {
         btn.addEventListener('click', () => {
             closeAllOtherModals();
 
             const { id, name, cash_limit, is_limit_active, user_id } = btn.dataset;
+            console.log("✏️ Dane z ikony:", { id, name, cash_limit, is_limit_active, user_id });
 
             nameInput.value = name || '';
-            checkbox.checked = is_limit_active == 1 || is_limit_active === true || is_limit_active === 'true';
+            checkbox.checked = (is_limit_active == 1 || is_limit_active === true || is_limit_active === 'true');
 
             if (checkbox.checked) {
                 cashLimitInput.disabled = false;
-                cashLimitInput.placeholder = "Enter limit or leave empty";
+                cashLimitInput.placeholder = 'Enter limit or leave empty';
                 cashLimitInput.value = cash_limit || '';
             } else {
                 cashLimitInput.disabled = true;
-                cashLimitInput.placeholder = "Limit is blocked now";
+                cashLimitInput.placeholder = 'Limit is blocked now';
                 cashLimitInput.value = '';
             }
 
             form.dataset.id = id;
-            document.getElementById('categoryEditExpenseUserId').value = user_id;
-
+            document.getElementById('categoryEditIncomeUserId').value = user_id;
             categoryError.textContent = '';
             nameInput.classList.remove('is-invalid');
             modal.show();
         });
     });
-
-
-
 
     // 🔹 Wysłanie formularza
     form.addEventListener('submit', async (e) => {
@@ -85,9 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const id = form.dataset.id;
-            const user_id = document.getElementById('categoryEditExpenseUserId').value;
+            const user_id = document.getElementById('categoryEditIncomeUserId').value;
 
-            const res = await fetch('/category-expense/edit-category', {
+            const res = await fetch('/category-income/edit-category', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include', // 🔹 zapewnia, że cookies (sesja) są wysyłane!
@@ -100,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
+
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
             }
@@ -107,7 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 // ✅ Dodaj nowy element do listy metod płatności bez odświeżania
-                const list = document.getElementById('expenseCategoriesList');
+                const list = document.getElementById('incomeCategoriesList');
+
                 if (list) {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
@@ -144,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 modal.hide();
-                showToast('Payment method added successfully!');
+                showToast('Income category added successfully!');
                 form.reset();
             } else {
                 // ❌ Obsługa błędów
@@ -161,6 +158,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
 });
-
