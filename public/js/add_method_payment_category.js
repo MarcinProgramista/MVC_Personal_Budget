@@ -127,7 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('Payment method added successfully!');
                 form.reset();
             } else {
-                categoryError.textContent = data.message || 'An error occurred.';
+                // ❌ Obsługa błędów
+                if (data.field === 'name') {
+                    nameInput.classList.add('is-invalid');
+                    categoryError.textContent = data.message || 'Invalid name.';
+                } else {
+                    showToast(data.message || 'An error occurred.', 'error');
+                }
             }
         } catch (error) {
             console.error('❌ Error sending request:', error);
