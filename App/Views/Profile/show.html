@@ -35,17 +35,7 @@
     </div>
 </div>
 
-
-
-
-{% include "Profile/edit_expense_category_modal.html" %}
-{% include "Profile/edit_income_category_modal.html" %}
-{% include 'Profile/edit_category.html' %}
-{% include 'Profile/add_category.html' %}
-{% include 'Profile/delete_category.html' %}
-<script src="/js/deleteCategory.js?v={{ random() }}"></script>
-<script src="/js/addCategory.js?v={{ random() }}"></script>
-<script src="/js/income.js?v={{ random() }}"></script>
-<script src="/js/editIncome.js?v={{ random() }}"></script>
+{% include 'Profile/add_method_payment_category.html' %}
+<script src="/js/add_method_payment_category.js?v={{ random() }}"></script>
 <script src="/js/profile.js?v={{ random() }}"></script>
 {% endblock %}

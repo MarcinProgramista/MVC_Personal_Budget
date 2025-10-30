@@ -128,7 +128,7 @@ class MethodPayment extends Authenticated
     /**
      * Edit an existing expense category (AJAX)
      */
-    public function editCategoryAction()
+    public function editAction()
     {
         header('Content-Type: application/json');
 

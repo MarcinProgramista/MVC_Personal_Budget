@@ -1,4 +1,5 @@
-<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" style="background-color: wheat;">
             <form id="editCategoryForm">
@@ -9,7 +10,6 @@
                 </div>
 
                 <div class="modal-body">
-                    <input type="hidden" id="categoryType" name="categoryType" value="expense">
 
                     <div class="mb-3">
                         <label for="categoryName" class="form-label fw-bold">Name</label>
@@ -31,7 +31,8 @@
                 </div>
 
                 <div class="modal-footer bg-dark">
-                    <button type="submit" class="btn btn-warning">Save</button>
+                    <button type="submit" id="confirmEditCategoryButton" class="btn btn-warning">Save</button>
+
                 </div>
             </form>
         </div>
