@@ -19,9 +19,10 @@
                     {% endif %}
                 </div>
                 <span>
-                    <i class="fas fa-pencil-alt text-success me-2 edit-expense-category" role="button"
+                    <i class="fas fa-pencil-alt text-success me-2 open-edit-expense-category-modal" role="button"
                         data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
                         data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"
+                        data-is_limit_active="{{ expenseCategory.is_limit_active}}"
                         data-user_id="{{ expenseCategory.user_id }}" data-type="expense"></i>
                     <i class="fas fa-trash-alt text-danger open-delete-category-modal"
                         data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
