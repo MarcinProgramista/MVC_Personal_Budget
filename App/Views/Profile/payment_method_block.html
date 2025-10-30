@@ -13,9 +13,18 @@
         <ul id="paymentMethodList" class="list-group custom-list" style="width: 95%; margin: 1 auto;">
             {% for paymentMethod in paymentMethods %}
             <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
-                {{ paymentMethod.name }}
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ paymentMethod.name }}</span>
+                    {% if paymentMethod.cash_limit is not none %}
+                    <small class="text-muted">Limited: {{ paymentMethod.cash_limit }} PLN</small>
+                    {% endif %}
+                </div>
                 <span>
-                    <i class="fas fa-pencil-alt text-success me-2" role="button"></i>
+                    <i class="fas fa-pencil-alt text-success me-2 open-edit-category-modal" role="button"
+                        data-id="{{ paymentMethod.id }}" data-name="{{ paymentMethod.name }}"
+                        data-cash_limit="{{ paymentMethod.cash_limit | default('') }}"
+                        data-is_limit_active="{{ paymentMethod.is_limit_active }}"
+                        data-user_id="{{ paymentMethod.user_id }}" data-type="payment"></i>
                     <i class="fas fa-trash-alt text-danger open-delete-category-modal" role="button" data-type="payment"
                         data-id="{{ paymentMethod.id }}" data-name="{{ paymentMethod.name }}"
                         data-user_id="{{ paymentMethod.user_id }}"></i>
