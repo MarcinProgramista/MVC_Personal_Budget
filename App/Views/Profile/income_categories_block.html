@@ -13,11 +13,18 @@
         <ul id="incomeCategoriesList" class="list-group custom-list" style="width: 95%; margin: 1 auto;">
             {% for incomeCategory in incomeCategories %}
             <li class="list-group-item d-flex justify-content-between align-items-center text-dark">
-                {{ incomeCategory.name }}
-
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ incomeCategory.name }}</span>
+                    {% if incomeCategory.cash_limit is not none %}
+                    <small class="text-muted">Limited: {{ incomeCategory.cash_limit }} PLN</small>
+                    {% endif %}
+                </div>
                 <span>
-                    <i class="fas fa-pencil-alt text-success me-2 edit-income-category" role="button"
-                        data-id="{{ incomeCategory.id }}" data-name="{{ incomeCategory.name|escape }}"></i>
+                    <i class="fas fa-pencil-alt text-success me-2 open-edit-income-category-modal" role="button"
+                        data-id="{{ incomeCategory.id }}" data-name="{{ incomeCategory.name|escape }}"
+                        data-cash_limit="{{ incomeCategory.cash_limit | default('') }}"
+                        data-is_limit_active="{{ incomeCategory.is_limit_active}}"
+                        data-user_id="{{ incomeCategory.user_id }}" data-type="income"></i>
                     <i class="fas fa-trash-alt text-danger open-delete-category-modal" data-id="{{ incomeCategory.id }}"
                         data-name="{{ incomeCategory.name|escape }}" data-user_id="{{ incomeCategory.user_id }}"
                         data-type="income"></i>
