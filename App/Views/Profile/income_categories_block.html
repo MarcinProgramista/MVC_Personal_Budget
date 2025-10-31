@@ -25,9 +25,9 @@
                         data-cash_limit="{{ incomeCategory.cash_limit | default('') }}"
                         data-is_limit_active="{{ incomeCategory.is_limit_active}}"
                         data-user_id="{{ incomeCategory.user_id }}" data-type="income"></i>
-                    <i class="fas fa-trash-alt text-danger open-delete-category-modal" data-id="{{ incomeCategory.id }}"
-                        data-name="{{ incomeCategory.name|escape }}" data-user_id="{{ incomeCategory.user_id }}"
-                        data-type="income"></i>
+                    <i class="fas fa-trash-alt text-danger open-delete-income-category-modal"
+                        data-id="{{ incomeCategory.id }}" data-name="{{ incomeCategory.name|escape }}"
+                        data-user_id="{{ incomeCategory.user_id }}" data-type="income"></i>
                 </span>
             </li>
             {% endfor %}
