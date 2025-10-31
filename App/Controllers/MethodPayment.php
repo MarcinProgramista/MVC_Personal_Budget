@@ -98,10 +98,9 @@ class MethodPayment extends Authenticated
     public function deleteAction()
     {
         header('Content-Type: application/json');
-        $input = json_decode(file_get_contents('php://input'), true);
 
-        $id = $input['id'] ?? null;
-        $user_id = $input['user_id'] ?? null;
+        $id = $_POST['id'] ?? null;
+        $user_id = $_POST['user_id'] ?? null;
 
         if (!$user_id) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
@@ -112,8 +111,6 @@ class MethodPayment extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
-
-
 
         $deleted = PaymentMethod::deleteCategoryById((int)$id, (int)$user_id);
 
