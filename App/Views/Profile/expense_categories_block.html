@@ -24,9 +24,9 @@
                         data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"
                         data-is_limit_active="{{ expenseCategory.is_limit_active}}"
                         data-user_id="{{ expenseCategory.user_id }}" data-type="expense"></i>
-                    <i class="fas fa-trash-alt text-danger open-delete-category-modal"
+                    <i class="fas fa-trash-alt text-danger open-delete-expense-category-modal" data-type="expense"
                         data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
-                        data-user_id="{{ expenseCategory.user_id }}" data-type="expense"></i>
+                        data-user_id="{{ expenseCategory.user_id }}"></i>
                 </span>
             </li>
             {% endfor %}
