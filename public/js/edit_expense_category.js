@@ -106,45 +106,54 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (data.success) {
-                // ✅ Dodaj nowy element do listy metod płatności bez odświeżania
-                const list = document.getElementById('expenseCategoriesList');
-                if (list) {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
-                    li.innerHTML = `
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold">${data.category.name}</span>
-                            ${data.category.is_limit_active && data.category.cash_limit
-                            ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>`
-                            : ''}
-                        </div>
-                        <span>
-                            <i class="fas fa-pencil-alt text-success me-2 open-edit-category-expense-modal" 
-                                role="button"
-                                data-id="${data.category.id}"
-                                data-name="${data.category.name}"
-                                data-cash_limit="${data.category.cash_limit || ''}"
-                                data-is_limit_active="${data.category.is_limit_active}"
-                                data-user_id="${data.category.user_id}"
-                                data-type="expense"></i>
+                // ✅ Znajdź istniejący element <li> po ID
+                const existingLi = document.querySelector(
+                    `#expenseCategoriesList [data-id="${data.category.id}"]`
+                );
 
-                            <i class="fas fa-trash-alt text-danger open-delete-category-expense-modal" 
-                                role="button" 
-                                data-type="expense"
-                                data-id="${data.category.id}" 
-                                data-name="${data.category.name}"
-                                data-user_id="${data.category.user_id}"></i>
-                        </span>
-                    `;
-                    list.appendChild(li);
-                    // 🔹 Podpięcie eventów po dodaniu
-                    li.querySelector('.open-edit-category-expense-modal')?.addEventListener('click', (e) => {
-                        showToast('You just edited this itme to edit agin refresh page ');
-                    });
+                if (existingLi) {
+                    // 🔹 Znajdź najbliższy <li> — ikony są wewnątrz <span>, więc musimy wejść wyżej
+                    const li = existingLi.closest('li');
+                    if (li) {
+                        // 🔹 Zaktualizuj zawartość elementu
+                        li.innerHTML = `
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">${data.category.name}</span>
+                    ${data.category.is_limit_active && data.category.cash_limit
+                                ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>`
+                                : ''}
+                </div>
+                <span>
+                    <i class="fas fa-pencil-alt text-success me-2 open-edit-expense-category-modal"
+                        role="button"
+                        data-id="${data.category.id}"
+                        data-name="${data.category.name}"
+                        data-cash_limit="${data.category.cash_limit || ''}"
+                        data-is_limit_active="${data.category.is_limit_active}"
+                        data-user_id="${data.category.user_id}"
+                        data-type="expense"></i>
+
+                    <i class="fas fa-trash-alt text-danger open-delete-category-expense-modal"
+                        role="button"
+                        data-type="expense"
+                        data-id="${data.category.id}"
+                        data-name="${data.category.name}"
+                        data-user_id="${data.category.user_id}"></i>
+                </span>
+            `;
+
+                        // 🔹 Podłącz ponownie event do nowo wstawionej ikony edycji
+                        li.querySelector('.open-edit-expense-category-modal')
+                            ?.addEventListener('click', () => {
+                                showToast('You just edited this item — reopen to edit again!');
+                            });
+                    }
+                } else {
+                    console.warn('⚠️ Nie znaleziono elementu li o id:', data.category.id);
                 }
 
                 modal.hide();
-                showToast('Payment method added successfully!');
+                showToast('Expense category updated successfully!');
                 form.reset();
             } else {
                 // ❌ Obsługa błędów
@@ -155,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(data.message || 'An error occurred.', 'error');
                 }
             }
+
         } catch (error) {
             console.error('❌ Error sending request:', error);
             categoryError.textContent = 'Server error.';
