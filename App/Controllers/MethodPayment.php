@@ -132,38 +132,51 @@ class MethodPayment extends Authenticated
     {
         header('Content-Type: application/json');
 
-        $data = json_decode(file_get_contents('php://input'), true);
+        try {
+            $userId = $_SESSION['user_id'] ?? null;
+            $id = $_POST['id'] ?? null;
+            $name = trim($_POST['name'] ?? '');
+            $cashLimit = $_POST['cash_limit'] ?? null;
+            $is_limit_active = $_POST['is_limit_active'] ?? null;
 
-        $userId = $_SESSION['user_id'] ?? null;
-        $id = $data['id'] ?? null;
-        $name = trim($data['name'] ?? '');
-        $cashLimit = $data['cash_limit'] ?? null;
-        $is_limit_active = $data['is_limit_active'] ?? null;
+            if (!$userId) {
+                throw new \Exception('User not logged in.');
+            }
 
-        if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
-            return;
-        }
+            if (!$id) {
+                throw new \Exception('Category ID not provided.');
+            }
 
-        if (!$id || $name === '') {
-            echo json_encode(['success' => false, 'message' => 'Invalid category data.']);
-            return;
-        }
+            if ($name === '') {
+                throw new \Exception('Category name cannot be empty.');
+            }
 
-        $updated = PaymentMethod::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
-        if ($updated) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Payment method updated successfully.',
-                'category' => [
-                    'id' => $id,
-                    'name' => $name,
-                    'cash_limit' => $cashLimit,
-                    'is_limit_active' => (int)$is_limit_active
-                ]
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
+            $existing = PaymentMethod::existCategoryName($name, $userId, $id);
+            if ($existing) {
+                echo json_encode(['success' => false, 'field' => 'name', 'message' => 'This category name already exists.']);
+                return;
+            }
+
+
+            $updated = PaymentMethod::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
+            if ($updated) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Category updated successfully.',
+                    'category' => [
+                        'id' => $id,
+                        'name' => $name,
+                        'cash_limit' => $cashLimit,
+                        'is_limit_active' => (int)$is_limit_active
+                    ]
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
+            }
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            error_log("💥 Error editing expense category: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 }
