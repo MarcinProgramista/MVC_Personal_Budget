@@ -169,10 +169,9 @@ class CategoryIncome extends Authenticated
     public function deleteAction()
     {
         header('Content-Type: application/json');
-        $input = json_decode(file_get_contents('php://input'), true);
 
-        $id = $input['id'] ?? null;
-        $user_id = $input['user_id'] ?? null;
+        $id = $_POST['id'] ?? null;
+        $user_id = $_POST['user_id'] ?? null;
 
         if (!$user_id) {
             echo json_encode(['success' => false, 'message' => 'User not logged in.']);
@@ -184,12 +183,12 @@ class CategoryIncome extends Authenticated
             return;
         }
 
-
-
-        $anotherId = IncomeCategory::getCategoryIdByName('Another', $user_id);
-        Income::updateCategoryForAnother($id, $user_id, $anotherId);
         $deleted = IncomeCategory::deleteCategoryById((int)$id, (int)$user_id);
 
-        echo json_encode(['success' => $deleted]);
+        if ($deleted) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to delete category.']);
+        }
     }
 }
