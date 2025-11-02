@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Income{% endblock %}
+
+{% block body %}
+<div class="col-md-12 col-sm-12 p-5 text-center form-group quote"></div>
+<div class="login">
+    <div class="col-md-9 col-sm-9 mx-auto ">
+        <form action="/incomes/new" method="post">
+            <div class="container col-md-4 ">
+                <div class="row form-group ml-5">
+
+                    <div class="col-9 col-md-9 pb-1 input-group mb-4 text-danger">
+                        {% if income.errors is not empty %}
+                        <p>Errors:</p>
+                        <ul>
+                            {% for error in income.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-9 col-md-9 pb-1 input-group mb-4">
+                        <h1 class="display-4 mx-auto">Income</h1>
+                    </div>
+
+                    <div class="col-9 col-md-9 pb-1 input-group mb-4">
+                        <i class="fas fa-coins display-4 mx-auto"></i>
+                    </div>
+
+                    <div class=" col-9 col-md-9 pb-1 input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fas fa-coins"></i></div>
+                        </div>
+                        <input name="amount" placeholder="Please put amount money" value="{{ income.amount }}"
+                            class="form-control bg-light">
+                    </div>
+
+                    <div class=" col-9 col-md-9 pb-1 input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
+                        </div>
+                        <input name="dateIncome" class="form-control" type="date"
+                            value="{{ income.dateIncome ?? dateIncome }}" />
+                    </div>
+
+                    <div class=" col-9 col-md-9 pb-1 input-group">
+                        <select name="nameCategory" class="form-control selectpicker pt-2" data-live-search="true">
+                            {% for incomeCategory in incomeCategories %}
+                            <option value="{{ incomeCategory.name }}" {% if incomeCategory.name==income.nameCategory or
+                                incomeCategory.name==nameCategory %}selected{% endif %}>
+                                {{ incomeCategory.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class=" col-9 col-md-9 pb-1 input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fas fa-pencil-alt"></i></div>
+                        </div>
+                        <textarea id="message" name="messageIncome" cols="30" rows="2"
+                            class="col-10 input-group">{{ income.messageIncome }}</textarea>
+                    </div>
+
+                    <div class="col-9 col-md-9 pb-1 input-group text-center">
+                        <button type="submit" class="btn btn-success text-white col-12">Add Income</button>
+                    </div>
+
+                    <div class="col-9 col-md-9 pb-1 input-group">
+                        <a href="/profile" class="btn btn-danger col-12 mx-auto text-white">Cancel</a>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+    });
+</script>
+{% endblock %}
