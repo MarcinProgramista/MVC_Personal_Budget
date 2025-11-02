@@ -118,12 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 🔹 Zaktualizuj zawartość elementu
                         li.innerHTML = `
                 <div class="d-flex flex-column">
+                    <div class="d-flex flex-row   align-items-center ">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                      
                     <span class="fw-bold">${data.category.name}</span>
+                    </div> 
                     ${data.category.is_limit_active && data.category.cash_limit
-                                ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>`
+                                ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
                                 : ''}
                 </div>
-                <span>
+                <span class="d-flex flex-row">
+                 <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                     <i class="fas fa-pencil-alt text-success me-2 open-edit-expense-category-modal"
                         role="button"
                         data-id="${data.category.id}"
@@ -132,14 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         data-is_limit_active="${data.category.is_limit_active}"
                         data-user_id="${data.category.user_id}"
                         data-type="expense"></i>
-
+                </button>
+                <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                     <i class="fas fa-trash-alt text-danger open-delete-category-expense-modal"
                         role="button"
                         data-type="expense"
                         data-id="${data.category.id}"
                         data-name="${data.category.name}"
-                        data-user_id="${data.category.user_id}"></i>
-                </span>
+                        data-user_id="${data.category.user_id}"></i> </button>
+                </span>    
             `;
 
                         // 🔹 Podłącz ponownie event do nowo wstawionej ikony edycji

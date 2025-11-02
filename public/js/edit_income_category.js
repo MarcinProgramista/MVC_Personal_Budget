@@ -114,12 +114,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 🔹 Zaktualizuj zawartość elementu
                         li.innerHTML = `
                 <div class="d-flex flex-column">
-                    <span class="fw-bold">${data.category.name}</span>
+                    <div class="d-flex flex-row   align-items-center ">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">${data.category.name}</span>
+                    </div>
                     ${data.category.is_limit_active && data.category.cash_limit
-                                ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>`
+                                ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
                                 : ''}
                 </div>
-                <span>
+                <span class="d-flex flex-row">
+                <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                         
                     <i class="fas fa-pencil-alt text-success me-2 open-edit-income-category-modal"
                         role="button"
                         data-id="${data.category.id}"
@@ -127,14 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         data-cash_limit="${data.category.cash_limit || ''}"
                         data-is_limit_active="${data.category.is_limit_active}"
                         data-user_id="${data.category.user_id}"
-                        data-type="income"></i>
-
+                        data-type="income"></i></button>
+                <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                         
                     <i class="fas fa-trash-alt text-danger open-delete-category-income-modal"
                         role="button"
                         data-type="income"
                         data-id="${data.category.id}"
                         data-name="${data.category.name}"
-                        data-user_id="${data.category.user_id}"></i>
+                        data-user_id="${data.category.user_id}"></i></button>
                 </span>
             `;
 

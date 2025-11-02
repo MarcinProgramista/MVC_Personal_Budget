@@ -85,15 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const list = document.getElementById('paymentMethodList');
                 if (list) {
                     const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center text-dark';
+                    li.className = 'list-group-item d-flex justify-content-between border border-warning align-items-center text-light';
                     li.innerHTML = `
                         <div class="d-flex flex-column">
                             <span class="fw-bold">${data.category.name}</span>
                             ${data.category.is_limit_active && data.category.cash_limit
-                            ? `<small class="text-muted">Limited: ${data.category.cash_limit} PLN</small>`
+                            ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
                             : ''}
                         </div>
-                        <span>
+                        <span class="d-flex flex-row">
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-pencil-alt text-success me-2 open-edit-category-modal" 
                                 role="button"
                                 data-id="${data.category.id}"
@@ -102,13 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data-is_limit_active="${data.category.is_limit_active}"
                                 data-user_id="${data.category.user_id}"
                                 data-type="payment"></i>
-
+                        </button>
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">       
                             <i class="fas fa-trash-alt text-danger open-delete-category-modal" 
                                 role="button" 
                                 data-type="payment"
                                 data-id="${data.category.id}" 
                                 data-name="${data.category.name}"
                                 data-user_id="${data.category.user_id}"></i>
+                        </button>        
                         </span>
                     `;
                     list.appendChild(li);
