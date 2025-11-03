@@ -10,7 +10,8 @@
         <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4 left-column">
             <h1 class="mb-4 text-center"><i class="fas fa-coins me-2"></i>Add Income</h1>
 
-            <form method="post" action="/incomes/new" class="registration-form text-warning bg-dark" id="fromLogin">
+            <form method="post" action="/incomes/new" class="registration-form text-warning bg-dark" id="fromLogin"
+                novalidate>
 
                 <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
                     <span class="input-group-text bg-dark text-warning border-warning">
@@ -18,6 +19,7 @@
                     </span>
                     <input type="number" id="amount" name="amount" value="{{ income.amount }}"
                         class="form-control bg-dark text-light border-warning" placeholder="Enter amount">
+
                 </div>
 
                 <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
@@ -65,34 +67,91 @@
         </div>
 
         <!-- PRAWA KOLUMNA Z WYNIKIEM -->
-        <div style="min-height: 180px; border-radius: 20px; margin-left: 10px;" class="col-md-5 hidden1"
-            id="selectedCategoryDiv">
-            <div class="info-card text-center p-4">
-                <h3 class="hidden text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
-                <p class="fs-5 text-light" id="selectedCategoryH1"></p>
-            </div>
+        <div class="col-md-6 position-relative right-column">
 
-            <!-- Drugi div pod pierwszym -->
-            <div class="info-card text-center p-4 mt-3" id="secondInfoDiv">
-                <h4 class="text-warning mb-2">Cash from all Categories </h4>
-                <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+            <!-- 🔹 TŁO Z OBRAZKIEM – ZAWSZE WIDOCZNE -->
+            <div class="income-bg"></div>
+
+            <!-- 🔹 ZAWARTOŚĆ KOLUMNY (pojawia się po wybraniu kategorii) -->
+            <div id="selectedCategoryDiv" class="hidden1">
+                <div class="info-card  text-center p-4 position-relative">
+                    <h3 class="text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
+                    <p class="fs-5 text-light" id="selectedCategoryH1"></p>
+                </div>
+
+                <div class="info-card text-center p-4 mt-3 position-relative" id="secondInfoDiv">
+                    <h4 class="text-warning mb-2">Cash from all Categories</h4>
+                    <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+                </div>
             </div>
         </div>
 
 
+
     </div>
 </div>
+<script src="/js/new_income.js?v={{ random() }}"></script>
 {% endblock %}
 
 {% block footer %}
 <style>
-    .left-column {
+    .right-column {
+        min-height: 600px;
+        border-radius: 20px;
         margin-left: 10px;
+        overflow: hidden;
+        position: relative;
     }
 
+    /* 🔹 Obrazek jako tło — zawsze widoczny */
+    .income-bg {
+        position: absolute;
+        inset: 0;
+        background: url('/images/income_growth_dark.png') center center no-repeat;
+        background-size: contain;
+        opacity: 0.45;
+        filter: brightness(0.8);
+        z-index: 0;
+    }
+
+    /* 🔹 Karty z tekstem */
+    .info-card {
+        background: linear-gradient(145deg, #1c1c1c, #222);
+        border: 1px solid #ffc107;
+        border-radius: 16px;
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+        transition: all 0.4s ease;
+        animation: fadeIn 0.5s ease;
+        position: relative;
+        z-index: 1;
+        margin: 10px;
+        opacity: 0.6;
+    }
+
+    .info-card:hover {
+        box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+        transform: scale(1.02);
+        opacity: 1;
+    }
+
+    /* 🔹 Animacja wejścia */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 🔹 Ukrywanie tylko treści, nie tła */
     .hidden1 {
         display: none;
     }
+
 
     .info-card {
         background: linear-gradient(145deg, #1c1c1c, #222);
@@ -155,79 +214,98 @@
         color: #f8f9fa;
         opacity: 1;
     }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    .shake {
+        animation: shake 0.4s ease;
+    }
 </style>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const select = document.getElementById('incomeCategorySelect');
-        const div = document.getElementById('selectedCategoryDiv');
-        const p = document.getElementById('selectedCategoryH1');
-        const h3 = document.getElementById('selectedCategoryH3');
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("fromLogin");
+        const amountInput = document.getElementById("amount");
         const dateInput = document.querySelector('input[name="dateIncome"]');
-        const secondInfo = document.getElementById('secondInfoP');
-        const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
+        const categorySelect = document.getElementById("incomeCategorySelect");
 
-        select.addEventListener('change', async function () {
-            const selectedOption = select.options[select.selectedIndex];
-            const selectedId = selectedOption.dataset.id;
-            const selectedName = selectedOption.value;
-            const selectedDate = dateInput.value;
+        form.addEventListener("submit", function (event) {
+            let valid = true;
 
-            if (!selectedId || !selectedDate) return;
+            // Usuń wszystkie stare komunikaty
+            document.querySelectorAll(".custom-alert").forEach(el => el.remove());
 
-            const monthNumber = new Date(selectedDate).getMonth() + 1;
-            const monthName = monthNames[monthNumber - 1];
+            // --- 1️⃣ Walidacja kwoty ---
+            const amountValue = parseFloat(amountInput.value);
+            if (isNaN(amountValue) || amountValue <= 0) {
+                showError(amountInput, "Please enter a valid amount greater than zero.");
+                valid = false;
+            }
 
-            try {
-                const response = await fetch('/incomes/checkAmountForMonth', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: selectedId, month: monthNumber })
-                });
+            // --- 2️⃣ Walidacja daty ---
+            if (!dateInput.value) {
+                showError(dateInput, "Please select a valid date.");
+                valid = false;
+            }
 
-                const data = await response.json();
-                //console.log(data);
+            // --- 3️⃣ Walidacja kategorii ---
+            if (!categorySelect.value || categorySelect.selectedIndex === 0) {
+                showError(categorySelect, "Please choose a category.");
+                valid = false;
+            }
 
-                if (data.status === 'ok') {
-                    const amount = parseFloat(data.sum);
-                    const amountAll = parseFloat(data.sumAllCategories);
-                    if (amount > 0) {
-                        p.innerHTML = `
-                        <span class="text-light">In <strong class="text-warning">${monthName}</strong>,</span><br>
-                        <span class="text-success fw-bold">${amount.toFixed(2)} PLN</span> 
-                        <span class="text-light">was received from</span> 
-                        <strong class="text-warning">(${selectedName})</strong>.
-                    `;
-                        secondInfo.innerHTML = `
-                            <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span> 
-                        `;
-                    } else {
-                        p.innerHTML = `
-                        <span class="text-light">In</span> 
-                        <strong class="text-warning">${monthName}</strong>, 
-                        <span class="text-light">you haven't received any money from</span> 
-                        <strong class="text-warning">(${selectedName})</strong>.
-                    `;
-                    }
-
-                    div.classList.remove('hidden1');
-                    h3.classList.remove('hidden');
-
-                } else {
-                    p.textContent = "Error fetching data.";
-                    div.classList.remove('hidden1');
-
-                }
-
-            } catch (error) {
-                console.error('Fetch error:', error);
-                p.textContent = "Server error, please try again later.";
-                div.classList.remove('hidden1');
+            if (!valid) {
+                event.preventDefault();
             }
         });
+
+        // 🔸 Nasłuchiwanie na zmiany — usuwa komunikaty po poprawce
+        amountInput.addEventListener("input", () => removeError(amountInput));
+        dateInput.addEventListener("input", () => removeError(dateInput));
+        categorySelect.addEventListener("change", () => removeError(categorySelect));
+
+        // 🔹 Funkcja do wyświetlania błędu
+        function showError(element, message) {
+            removeError(element); // usuń poprzedni komunikat jeśli istnieje
+
+            const alert = document.createElement("div");
+            alert.className = "custom-alert text-warning mt-2 p-2 rounded border border-warning";
+            alert.style.backgroundColor = "rgba(255, 193, 7, 0.1)";
+            alert.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> ${message}`;
+
+            // wstaw komunikat pod pole
+            element.closest(".input-group")
+                ? element.closest(".input-group").after(alert)
+                : element.after(alert);
+
+            element.classList.add("shake");
+            setTimeout(() => element.classList.remove("shake"), 400);
+        }
+
+        // 🔹 Funkcja do usuwania błędu
+        function removeError(element) {
+            const alert = element.closest(".input-group")
+                ? element.closest(".input-group").nextElementSibling
+                : element.nextElementSibling;
+
+            if (alert && alert.classList.contains("custom-alert")) {
+                alert.remove();
+            }
+        }
     });
+
 </script>
 {% endblock %}
