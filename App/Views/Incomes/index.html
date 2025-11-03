@@ -3,86 +3,231 @@
 {% block title %}Add Income{% endblock %}
 
 {% block body %}
-<div class="col-md-12 col-sm-12 p-5 text-center form-group quote"></div>
-<div class="login">
-    <div class="col-md-9 col-sm-9 mx-auto ">
-        <form action="/incomes/new" method="post">
-            <div class="container col-md-4 ">
-                <div class="row form-group ml-5">
+<div class="container-fluid my-6">
+    <div class="row justify-content-start align-items-center g-1">
 
-                    <div class="col-9 col-md-9 pb-1 input-group mb-4 text-danger">
-                        {% if income.errors is not empty %}
-                        <p>Errors:</p>
-                        <ul>
-                            {% for error in income.errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                    </div>
+        <!-- LEWA KOLUMNA blisko lewej krawędzi -->
+        <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4 left-column">
+            <h1 class="mb-4 text-center"><i class="fas fa-coins me-2"></i>Add Income</h1>
 
-                    <div class="col-9 col-md-9 pb-1 input-group mb-4">
-                        <h1 class="display-4 mx-auto">Income</h1>
-                    </div>
+            <form method="post" action="/incomes/new" class="registration-form text-warning bg-dark" id="fromLogin">
 
-                    <div class="col-9 col-md-9 pb-1 input-group mb-4">
-                        <i class="fas fa-coins display-4 mx-auto"></i>
-                    </div>
-
-                    <div class=" col-9 col-md-9 pb-1 input-group mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fas fa-coins"></i></div>
-                        </div>
-                        <input name="amount" placeholder="Please put amount money" value="{{ income.amount }}"
-                            class="form-control bg-light">
-                    </div>
-
-                    <div class=" col-9 col-md-9 pb-1 input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
-                        </div>
-                        <input name="dateIncome" class="form-control" type="date"
-                            value="{{ income.dateIncome ?? dateIncome }}" />
-                    </div>
-
-                    <div class=" col-9 col-md-9 pb-1 input-group">
-                        <select name="nameCategory" class="form-control selectpicker pt-2" data-live-search="true">
-                            {% for incomeCategory in incomeCategories %}
-                            <option value="{{ incomeCategory.name }}" {% if incomeCategory.name==income.nameCategory or
-                                incomeCategory.name==nameCategory %}selected{% endif %}>
-                                {{ incomeCategory.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class=" col-9 col-md-9 pb-1 input-group mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fas fa-pencil-alt"></i></div>
-                        </div>
-                        <textarea id="message" name="messageIncome" cols="30" rows="2"
-                            class="col-10 input-group">{{ income.messageIncome }}</textarea>
-                    </div>
-
-                    <div class="col-9 col-md-9 pb-1 input-group text-center">
-                        <button type="submit" class="btn btn-success text-white col-12">Add Income</button>
-                    </div>
-
-                    <div class="col-9 col-md-9 pb-1 input-group">
-                        <a href="/profile" class="btn btn-danger col-12 mx-auto text-white">Cancel</a>
-                    </div>
-
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <input type="number" id="amount" name="amount" value="{{ income.amount }}"
+                        class="form-control bg-dark text-light border-warning" placeholder="Enter amount">
                 </div>
+
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                    <input type="date" name="dateIncome" class="form-control bg-dark text-light border-warning"
+                        value="{{ income.dateIncome ?? dateIncome }}">
+                </div>
+
+                <!-- SELECT -->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning"
+                    id="incomeCategorySelect">
+                    {% if income.nameCategory %}
+                    {% for incomeCategory in incomeCategories %}
+                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}"
+                        data-dateIncome="{{ dateIncome }}" {% if income.nameCategory==incomeCategory.name %}selected{%
+                        endif %}>
+                        {{ incomeCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option selected disabled>-- Select income category --</option>
+                    {% for incomeCategory in incomeCategories %}
+                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}"
+                        data-dateIncome="{{ dateIncome }}">
+                        {{ incomeCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+
+                <textarea id="message" name="messageIncome" rows="4"
+                    class="col-10 input-group mt-3 bg-dark text-light border border-warning mb-5"
+                    placeholder="Enter your comment here">{{ income.messageIncome }}</textarea>
+
+                <div class="col-9 col-md-9 pb-1 input-group text-center">
+                    <button type="submit" class="btn btn-outline-success text-white col-12">Add Income</button>
+                </div>
+
+                <div class="col-9 col-md-9 input-group">
+                    <a href="/profile" class="btn btn-outline-danger col-12 mx-auto text-white">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- PRAWA KOLUMNA Z WYNIKIEM -->
+        <div style="min-height: 180px; border-radius: 20px; margin-left: 10px;" class="col-md-5 hidden1"
+            id="selectedCategoryDiv">
+            <div class="info-card text-center p-4">
+                <h3 class="hidden text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
+                <p class="fs-5 text-light" id="selectedCategoryH1"></p>
             </div>
-        </form>
+
+            <!-- Drugi div pod pierwszym -->
+            <div class="info-card text-center p-4 mt-3" id="secondInfoDiv">
+                <h4 class="text-warning mb-2">Cash from all Categories </h4>
+                <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+            </div>
+        </div>
+
+
     </div>
 </div>
 {% endblock %}
 
 {% block footer %}
+<style>
+    .left-column {
+        margin-left: 10px;
+    }
+
+    .hidden1 {
+        display: none;
+    }
+
+    .info-card {
+        background: linear-gradient(145deg, #1c1c1c, #222);
+        border: 1px solid #ffc107;
+        border-radius: 16px;
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+        transition: all 0.4s ease;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .info-card:hover {
+        box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+        transform: scale(1.02);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #incomeCategorySelect:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+        border-color: #ffc107 !important;
+    }
+
+    .input-group-text {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        padding: 0 0.75rem;
+    }
+
+    input[type="date"].form-control {
+        background-color: #1a1a1a;
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+
+    input[type="date"].form-control::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+
+    #message:focus {
+        border-color: #ffc107;
+        outline: none;
+    }
+
+    #message::placeholder {
+        color: #f8f9fa;
+        opacity: 1;
+    }
+</style>
+
 <script>
-    $(document).ready(function () {
-        $('.selectpicker').selectpicker();
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('incomeCategorySelect');
+        const div = document.getElementById('selectedCategoryDiv');
+        const p = document.getElementById('selectedCategoryH1');
+        const h3 = document.getElementById('selectedCategoryH3');
+        const dateInput = document.querySelector('input[name="dateIncome"]');
+        const secondInfo = document.getElementById('secondInfoP');
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        select.addEventListener('change', async function () {
+            const selectedOption = select.options[select.selectedIndex];
+            const selectedId = selectedOption.dataset.id;
+            const selectedName = selectedOption.value;
+            const selectedDate = dateInput.value;
+
+            if (!selectedId || !selectedDate) return;
+
+            const monthNumber = new Date(selectedDate).getMonth() + 1;
+            const monthName = monthNames[monthNumber - 1];
+
+            try {
+                const response = await fetch('/incomes/checkAmountForMonth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: selectedId, month: monthNumber })
+                });
+
+                const data = await response.json();
+                //console.log(data);
+
+                if (data.status === 'ok') {
+                    const amount = parseFloat(data.sum);
+                    const amountAll = parseFloat(data.sumAllCategories);
+                    if (amount > 0) {
+                        p.innerHTML = `
+                        <span class="text-light">In <strong class="text-warning">${monthName}</strong>,</span><br>
+                        <span class="text-success fw-bold">${amount.toFixed(2)} PLN</span> 
+                        <span class="text-light">was received from</span> 
+                        <strong class="text-warning">(${selectedName})</strong>.
+                    `;
+                        secondInfo.innerHTML = `
+                            <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span> 
+                        `;
+                    } else {
+                        p.innerHTML = `
+                        <span class="text-light">In</span> 
+                        <strong class="text-warning">${monthName}</strong>, 
+                        <span class="text-light">you haven't received any money from</span> 
+                        <strong class="text-warning">(${selectedName})</strong>.
+                    `;
+                    }
+
+                    div.classList.remove('hidden1');
+                    h3.classList.remove('hidden');
+
+                } else {
+                    p.textContent = "Error fetching data.";
+                    div.classList.remove('hidden1');
+
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                p.textContent = "Server error, please try again later.";
+                div.classList.remove('hidden1');
+            }
+        });
     });
 </script>
 {% endblock %}
