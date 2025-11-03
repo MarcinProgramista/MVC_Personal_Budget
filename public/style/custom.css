@@ -103,6 +103,10 @@ body {
     background-color: #ffc107;
 }
 
+.select {
+    background-color: #ffc107;
+}
+
 .guest-background {
     position: fixed;
     top: 0;
@@ -231,7 +235,6 @@ form#formSignup .hideShowPassword-wrapper {
 }
 
 
-
 .fade-section-list {
     opacity: 0;
     max-height: 0;
@@ -296,4 +299,16 @@ form#formSignup .hideShowPassword-wrapper {
     color: red !important;
     font-weight: bold;
     display: block !important;
+}
+
+#message:focus {
+    border-color: #ffc107;
+    /* border-warning */
+    outline: none;
+}
+
+#message::placeholder {
+    color: #f8f9fa;
+    /* text-light */
+    opacity: 1;
 }

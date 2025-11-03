@@ -40,6 +40,8 @@ $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'ac
 $router->add('signup/activate/{token:[\da-f]+}', ['controller' => 'Signup', 'action' => 'activate']);
 $router->add('profile/get-user-data', ['controller' => 'Profile', 'action' => 'getUserData', 'method' => 'GET']);
 $router->add('profile/update', ['controller' => 'Profile', 'action' => 'update', 'method' => 'POST']);
+$router->add('incomes/check-amount', ['controller' => 'Incomes', 'action' => 'checkAmountForMonth']);
+
 
 $router->add('{controller}/{action}');
 

@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use \Core\View;
 use \App\Auth;
-use \App\Models\User;
 use \App\Models\Income;
+use App\Models\IncomeCategory;
 use \App\Models\Balance;
 use \App\Flash;
 
@@ -33,15 +33,37 @@ class Incomes extends Authenticated
      */
     public function indexAction()
     {
-        //$incomeCategories = Income::getAllIncomesAssignedToUser($this->user->id);
+        $user = Auth::getUser();
+        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user->id);
         $dateIncome =  date('Y-m-d');
         $nameCategory =  'Allegro';
         $active = true;
         View::renderTemplate('Incomes/index.html', [
-            //'incomeCategories' => $incomeCategories,
+            'incomeCategories' => $incomeCategories,
             'dateIncome' => $dateIncome,
             'nameCategory' => $nameCategory,
             'active' => $active
         ]);
+    }
+
+    public function checkAmountForMonthAction()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        $categoryId = $input['id'] ?? null;
+        $month = $input['month'] ?? null;
+        $userId = $_SESSION['user_id']; // zakładam, że masz sesję użytkownika
+
+        $sum = Income::getSumForCategoryAndMonth($userId, $categoryId, $month);
+        $sumForAllCategires = Income::getSumForAllCategoryAndMonth($userId, $month);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'ok',
+            'sum' => $sum,
+            'id' => $categoryId,
+            'month' => $month,
+            'sumAllCategories' => $sumForAllCategires
+        ]);
+        exit;
     }
 }
