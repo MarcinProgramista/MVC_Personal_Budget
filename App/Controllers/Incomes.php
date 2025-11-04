@@ -8,6 +8,7 @@ use \App\Models\Income;
 use App\Models\IncomeCategory;
 use \App\Models\Balance;
 use \App\Flash;
+use \App\Controllers\Authenticated;
 
 /**
  * Incomes controller (example)
@@ -23,7 +24,7 @@ class Incomes extends Authenticated
      */
     protected function before()
     {
-        $user = Auth::getUser();
+        $this->user = Auth::getUser();
     }
 
     /**
@@ -33,8 +34,8 @@ class Incomes extends Authenticated
      */
     public function indexAction()
     {
-        $user = Auth::getUser();
-        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user->id);
+
+        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($this->user->id);
         $dateIncome =  date('Y-m-d');
         $nameCategory =  'Allegro';
         $active = true;

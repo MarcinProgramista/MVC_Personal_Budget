@@ -195,4 +195,23 @@ class PaymentMethod extends \Core\Model
 
         return $stmt->execute();
     }
+
+    /**
+     * Get all the methdPaymentfrom expense as an associative array
+     *
+     * @return array
+     */
+    public static function getPayments($id)
+    {
+        $sql = 'SELECT id,name FROM payment_methods_assigned_to_users WHERE user_id = :id';
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
 }
