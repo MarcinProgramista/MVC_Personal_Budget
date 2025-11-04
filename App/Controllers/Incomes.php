@@ -53,10 +53,36 @@ class Incomes extends Authenticated
      */
     public function newAction()
     {
-        $income = new Income($_POST);
-        var_dump($income);
-    }
+        header('Content-Type: text/plain; charset=utf-8');
 
+        // symulacja: np. ID zalogowanego użytkownika
+        $userId = $_SESSION['user_id'] ?? 1; // <- albo metoda Auth::getUser()->id
+
+        // połącz dane z formularza z user_id
+        $data = $_POST;
+        $data['user_id'] = $userId;
+        $income = new Income($_POST);
+        $income_category_assigned_to_user_id = Income::findIdIncomeCategory($userId, $data['incomeCategoryName']);
+
+        if ($income->save($userId, $income_category_assigned_to_user_id)) {
+
+            Flash::addMessage('Added Income');
+
+            $this->redirect('/incomes/success');
+        } else {
+            $dateIncome =  date('Y-m-d');
+            $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($userId);
+            View::renderTemplate('Incomes/index.html', [
+                'income' => $income,
+                'incomeCategories' => $incomeCategories,
+                'dateIncome' => $dateIncome
+            ]);
+        }
+        // echo "✅ Form data received:\n\n";
+        // print_r($income_category_assigned_to_user_id);
+
+        // exit;
+    }
     public function checkAmountForMonthAction()
     {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -76,5 +102,15 @@ class Incomes extends Authenticated
             'sumAllCategories' => $sumForAllCategires
         ]);
         exit;
+    }
+
+    /**
+     * Show add success income
+     *
+     * @return void
+     */
+    public function successAction()
+    {
+        View::renderTemplate('Incomes/success.html');
     }
 }

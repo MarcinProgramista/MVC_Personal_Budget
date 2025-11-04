@@ -31,27 +31,25 @@
                 </div>
 
                 <!-- SELECT -->
+                <!-- SELECT -->
                 <select class="form-select form-select-sm bg-dark text-light border border-warning"
-                    id="incomeCategorySelect">
+                    id="incomeCategorySelect" name="incomeCategoryName">
                     {% if income.nameCategory %}
                     {% for incomeCategory in incomeCategories %}
-                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}"
-                        data-dateIncome="{{ dateIncome }}" {% if income.nameCategory==incomeCategory.name %}selected{%
-                        endif %}>
+                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}" {% if
+                        income.nameCategory==incomeCategory.name %}selected{% endif %}>
                         {{ incomeCategory.name }}
                     </option>
                     {% endfor %}
                     {% else %}
                     <option selected disabled>-- Select income category --</option>
                     {% for incomeCategory in incomeCategories %}
-                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}"
-                        data-dateIncome="{{ dateIncome }}">
+                    <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}">
                         {{ incomeCategory.name }}
                     </option>
                     {% endfor %}
                     {% endif %}
                 </select>
-
                 <textarea id="message" name="messageIncome" rows="4"
                     class="col-10 input-group mt-3 bg-dark text-light border border-warning mb-5"
                     placeholder="Enter your comment here">{{ income.messageIncome }}</textarea>
