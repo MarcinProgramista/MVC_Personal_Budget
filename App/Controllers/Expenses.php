@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use \Core\View;
 use \App\Auth;
-use \App\Models\User;
+use \App\Models\PaymentMethod;
 use \App\Models\Expense;
 use \App\Flash;
 use \App\Controllers\Authenticated;
@@ -35,7 +35,8 @@ class Expenses extends Authenticated
      */
     public function indexAction()
     {
-
-        var_dump($this->user->id);
+        $expenseCategories = Expense::getCategories($this->user->id);
+        $expensePayments = PaymentMethod::getPayments($this->user->id);
+        $dateExpense =  date('Y-m-d');
     }
 }

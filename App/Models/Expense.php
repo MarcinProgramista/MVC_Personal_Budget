@@ -58,4 +58,23 @@ class Expense extends \Core\Model
 
         return true;
     }
+
+    /**
+     * Get all the Categries from expense as an associative array
+     *
+     * @return array
+     */
+    public static function getCategories($id)
+    {
+        $sql = 'SELECT id,name FROM expenses_category_assigned_to_users WHERE user_id = :id';
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
 }
