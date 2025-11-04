@@ -46,6 +46,17 @@ class Incomes extends Authenticated
         ]);
     }
 
+    /**
+     * Add a new income
+     *
+     * @return void
+     */
+    public function newAction()
+    {
+        $income = new Income($_POST);
+        var_dump($income);
+    }
+
     public function checkAmountForMonthAction()
     {
         $input = json_decode(file_get_contents('php://input'), true);

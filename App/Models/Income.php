@@ -17,9 +17,10 @@ class Income extends \Core\Model
     public int $user_id;
     public int $income_category_assigned_to_user_id;
     public float $amount;
-    public ?string $date_of_income;
+    public string $date_of_income;
     public string $income_comment;
-
+    public ?string $dateIncome;
+    public string $messageIncome;
     /**
      * Class constructor
      *
