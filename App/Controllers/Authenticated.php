@@ -9,6 +9,7 @@ namespace App\Controllers;
  */
 abstract class Authenticated extends \Core\Controller
 {
+    protected $user;
     /**
      * Require the user to be authenticated before giving access to all methods in the controller
      *
