@@ -40,7 +40,8 @@ class Expenses extends Authenticated
         $dateExpense =  date('Y-m-d');
         View::renderTemplate('Expenses/index.html', [
             'dateExpense' => $dateExpense,
-            'expenseCategories' => $expenseCategories
+            'expenseCategories' => $expenseCategories,
+            'expensePayments' => $expensePayments
         ]);
     }
 }

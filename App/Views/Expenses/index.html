@@ -21,8 +21,8 @@
                     <input type="date" name="dateExpense" class="form-control bg-dark text-light border-warning"
                         value="{{ dateExpense }}">
                 </div>
-                <!-- SELECT -->
-                <select class="form-select form-select-sm bg-dark text-light border border-warning"
+                <!-- SELECT Category-->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning mb-3"
                     id="expenseCategorySelect" name="expenseCategoryName">
                     {% if expense.nameCategory %}
                     {% for expenseCategory in expenseCategories %}
@@ -36,6 +36,25 @@
                     {% for expenseCategory in expenseCategories %}
                     <option value="{{ expenseCategory.name | escape }}" data-id="{{ expenseCategory.id }}">
                         {{ expenseCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+                <!-- SELECT Payment Method-->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning mb-3"
+                    id="namePayment" name="namePayment">
+                    {% if expense.namePayment %}
+                    {% for expensePayment in expensePayments %}
+                    <option value="{{ expensePayment.name | escape }}" data-id="{{ expensePayment.id }}" {% if
+                        expense.namePayment==expensePayment.name %}selected{% endif %}>
+                        {{ expensePayment.name }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option selected disabled>-- Select payment method-</option>
+                    {% for expensePayment in expensePayments %}
+                    <option value="{{ expensePayment.name | escape }}" data-id="{{ expensePayment.id }}">
+                        {{ expensePayment.name }}
                     </option>
                     {% endfor %}
                     {% endif %}
