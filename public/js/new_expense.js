@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("fromAddExpense");
     const amountInput = document.getElementById("amount");
-
+    const dateInput = document.querySelector('input[name="dateExpense"]');
     form.addEventListener("submit", function (event) {
         let valid = true;
 
@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const amountValue = parseFloat(amountInput.value);
         if (isNaN(amountValue) || amountValue <= 0) {
             showError(amountInput, "Please enter a valid amount greater than zero.");
+            valid = false;
+        }
+        // --- 2️⃣ Walidacja daty ---
+        if (!dateInput.value) {
+            showError(dateInput, "Please select a valid date.");
             valid = false;
         }
 

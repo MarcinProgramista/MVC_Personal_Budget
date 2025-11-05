@@ -13,7 +13,13 @@
                     </span>
                     <input type="number" id="amount" name="amount" value="{{ expense.amount }}"
                         class="form-control bg-dark text-light border-warning" placeholder="Enter amount">
-
+                </div>
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                    <input type="date" name="dateExpense" class="form-control bg-dark text-light border-warning"
+                        value="{{ dateExpense }}">
                 </div>
                 <div class="col-9 input-group col-md-9 pb-1 text-center">
                     <button type="submit" class="btn btn-outline-success text-white col-12">Add Income</button>
