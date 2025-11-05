@@ -22,6 +22,7 @@
         </div>
     </div>
 </div>
+<script src="/js/new_expense.js?v={{ random() }}"></script>
 {% endblock %}
 {% block footer %}
 <style>
@@ -52,6 +53,26 @@
         justify-content: center;
         font-size: 1.2rem;
         padding: 0 0.75rem;
+    }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    .shake {
+        animation: shake 0.4s ease;
     }
 </style>
 {% endblock %}
