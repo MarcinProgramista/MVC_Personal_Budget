@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("fromAddExpense");
     const amountInput = document.getElementById("amount");
     const dateInput = document.querySelector('input[name="dateExpense"]');
+    const categorySelect = document.getElementById("expenseCategorySelect");
     form.addEventListener("submit", function (event) {
         let valid = true;
 
@@ -17,6 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // --- 2️⃣ Walidacja daty ---
         if (!dateInput.value) {
             showError(dateInput, "Please select a valid date.");
+            valid = false;
+        }
+
+        // --- 3️⃣ Walidacja kategorii ---
+        if (!categorySelect.value || categorySelect.selectedIndex === 0) {
+            showError(categorySelect, "Please choose a category.");
             valid = false;
         }
 
