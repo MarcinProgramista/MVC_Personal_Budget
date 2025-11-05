@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const amountInput = document.getElementById("amount");
     const dateInput = document.querySelector('input[name="dateExpense"]');
     const categorySelect = document.getElementById("expenseCategorySelect");
+    const paymentSelect = document.getElementById("namePayment");
     form.addEventListener("submit", function (event) {
         let valid = true;
 
@@ -24,6 +25,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // --- 3️⃣ Walidacja kategorii ---
         if (!categorySelect.value || categorySelect.selectedIndex === 0) {
             showError(categorySelect, "Please choose a category.");
+            valid = false;
+        }
+        // --- 3️⃣ Walidacja payment ---
+        if (!paymentSelect.value || paymentSelect.selectedIndex === 0) {
+            showError(paymentSelect, "Please choose a payment method.");
             valid = false;
         }
 
