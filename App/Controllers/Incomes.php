@@ -37,12 +37,10 @@ class Incomes extends Authenticated
 
         $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($this->user->id);
         $dateIncome =  date('Y-m-d');
-        $nameCategory =  'Allegro';
         $active = true;
         View::renderTemplate('Incomes/index.html', [
             'incomeCategories' => $incomeCategories,
             'dateIncome' => $dateIncome,
-            'nameCategory' => $nameCategory,
             'active' => $active
         ]);
     }

@@ -21,6 +21,25 @@
                     <input type="date" name="dateExpense" class="form-control bg-dark text-light border-warning"
                         value="{{ dateExpense }}">
                 </div>
+                <!-- SELECT -->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning"
+                    id="expenseCategorySelect" name="expenseCategoryName">
+                    {% if expense.nameCategory %}
+                    {% for expenseCategory in expenseCategories %}
+                    <option value="{{ expenseCategory.name | escape }}" data-id="{{ expenseCategory.id }}" {% if
+                        expense.expenseCategory==expenseCategory.name %}selected{% endif %}>
+                        {{ expenseCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option selected disabled>-- Select expense category --</option>
+                    {% for expenseCategory in expenseCategories %}
+                    <option value="{{ expenseCategory.name | escape }}" data-id="{{ expenseCategory.id }}">
+                        {{ expenseCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
                 <div class="col-9 input-group col-md-9 pb-1 text-center">
                     <button type="submit" class="btn btn-outline-success text-white col-12">Add Income</button>
                 </div>
@@ -32,6 +51,12 @@
 {% endblock %}
 {% block footer %}
 <style>
+    #expenseCategorySelect:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+        border-color: #ffc107 !important;
+    }
+
     #leftColumn {
         background: linear-gradient(145deg, #1c1c1c, #222);
         border: 1px solid #ffc107;
