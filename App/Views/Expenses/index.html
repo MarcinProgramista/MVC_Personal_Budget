@@ -1,8 +1,55 @@
 {% extends 'base.html' %}
 {% block title %}Add Income{% endblock %}
 {% block body %}
+<div class="container-fluid ">
+    <div class="row justify-content-start align-items-center g-1">
+        <div class="col-md-5 text-center border border-warning  p-4 left-column" id="leftColumn">
+            <h1 class="mb-4 text-center"><i class="fas fa-coins me-2"></i>Add Expense</h1>
+            <form method="post" action="/expenses/new" class="registration-form text-warning bg-dark" id="fromLogin"
+                novalidate>
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <input type="number" id="amount" name="amount" value="{{ expense.amount }}"
+                        class="form-control bg-dark text-light border-warning" placeholder="Enter amount">
 
+                </div>
 
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
 {% block footer %}
+<style>
+    #leftColumn {
+        background: linear-gradient(145deg, #1c1c1c, #222);
+        border: 1px solid #ffc107;
+        border-radius: 16px;
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+        transition: all 0.4s ease;
+        animation: fadeIn 0.5s ease;
+        position: relative;
+        z-index: 1;
+        margin: 10px;
+        opacity: 0.6;
+    }
 
+
+    #leftColumn:hover {
+        box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+        transform: scale(1.02);
+        opacity: 1;
+    }
+
+    .input-group-text {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        padding: 0 0.75rem;
+    }
+</style>
 {% endblock %}
