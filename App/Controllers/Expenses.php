@@ -38,6 +38,8 @@ class Expenses extends Authenticated
         $expenseCategories = Expense::getCategories($this->user->id);
         $expensePayments = PaymentMethod::getPayments($this->user->id);
         $dateExpense =  date('Y-m-d');
-        View::renderTemplate('Expenses/index.html');
+        View::renderTemplate('Expenses/index.html', [
+            'dateExpense' => $dateExpense
+        ]);
     }
 }
