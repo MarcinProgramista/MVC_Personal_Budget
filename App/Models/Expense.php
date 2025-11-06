@@ -77,4 +77,54 @@ class Expense extends \Core\Model
 
         return $results;
     }
+
+    /**
+     * Pobiera sumę amount dla danej kategorii i miesiąca (i użytkownika)
+     *
+     * @param int $userId
+     * @param int $categoryId
+     * @param int $monthNumber
+     * @return float
+     */
+    public static function getSumForCategoryAndMonth($userId, $categoryId, $monthNumber)
+    {
+        $sql = "SELECT SUM(amount) AS total
+                FROM expenses
+                WHERE user_id = :user_id
+                AND expense_category_assigned_to_user_id = :category_id
+                AND MONTH(date_of_expense) = :month";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $monthNumber, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() ?: 0;
+    }
+
+    /**
+     * Take sum amount from all categries from month and loged user 
+     *
+     * @param int $userId
+     * @param int $monthNumber
+     * @return float
+     */
+    public static function getSumForAllCategoryAndMonth($userId, $monthNumber)
+    {
+        $sql = "SELECT SUM(amount) AS total FROM expenses
+            WHERE user_id = :userId
+            AND MONTH(date_of_expense) = :monthNumber";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':monthNumber', $monthNumber, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchColumn() ?: 0;
+    }
 }

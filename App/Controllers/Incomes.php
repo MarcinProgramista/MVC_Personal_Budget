@@ -82,6 +82,7 @@ class Incomes extends Authenticated
 
         // exit;
     }
+
     public function checkAmountForMonthAction()
     {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -92,13 +93,15 @@ class Incomes extends Authenticated
 
         $sum = Income::getSumForCategoryAndMonth($userId, $categoryId, $month);
         $sumForAllCategires = Income::getSumForAllCategoryAndMonth($userId, $month);
+        $expectedMoney = IncomeCategory::findExpectedMonetForChosenCategory($userId, $categoryId);
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'ok',
             'sum' => $sum,
             'id' => $categoryId,
             'month' => $month,
-            'sumAllCategories' => $sumForAllCategires
+            'sumAllCategories' => $sumForAllCategires,
+            'expectedMoney' => $expectedMoney
         ]);
         exit;
     }
