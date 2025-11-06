@@ -214,4 +214,47 @@ class PaymentMethod extends \Core\Model
 
         return $results;
     }
+
+    /**
+     * Find limit payment method  in payment_methods_assigned_to_users
+     *
+     * @return limit float
+     */
+    public static function findLimitPaymentMethod($user_id, $categoryId)
+    {
+        $nameCategory = static::findNamePaymentMethod($user_id, $categoryId);
+        $sql = 'SELECT cash_limit FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['cash_limit'] ?: 0;
+    }
+
+    /**
+     * Find id category in incomes_category_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findNamePaymentMethod($user_id, $id)
+    {
+        $sql = 'SELECT name FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND id=:id';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['name'];
+    }
 }
