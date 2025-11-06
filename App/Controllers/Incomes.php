@@ -10,6 +10,7 @@ use \App\Models\Balance;
 use \App\Flash;
 use \App\Controllers\Authenticated;
 
+
 /**
  * Incomes controller (example)
  *
@@ -17,6 +18,12 @@ use \App\Controllers\Authenticated;
  */
 class Incomes extends Authenticated
 {
+    public function __construct($data = [])
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+    }
     /**
      * Before filter - called before each action method
      *

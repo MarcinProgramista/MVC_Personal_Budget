@@ -257,4 +257,25 @@ class PaymentMethod extends \Core\Model
 
         return $result['name'];
     }
+
+    /**
+     * Find id payment method in payment_methods_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findIdPaymentMethod($user_id, $nameCategory)
+    {
+        $sql = 'SELECT id FROM payment_methods_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['id'];
+    }
 }

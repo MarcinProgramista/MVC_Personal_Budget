@@ -54,11 +54,18 @@ class Expenses extends Authenticated
     {
         header('Content-Type: text/plain; charset=utf-8');
 
-        // symulacja: np. ID zalogowanego użytkownika
-        $userId = $_SESSION['user_id'] ?? 1; // <- albo metoda Auth::getUser()->id
+        $userId = $_SESSION['user_id'] ?? 1;
+        // dodaj user_id do danych z formularza
         $data = $_POST;
-        var_dump($data);
+        $data['user_id'] = $userId;
+        $expense_category_assigned_to_user_id = ExpenseCategory::findIdExpenseCategory($userId, $data['expenseCategoryName']);
+        $data['expense_category_assigned_to_user_id'] = $expense_category_assigned_to_user_id;
+        echo  PaymentMethod::findIdPaymentMethod($userId, $data['namePayment']);
+        $expense = new Expense($data);
+        var_dump($expense);
+        //$expense->save();
     }
+
 
     public function checkAmountForMonthAction()
     {
