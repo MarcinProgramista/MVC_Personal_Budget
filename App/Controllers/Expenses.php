@@ -57,6 +57,7 @@ class Expenses extends Authenticated
         // symulacja: np. ID zalogowanego użytkownika
         $userId = $_SESSION['user_id'] ?? 1; // <- albo metoda Auth::getUser()->id
         $data = $_POST;
+        var_dump($data);
     }
 
     public function checkAmountForMonthAction()

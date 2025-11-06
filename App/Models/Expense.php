@@ -6,6 +6,8 @@ use App\Models\User;
 
 use PDO;
 
+
+
 /**
  * Example user model
  *
@@ -18,8 +20,8 @@ class Expense extends \Core\Model
     public int $income_category_assigned_to_user_id;
     public int $ayment_method_assigned_to_user_id;
     public float $amount;
-    public ?string $date_of_income;
-    public string $income_comment;
+    public ?string $date_of_expemnse;
+    public array $errors = [];
 
     /**
      * Class constructor
@@ -152,5 +154,22 @@ class Expense extends \Core\Model
         $stmt->execute();
 
         return $stmt->fetchColumn() ?: 0;
+    }
+
+    /**
+     * Validate current property values, adding valiation error messages to the errors array property
+     *
+     * @return void
+     */
+    public function validate()
+    {
+
+        if (!is_numeric($_POST['amount'])) {
+            $this->errors[] = 'Put amount of income';
+        }
+
+        if (!isset($_POST['amount'])) {
+            $this->errors[] = 'You need put the amount of income';
+        }
     }
 }
