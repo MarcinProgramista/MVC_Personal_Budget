@@ -73,24 +73,45 @@
         <div class="col-md-6 position-relative right-column">
             <!-- 🔹 TŁO Z OBRAZKIEM – ZAWSZE WIDOCZNE -->
             <div class="expense-bg"></div>
-            <!-- 🔹 ZAWARTOŚĆ KOLUMNY (pojawia się po wybraniu kategorii) -->
+
+            <!-- 🔹 ZAWARTOŚĆ KATEGORII (pojawia się po wybraniu kategorii) -->
             <div id="selectedCategoryDiv" class="hidden1">
-                <div class="info-card  text-center p-4 position-relative">
+                <div class="info-card text-center p-4 position-relative">
                     <h3 class="text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
                     <p class="fs-5 text-light" id="selectedCategoryH1"></p>
                 </div>
+
                 <div class="info-card text-center p-4 mt-3 position-relative" id="secondInfoDiv">
                     <h4 id="limitExpense" class="text-warning mb-2">Limit value</h4>
-                    <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+                    <p class="fs-6 text-light" id="secondInfoP"></p>
                 </div>
-                <div class="info-card  text-center p-4 position-relative">
-                    <h3 class="text-warning mb-3" id="selectedPaymentH3">Cash left</h3>
+
+                <div class="info-card text-center p-4 position-relative">
+                    <h3 class="text-warning mb-3">Cash left</h3>
                     <p class="fs-5 text-light" id="selectedPaymentH1"></p>
                 </div>
             </div>
+
+            <!-- 🔹 Payment Method (niezależne, zawsze aktywne) -->
+            <div class="info-card text-center p-4 position-relative hidden1" id="paymentInfoDiv">
+                <h3 class="text-warning mb-3">Payment Method limit</h3>
+                <p class="fs-5 text-light" id="selectedPaymentLimit"></p>
+            </div>
+            <div class="info-card text-center p-4 position-relative hidden1" id="paymentCashLeftDiv">
+                <h3 class="text-warning mb-3">Cash left in this method payment</h3>
+                <p class="fs-5 text-light" id="selectedPaymentCashLeft"></p>
+            </div>
+            <div class="info-card text-center p-4 position-relative hidden1" id="paymentMethodInfoDiv">
+                <h3 class="text-warning mb-3">Payment Method info</h3>
+                <p class="fs-5 text-light" id="selectedPaymentMethodInfo"></p>
+            </div>
+
+
         </div>
+
     </div>
-    <script src="/js/new_expense.js?v={{ random() }}"></script>
+    <script src="/js/new_expense.js?v={{ random() }}" defer></script>
+
     {% endblock %}
     {% block footer %}
     <style>

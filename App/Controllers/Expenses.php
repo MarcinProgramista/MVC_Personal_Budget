@@ -68,7 +68,7 @@ class Expenses extends Authenticated
         $userId = $_SESSION['user_id']; // zakładam, że masz sesję użytkownika
         $limitCategory = ExpenseCategory::findLimitExpenseCategory($userId, $categoryId);
         $sum = Expense::getSumForCategoryAndMonth($userId, $categoryId, $month);
-        $sumForAllCategires = Expense::getSumForAllCategoryAndMonth($userId, $month);
+        $sumForAllCategires = Expense::getSumForAllCategoryAndMonth($userId, $month);;
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'ok',
@@ -76,7 +76,28 @@ class Expenses extends Authenticated
             'id' => $categoryId,
             'month' => $month,
             'sumAllCategories' => $sumForAllCategires,
-            'limitCategory' => $limitCategory
+            'limitCategory' => $limitCategory,
+        ]);
+        exit;
+    }
+
+    public function checkPaymentLimitAction()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        $paymentId = $input['id'] ?? null;
+        $month = $input['month'] ?? null;
+        $userId = $_SESSION['user_id'];
+        $sumPaymentMethodInMonth = Expense::getSumForPaymentMethodAndChoosenMonth($userId, $paymentId, $month);
+        // Tu możesz zrobić swoje zapytanie:
+        $limitPayment = PaymentMethod::findLimitPaymentMethod($userId, $paymentId);
+
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'ok',
+            'limitPayment' => $limitPayment,
+            'sumPaymentMethodInMonth' => $sumPaymentMethodInMonth
         ]);
         exit;
     }

@@ -127,4 +127,30 @@ class Expense extends \Core\Model
 
         return $stmt->fetchColumn() ?: 0;
     }
+
+    /**
+     * Pobiera sumę amount dla danej kategorii i miesiąca (i użytkownika)
+     *
+     * @param int $userId
+     * @param int $categoryId
+     * @param int $monthNumber
+     * @return float
+     */
+    public static function getSumForPaymentMethodAndChoosenMonth($userId, $categoryId, $monthNumber)
+    {
+        $sql = "SELECT SUM(amount) AS total
+                FROM expenses
+                WHERE user_id = :user_id
+                AND payment_method_assigned_to_user_id = :category_id
+                AND MONTH(date_of_expense) = :month";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $monthNumber, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() ?: 0;
+    }
 }
