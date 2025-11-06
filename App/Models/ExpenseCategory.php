@@ -197,4 +197,68 @@ class ExpenseCategory extends \Core\Model
 
         return $result ? (int)$result['id'] : null;
     }
+
+    /**
+     * Find id category in expense_category_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findIdExpenseCategory($user_id, $nameCategory)
+    {
+        $sql = 'SELECT id FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['id'];
+    }
+
+    /**
+     * Find id category in expense_category_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findLimitExpenseCategory($user_id, $categoryId)
+    {
+        $nameCategory = static::findNameExpenseCategory($user_id, $categoryId);
+        $sql = 'SELECT cash_limit FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['cash_limit'] ?: 0;
+    }
+
+    /**
+     * Find id category in incomes_category_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findNameExpenseCategory($user_id, $id)
+    {
+        $sql = 'SELECT name FROM expenses_category_assigned_to_users WHERE user_id = :user_id AND id=:id';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['name'];
+    }
 }

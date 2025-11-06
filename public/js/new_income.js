@@ -1,20 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {
     const select = document.getElementById('incomeCategorySelect');
+    const dateInput = document.querySelector('input[name="dateIncome"]');
+    const amountInput = document.querySelector('input[name="amount"]');
     const div = document.getElementById('selectedCategoryDiv');
     const p = document.getElementById('selectedCategoryH1');
     const h3 = document.getElementById('selectedCategoryH3');
-    const dateInput = document.querySelector('input[name="dateIncome"]');
     const secondInfo = document.getElementById('secondInfoP');
+    const expectedMoneyInCategory = document.getElementById('expectedMoneyInCategory');
+
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
 
-    select.addEventListener('change', async function () {
+    // 🔹 Funkcja do pobierania danych (używana przy zmianie kategorii lub daty)
+    async function fetchIncomeData() {
         const selectedOption = select.options[select.selectedIndex];
+        if (!selectedOption || selectedOption.disabled) return;
+
         const selectedId = selectedOption.dataset.id;
         const selectedName = selectedOption.value;
         const selectedDate = dateInput.value;
+        const selectedAmount = amountInput.value;
 
         if (!selectedId || !selectedDate) return;
 
@@ -29,40 +36,50 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const data = await response.json();
-            //console.log(data);
 
             if (data.status === 'ok') {
                 const amount = parseFloat(data.sum);
                 const amountAll = parseFloat(data.sumAllCategories);
+                const expectedMoney = parseFloat(data.expectedMoney);
                 if (amount > 0) {
                     p.innerHTML = `
-                        <span class="text-light">In <strong class="text-warning">${monthName}</strong>,</span><br>
+                        <span class="text-light">You received from category </span> 
+                        <strong class="text-warning">${selectedName}</strong> 
                         <span class="text-success fw-bold">${amount.toFixed(2)} PLN</span> 
-                        <span class="text-light">was received from</span> 
-                        <strong class="text-warning">(${selectedName})</strong>.
+                        <span class="text-light">in <strong class="text-warning">${monthName}</strong>.</span>
                     `;
-                    secondInfo.innerHTML = `
-                            <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span> 
-                        `;
                 } else {
                     p.innerHTML = `
                         <span class="text-light">In</span> 
                         <strong class="text-warning">${monthName}</strong>, 
-                        <span class="text-light">you haven't received any money from</span> 
+                        <span class="text-light">you haven't received any money from category </span> 
                         <strong class="text-warning">(${selectedName})</strong>.
                     `;
                     secondInfo.innerHTML = `
-                            <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span> 
-                        `;
+                    <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span>
+                `;
                 }
 
+                // 🔸 Zawsze pokazuj łączną kwotę
+                secondInfo.innerHTML = `
+                    <span class="text-success fw-bold">${amountAll.toFixed(2)} PLN</span>
+                `;
+                if (expectedMoney > 0) {
+                    expectedMoneyInCategory.innerHTML = `
+                    <span class="text-light fw-bold">In this month you expecting  <span class="text-success fw-bold">${expectedMoney.toFixed(2)} PLN</span> PLN</span>
+                `;
+                } else {
+                    expectedMoneyInCategory.innerHTML = `
+                    <span class="text-light fw-bold"> Expexted money for this month wasn't set yet</span>
+                `;
+                }
+
+                // 🔸 Pokaż kartę z wynikami
                 div.classList.remove('hidden1');
                 h3.classList.remove('hidden');
-
             } else {
                 p.textContent = "Error fetching data.";
                 div.classList.remove('hidden1');
-
             }
 
         } catch (error) {
@@ -70,9 +87,13 @@ document.addEventListener('DOMContentLoaded', function () {
             p.textContent = "Server error, please try again later.";
             div.classList.remove('hidden1');
         }
-    });
-});
+    }
 
+    // 🔹 Nasłuchiwanie na zmianę kategorii i daty (obie wywołują async update)
+    select.addEventListener('change', fetchIncomeData);
+    dateInput.addEventListener('change', fetchIncomeData);
+    amountInput.addEventListener('change', fetchIncomeData);
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("fromLogin");

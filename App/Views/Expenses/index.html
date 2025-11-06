@@ -3,6 +3,7 @@
 {% block body %}
 <div class="container-fluid ">
     <div class="row justify-content-start align-items-center g-1">
+        <!-- LEWA KOLUMNA blisko lewej krawędzi -->
         <div class="col-md-5 text-center border border-warning  p-4 left-column" id="leftColumn">
             <h1 class="mb-4 text-center"><i class="fas fa-coins me-2"></i>Add Expense</h1>
             <form method="post" action="/expenses/new" class="registration-form text-warning bg-dark"
@@ -59,70 +60,138 @@
                     {% endfor %}
                     {% endif %}
                 </select>
+                <textarea id="message" name="messageExpense" rows="4"
+                    class="col-10 input-group mt-3 bg-dark text-light border border-warning mb-5"
+                    placeholder="Enter your comment here">{{ expense.messageExpense }}</textarea>
+
                 <div class="col-9 input-group col-md-9 pb-1 text-center">
                     <button type="submit" class="btn btn-outline-success text-white col-12">Add Income</button>
                 </div>
             </form>
         </div>
+        <!-- PRAWA KOLUMNA Z WYNIKIEM -->
+        <div class="col-md-6 position-relative right-column">
+            <!-- 🔹 TŁO Z OBRAZKIEM – ZAWSZE WIDOCZNE -->
+            <div class="expense-bg"></div>
+            <!-- 🔹 ZAWARTOŚĆ KOLUMNY (pojawia się po wybraniu kategorii) -->
+            <div id="selectedCategoryDiv" class="hidden1">
+                <div class="info-card  text-center p-4 position-relative">
+                    <h3 class="text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
+                    <p class="fs-5 text-light" id="selectedCategoryH1"></p>
+                </div>
+                <div class="info-card text-center p-4 mt-3 position-relative" id="secondInfoDiv">
+                    <h4 id="limitExpense" class="text-warning mb-2">Limit value</h4>
+                    <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+                </div>
+                <div class="info-card  text-center p-4 position-relative">
+                    <h3 class="text-warning mb-3" id="selectedPaymentH3">Cash left</h3>
+                    <p class="fs-5 text-light" id="selectedPaymentH1"></p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<script src="/js/new_expense.js?v={{ random() }}"></script>
-{% endblock %}
-{% block footer %}
-<style>
-    #expenseCategorySelect:focus {
-        outline: none !important;
-        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
-        border-color: #ffc107 !important;
-    }
-
-    #leftColumn {
-        background: linear-gradient(145deg, #1c1c1c, #222);
-        border: 1px solid #ffc107;
-        border-radius: 16px;
-        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-        transition: all 0.4s ease;
-        animation: fadeIn 0.5s ease;
-        position: relative;
-        z-index: 1;
-        margin: 10px;
-        opacity: 0.6;
-    }
-
-
-    #leftColumn:hover {
-        box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
-        transform: scale(1.02);
-        opacity: 1;
-    }
-
-    .input-group-text {
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        padding: 0 0.75rem;
-    }
-
-    @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
+    <script src="/js/new_expense.js?v={{ random() }}"></script>
+    {% endblock %}
+    {% block footer %}
+    <style>
+        /* 🔹 Ukrywanie tylko treści, nie tła */
+        .hidden1 {
+            display: none;
         }
 
-        25% {
-            transform: translateX(-5px);
+        .right-column {
+            min-height: 600px;
+            border-radius: 20px;
+            margin-left: 10px;
+            overflow: hidden;
+            position: relative;
         }
 
-        75% {
-            transform: translateX(5px);
-        }
-    }
+        /* 🔹 Obrazek jako tło — zawsze widoczny */
+        .expense-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/expense_down.png') center center no-repeat;
+            background-size: contain;
+            opacity: 0.45;
+            filter: brightness(0.8);
+            z-index: 0;
 
-    .shake {
-        animation: shake 0.4s ease;
-    }
-</style>
-{% endblock %}
+        }
+
+        #expenseCategorySelect:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+            border-color: #ffc107 !important;
+        }
+
+        #leftColumn {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 10px;
+            opacity: 0.6;
+        }
+
+        /* 🔹 Karty z tekstem */
+        .info-card {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 10px;
+            opacity: 0.6;
+        }
+
+        .info-card:hover {
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+
+        #leftColumn:hover {
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        .input-group-text {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            padding: 0 0.75rem;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+    </style>
+    {% endblock %}

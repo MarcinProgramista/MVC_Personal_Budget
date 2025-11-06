@@ -58,9 +58,7 @@
                     <button type="submit" class="btn btn-outline-success text-white col-12">Add Income</button>
                 </div>
 
-                <div class="col-9 col-md-9 input-group">
-                    <a href="/profile" class="btn btn-outline-danger col-12 mx-auto text-white">Cancel</a>
-                </div>
+
             </form>
         </div>
 
@@ -73,13 +71,17 @@
             <!-- 🔹 ZAWARTOŚĆ KOLUMNY (pojawia się po wybraniu kategorii) -->
             <div id="selectedCategoryDiv" class="hidden1">
                 <div class="info-card  text-center p-4 position-relative">
-                    <h3 class="text-warning mb-3" id="selectedCategoryH3">Cash info</h3>
+                    <h3 class="text-warning mb-3" id="selectedCategoryH3">Money info</h3>
                     <p class="fs-5 text-light" id="selectedCategoryH1"></p>
                 </div>
 
                 <div class="info-card text-center p-4 mt-3 position-relative" id="secondInfoDiv">
-                    <h4 class="text-warning mb-2">Cash from all Categories</h4>
+                    <h4 class="text-warning mb-2">Money from all income categories</h4>
                     <p class="fs-6 text-light" id="secondInfoP">Here you can put another message.</p>
+                </div>
+                <div class="info-card text-center p-4 mt-3 position-relative" id="secondInfoDiv">
+                    <h4 class="text-warning mb-2">Expcted money for this category</h4>
+                    <p class="fs-6 text-light" id="expectedMoneyInCategory"></p>
                 </div>
             </div>
         </div>
