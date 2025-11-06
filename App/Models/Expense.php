@@ -17,12 +17,18 @@ class Expense extends \Core\Model
 {
     public int $id;
     public int $user_id;
-    public int $income_category_assigned_to_user_id;
-    public int $ayment_method_assigned_to_user_id;
-    public float $amount;
-    public ?string $date_of_expemnse;
-    public array $errors = [];
 
+    public float $amount;
+    public array $errors = [];
+    public string $dateExpense;
+    public string $expenseCategoryName;
+    public string $namePayment;
+    public string $messageExpense;
+
+
+    public int $expense_category_assigned_to_user_id = 0;
+    public int $payment_method_assigned_to_user_id = 0;
+    public ?string $date_of_expense = null;
     /**
      * Class constructor
      *
@@ -171,5 +177,32 @@ class Expense extends \Core\Model
         if (!isset($_POST['amount'])) {
             $this->errors[] = 'You need put the amount of income';
         }
+    }
+    public function save()
+    {
+        echo $this->expenseCategoryName . PHP_EOL;
+
+        echo $this->user_id;
+    }
+
+    /**
+     * Find id category in incomes_category_assigned_to_users
+     *
+     * @return name category
+     */
+    public static function findIdExpenseCategory($user_id, $nameCategory)
+    {
+        $sql = 'SELECT id FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['id'];
     }
 }
