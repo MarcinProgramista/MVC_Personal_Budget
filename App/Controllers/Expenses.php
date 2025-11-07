@@ -57,13 +57,38 @@ class Expenses extends Authenticated
         $userId = $_SESSION['user_id'] ?? 1;
         // dodaj user_id do danych z formularza
         $data = $_POST;
+
         $data['user_id'] = $userId;
-        $expense_category_assigned_to_user_id = ExpenseCategory::findIdExpenseCategory($userId, $data['expenseCategoryName']);
-        $data['expense_category_assigned_to_user_id'] = $expense_category_assigned_to_user_id;
-        echo  PaymentMethod::findIdPaymentMethod($userId, $data['namePayment']);
+        $data['expense_category_assigned_to_user_id'] = ExpenseCategory::findIdExpenseCategory($userId, $data['expenseCategoryName']);
+        $data['payment_method_assigned_to_user_id'] =  PaymentMethod::findIdPaymentMethod($userId, $data['namePayment']);
+        $data['date_of_expense'] = $data['dateExpense'];
         $expense = new Expense($data);
-        var_dump($expense);
-        //$expense->save();
+
+        if ($expense->save()) {
+            Flash::addMessage('Added expense');
+            $this->redirect('/expenses/success');
+        } else {
+            $dateExpense =  date('Y-m-d');
+            $expenseCategories = Expense::getCategories($this->user->id);
+            $expensePayments = PaymentMethod::getPayments($this->user->id);
+            View::renderTemplate('expenses/index.html', [
+                'expense' => $expense,
+                'expenseCategories' => $expenseCategories,
+                'dateExpense' => $dateExpense,
+                'expensePayments' => $expensePayments
+            ]);
+        }
+    }
+
+
+    /**
+     * Show add success income
+     *
+     * @return void
+     */
+    public function successAction()
+    {
+        View::renderTemplate('Expenses/success.html');
     }
 
 
