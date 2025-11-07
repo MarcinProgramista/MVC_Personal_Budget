@@ -42,8 +42,46 @@ class Balances extends Authenticated
      */
     public function indexAction()
     {
-        $dateIncome =  date('Y-m-d');
-        $active = true;
-        View::renderTemplate('Balances/index.html');
+        $month = date('m');
+        $this->sentDetailsToPage($this->user->id, $month);
+    }
+
+    /**
+     * Send detail incomes and expenses to page 
+     *
+     * @return page
+     */
+    public function sentDetailsToPage($user_id, $month)
+    {
+        $balance = true;
+        $nameMonth = $this->getMonth($month);
+        $incomes = Income::getAllIncomes($user_id, $month);
+
+        View::renderTemplate('Balances/index.html', [
+            'balance' => $balance,
+            'incomes' => $incomes,
+            'nameMonth' => $nameMonth,
+        ]);
+    }
+
+    /**
+     * Get month
+     *
+     * @return string
+     */
+    public function getMonth($month)
+    {
+        if ($month == 1) return $month = 'Januray';
+        if ($month == 2) return $month = 'February';
+        if ($month == 3) return $month = 'March';
+        if ($month == 4) return $month = 'April';
+        if ($month == 5) return $month = 'May';
+        if ($month == 6) return $month = 'June';
+        if ($month == 7) return $month = 'July';
+        if ($month == 8) return $month = 'August';
+        if ($month == 9) return $month = 'Spetember';
+        if ($month == 10) return $month = 'October';
+        if ($month == 11) return $month = 'November';
+        if ($month == 12) return $month = 'December';
     }
 }
