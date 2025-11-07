@@ -200,4 +200,24 @@ class Income extends \Core\Model
 
         return $results;
     }
+
+    /**
+     * Get Sum of Incomes from month
+     *
+     * @return array
+     */
+    public static function getSumOfIncomes($id, $month)
+    {
+        $sql = 'SELECT sum(amount) as Amount from incomes WHERE  incomes.user_id = :id AND Month(incomes.date_of_income) = :month';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $month, PDO::PARAM_INT);
+        $stmt->execute();
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $results['Amount'];
+    }
 }
