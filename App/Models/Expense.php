@@ -180,9 +180,28 @@ class Expense extends \Core\Model
     }
     public function save()
     {
-        echo $this->expenseCategoryName . PHP_EOL;
+        $this->validate();
+        if (empty($this->errors)) {
 
-        echo $this->user_id;
+
+            $sql = 'INSERT INTO expenses (user_id, expense_category_assigned_to_user_id, payment_method_assigned_to_user_id, amount, date_of_expense, expense_comment) 
+                    VALUES (:user_id, :idCategoryExpense, :idMethodPeyment, :amount, :dateExpense, :messageExpense)';
+
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+
+            $stmt->bindValue(':user_id', $this->user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':idCategoryExpense', $this->expense_category_assigned_to_user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':idMethodPeyment', $this->payment_method_assigned_to_user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':amount', $this->amount, PDO::PARAM_STR);
+            $stmt->bindValue(':dateExpense', $this->dateExpense, PDO::PARAM_STR);
+            $stmt->bindValue(':messageExpense', $this->messageExpense, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+            return true;
+        }
+        return false;
     }
 
     /**

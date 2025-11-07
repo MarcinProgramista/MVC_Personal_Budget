@@ -18,6 +18,8 @@ use \App\Controllers\Authenticated;
  */
 class Incomes extends Authenticated
 {
+    protected $controller; // 👈 dodaj to
+    protected $action; // 👈 dodaj to
     public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
