@@ -178,4 +178,26 @@ class Income extends \Core\Model
 
         return $result['id'];
     }
+
+    /**
+     * Get all the incomes from current month
+     *
+     * @return array
+     */
+    public static function getAllIncomes($id, $month)
+    {
+
+        $sql = 'SELECT category_incomes.name as Category, SUM(incomes.amount) as Amount FROM incomes INNER JOIN incomes_category_assigned_to_users as category_incomes WHERE incomes.income_category_assigned_to_user_id = category_incomes.id and incomes.user_id = :id AND Month(date_of_income) = :month  GROUP BY Category';
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $month, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
 }

@@ -1,0 +1,43 @@
+<div class="border border-warning bg-dark rounded shadow-lg ">
+    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
+        <button id="toggleListIncomesBalanceBtn"
+            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
+            <span><i class="fas fa-money-bill-wave me-1"></i> Incomes</span>
+            <span id="toggleIncomesBalanceArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+        </button>
+    </div>
+    <!-- 🔽 Sekcja z listą -->
+    <div id="incomeBalanceListContainer" class="fade-section show d-flex align-items-center  d-flex flex-column"
+        style="width: 100%;">
+        <ul id="incomeBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
+            {% for income in incomes %}
+            <li
+                class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-row   align-items-center ">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">{{ income.Category}}</span>
+                    </div>
+                </div>
+                <span class="d-flex flex-row">
+                    <span class="d-flex align-items-center">
+                        <strong class="text-ligt text-center mx-2">{{ income.Amount }} PLN</strong>
+
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                            <i class="fas fa-pencil-alt text-success open-edit-income-balance-modal" role="button"
+                                data-id="{{ income.id }}" data-name="{{ income.Category|escape }}"></i>
+                        </button>
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                            <i class="fas fa-trash-alt text-danger open-delete-income-balance-modal"
+                                data-id="{{ income.id }}" data-name="{{ income.Category|escape }}"></i>
+                        </button>
+                    </span>
+
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
