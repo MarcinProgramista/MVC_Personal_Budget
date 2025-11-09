@@ -10,12 +10,15 @@
 </div>
 <div class="expense-bg"></div>
 <div class="row justify-content-center align-items-center g-1 ">
-    <div class="col-md-5 text-center border border-warning m-1 p-1 left-column">
+    <div id="piechart1" class="justify-content-center bg-dark col-5 left-column" style="height: 400px;"></div>
+    <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column " style="height: 400px;">
+    </div>
+    <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
         <!-- 🔘 Przycisk pokazujący listę incomes-->
         {% include "Balances/income_balance_block.html" %}
     </div>
-    <div class="col-md-5 text-center border border-warning m-1 p-1 right-column">
-
+    <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
+        {% include "Balances/expense_balance_block.html" %}
     </div>
 </div>
 

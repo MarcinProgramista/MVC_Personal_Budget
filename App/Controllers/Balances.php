@@ -9,7 +9,7 @@ use App\Models\IncomeCategory;
 use \App\Models\Balance;
 use \App\Flash;
 use \App\Controllers\Authenticated;
-
+use App\Models\Expense;
 
 /**
  * Balances
@@ -56,12 +56,16 @@ class Balances extends Authenticated
         $balance = true;
         $nameMonth = $this->getMonth($month);
         $incomes = Income::getAllIncomes($user_id, $month);
+        $expenses = Expense::getAlExpenses($user_id, $month);
         $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
+        $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
             'incomes' => $incomes,
             'nameMonth' => $nameMonth,
-            'sumALlIncomes' => $sumALlIncomes
+            'sumALlIncomes' => $sumALlIncomes,
+            'expenses' => $expenses,
+            'sumALlExpenses' => $sumALlExpenses
         ]);
     }
 
