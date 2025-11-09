@@ -224,4 +224,46 @@ class Expense extends \Core\Model
 
         return $result['id'];
     }
+
+    /**
+     * Get all the expenses from current month
+     *
+     * @return array
+     */
+    public static function getAlExpenses($id, $month)
+    {
+
+        $sql = 'SELECT category_expenses.name as Category, SUM(expenses.amount) as Amount FROM expenses INNER JOIN expenses_category_assigned_to_users as category_expenses WHERE expenses.expense_category_assigned_to_user_id = category_expenses.id and expenses.user_id = :id AND Month(date_of_expense) = :month GROUP BY Category';
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $month, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
+
+    /**
+     * Get Sum of Expense from month
+     *
+     * @return array
+     */
+    public static function getSumOfExpenses($id, $month)
+    {
+        $sql = 'SELECT sum(amount) as Amount from expenses WHERE  expenses.user_id = :id AND Month(expenses.date_of_expense) = :month';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $month, PDO::PARAM_INT);
+        $stmt->execute();
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $results['Amount'];
+    }
 }

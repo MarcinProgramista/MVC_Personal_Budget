@@ -74,7 +74,8 @@ class CategoryExpense extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
-
+        $idAnotherCategory = ExpenseCategory::getCategoryIdByName("Another", (int)$user_id);
+        Expense::updateCategoryForAnother($id, $user_id, $idAnotherCategory);
         $deleted = ExpenseCategory::deleteCategoryById((int)$id, (int)$user_id);
 
         if ($deleted) {

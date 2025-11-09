@@ -12,3 +12,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleListExpensesBalanceBtn = document.getElementById("toggleListExpensesBalanceBtn");
+    const expenseBalanceListContainer = document.getElementById("expenseBalanceListContainer");
+    const toggleExpensesBalanceArrow = document.getElementById("toggleExpensesBalanceArrow"); // <-- unikalne
+
+    if (toggleListExpensesBalanceBtn && expenseBalanceListContainer && toggleExpensesBalanceArrow) {
+        toggleListExpensesBalanceBtn.addEventListener("click", function () {
+            expenseBalanceListContainer.classList.toggle("show");
+            toggleExpensesBalanceArrow.innerHTML = expenseBalanceListContainer.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
+});
