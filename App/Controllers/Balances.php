@@ -56,11 +56,12 @@ class Balances extends Authenticated
         $balance = true;
         $nameMonth = $this->getMonth($month);
         $incomes = Income::getAllIncomes($user_id, $month);
-
+        $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
             'incomes' => $incomes,
             'nameMonth' => $nameMonth,
+            'sumALlIncomes' => $sumALlIncomes
         ]);
     }
 

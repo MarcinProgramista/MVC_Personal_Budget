@@ -182,8 +182,11 @@ class CategoryIncome extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
+        $idAnotherCategory = IncomeCategory::getCategoryIdByName("Another", (int)$user_id);
+        Income::updateCategoryForAnother($id, $user_id, $idAnotherCategory);
 
         $deleted = IncomeCategory::deleteCategoryById((int)$id, (int)$user_id);
+
 
         if ($deleted) {
             echo json_encode(['success' => true]);

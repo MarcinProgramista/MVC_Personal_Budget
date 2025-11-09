@@ -6,24 +6,26 @@
             <span id="toggleIncomesBalanceArrow"><i class="fas fa-arrow-down text-warning"></i></span>
         </button>
     </div>
+
     <!-- 🔽 Sekcja z listą -->
-    <div id="incomeBalanceListContainer" class="fade-section show d-flex align-items-center  d-flex flex-column"
+    <div id="incomeBalanceListContainer" class="fade-section show d-flex align-items-center flex-column"
         style="width: 100%;">
+
+        <!-- 🔹 Lista przychodów -->
         <ul id="incomeBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
             {% for income in incomes %}
             <li
                 class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
                 <div class="d-flex flex-column">
-                    <div class="d-flex flex-row   align-items-center ">
+                    <div class="d-flex flex-row align-items-center ">
                         <i class="fas fa-circle me-2 text-success"></i>
-                        <span class="fw-bold">{{ income.Category}}</span>
+                        <span class="fw-bold">{{ income.Category }}</span>
                     </div>
                 </div>
                 <span class="d-flex flex-row">
                     <span class="d-flex align-items-center">
-                        <strong class="text-ligt text-center mx-2">{{ income.Amount }} PLN</strong>
-
-                        <button
+                        <strong class="text-light text-center mx-2">{{ income.Amount }} PLN</strong>
+                        <!-- <button
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-pencil-alt text-success open-edit-income-balance-modal" role="button"
                                 data-id="{{ income.id }}" data-name="{{ income.Category|escape }}"></i>
@@ -32,12 +34,58 @@
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-trash-alt text-danger open-delete-income-balance-modal"
                                 data-id="{{ income.id }}" data-name="{{ income.Category|escape }}"></i>
-                        </button>
+                        </button> -->
                     </span>
-
                 </span>
             </li>
             {% endfor %}
         </ul>
+
+        <!-- 🔹 Suma przychodów -->
+        <div class="d-flex align-items-center" style="width: 95%;">
+            <div
+                class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
+                SUM :<strong class="text-light m-0">{{ sumALlIncomes }} PLN</strong>
+            </div>
+        </div>
+
+        <!-- 🔹 Wykres -->
+        <div id="piechart1" class="row justify-content-center bg-dark w-100" style="height: 400px;"></div>
     </div>
 </div>
+
+<!-- 🔹 Dane Twig -> JSON -->
+<script>
+    const incomesData = {{ incomes| json_encode | raw }};
+</script>
+
+<!-- 🔹 Google Charts -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+    window.addEventListener('resize', drawChart); // responsywny wykres
+
+    function drawChart() {
+        if (!incomesData || incomesData.length === 0) return;
+
+        const dataArray = [['Category', 'Amount']];
+        incomesData.forEach(income => {
+            dataArray.push([income.Category, parseFloat(income.Amount)]);
+        });
+
+        const data = google.visualization.arrayToDataTable(dataArray);
+
+        const options = {
+            title: 'Incomes',
+            backgroundColor: '#212529', // 🔹 ciemne tło (bg-dark)
+            titleTextStyle: { color: '#f8f9fa' }, // jasny tytuł
+            legend: { textStyle: { color: '#f8f9fa' } }, // jasna legenda
+            pieSliceTextStyle: { color: '#212529' }, // ciemny tekst na kawałkach
+            chartArea: { width: '90%', height: '80%' }
+        };
+
+        const chart = new google.visualization.PieChart(document.getElementById('piechart1'));
+        chart.draw(data, options);
+    }
+</script>
