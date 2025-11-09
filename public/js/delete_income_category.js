@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await res.json();
+            console.log(data);
 
             if (data.success) {
                 // 🔹 Usuń element z listy bez odświeżania
