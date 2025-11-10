@@ -289,4 +289,25 @@ class Expense extends \Core\Model
 
         return $results;
     }
+
+    /**
+     * Get Sum of Expenses for choosen period
+     *
+     * @return array
+     */
+    public static function getSumOfExpensesForChoosenPeriod($id, $dateFirst, $dateSecond)
+    {
+        $sql = 'SELECT sum(amount) as Amount from expenses WHERE  expenses.user_id = :id AND date_of_expense >= :dateFirst AND date_of_expense <= :dateSecond';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':dateFirst', $dateFirst,  PDO::PARAM_STR);
+        $stmt->bindValue(':dateSecond', $dateSecond, PDO::PARAM_STR);
+        $stmt->execute();
+        $results = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $results['Amount'];
+    }
 }
