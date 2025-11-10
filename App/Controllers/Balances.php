@@ -112,7 +112,7 @@ class Balances extends Authenticated
     {
         $incomes = Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $expenses = Balance::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        // $sumALlIncomes = Balance::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        $sumALlIncomes = Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $sumALlExpenses = Balance::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $incomeDetails = Balance::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $expenseDetails = Balance::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
@@ -124,7 +124,7 @@ class Balances extends Authenticated
             'dateSecond' => $dateSeond,
             'incomes' => $incomes,
             //     'expenses' => $expenses,
-            //     'sumALlIncomes' => $sumALlIncomes,
+            'sumALlIncomes' => $sumALlIncomes,
             //     'sumALlExpenses' => $sumALlExpenses,
             //     'incomeDetails' => $incomeDetails,
             //     'expenseDetails' => $expenseDetails,
