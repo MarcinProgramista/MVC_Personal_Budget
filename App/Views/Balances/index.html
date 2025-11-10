@@ -10,9 +10,13 @@
 </div>
 <div class="expense-bg"></div>
 <div class="row justify-content-center align-items-center g-1 ">
+    {% if incomes %}
     <div id="piechart1" class="justify-content-center bg-dark col-5 left-column" style="height: 400px;"></div>
+    {% endif %}
+    {% if expenses %}
     <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column " style="height: 400px;">
     </div>
+    {% endif %}
     <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
         <!-- 🔘 Przycisk pokazujący listę incomes-->
         {% include "Balances/income_balance_block.html" %}

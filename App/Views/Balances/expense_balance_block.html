@@ -1,4 +1,5 @@
 <div class="border border-warning bg-dark rounded shadow-lg ">
+    {% if expenses %}
     <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
         <button id="toggleListExpensesBalanceBtn"
             class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
@@ -39,6 +40,19 @@
         </div>
         <!-- <div id="piechartExpenses" class="row justify-content-center bg-dark w-100" style="height: 400px;"></div> -->
     </div>
+    {% else %}
+    <div class="d-flex flex-column align-items-center justify-content-center text-center p-4 my-3 fade-in">
+        <div class="border border-warning rounded-3 bg-dark shadow-lg p-4" style="max-width: 500px;">
+            <i class="fas fa-wallet fa-3x text-warning mb-3 pulse"></i>
+            <h3 class="text-light mb-2">No incomes found</h3>
+            <p class="text-secondary mb-3">There are no recorded incomes for this selected period.</p>
+            <a href="/incomes/add" class="btn btn-outline-warning">
+                <i class="fas fa-plus-circle me-1"></i> Add new income
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 <!-- 🔹 Dane Twig -> JSON -->
 <script>
@@ -74,3 +88,43 @@
         chart.draw(data, options);
     }
 </script>
+<style>
+    /* 🔹 Efekt łagodnego pojawienia się */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 🔹 Subtelne pulsowanie ikony */
+    .pulse {
+        animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
