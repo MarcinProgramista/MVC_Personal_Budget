@@ -89,4 +89,46 @@ class Balances extends Authenticated
         if ($month == 11) return $month = 'November';
         if ($month == 12) return $month = 'December';
     }
+
+    /**
+     * Send date to bala;ances page income
+     *
+     * @return void
+     */
+    public function sendChoosenDatesAction()
+    {
+        $this->user = Auth::getUser();
+        $dateFirst = $_POST['dateFirst'];
+        $dateSecond = $_POST['dateSecond'];
+        static::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
+    }
+
+    /**
+     * Show details from income and expenseDetails
+     *
+     * @return void
+     */
+    public static function showChoosenDatesAction($user_id, $dateFirst, $dateSeond)
+    {
+        // $incomes = Balance::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $expenses = Balance::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $sumALlIncomes = Balance::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $sumALlExpenses = Balance::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $incomeDetails = Balance::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $expenseDetails = Balance::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        // $sum = $sumALlIncomes - $sumALlExpenses;
+        $balance = true;
+        View::renderTemplate('Balances/index.html'); //, [
+        //     'balance' => $balance,
+        //     'dateFirst' => $dateFirst,
+        //     'dateSecond' => $dateSeond,
+        //     'incomes' => $incomes,
+        //     'expenses' => $expenses,
+        //     'sumALlIncomes' => $sumALlIncomes,
+        //     'sumALlExpenses' => $sumALlExpenses,
+        //     'incomeDetails' => $incomeDetails,
+        //     'expenseDetails' => $expenseDetails,
+        //     'sum' => $sum
+        // ]);
+    }
 }
