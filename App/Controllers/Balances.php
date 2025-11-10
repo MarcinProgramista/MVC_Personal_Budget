@@ -110,7 +110,7 @@ class Balances extends Authenticated
      */
     public static function showChoosenDatesAction($user_id, $dateFirst, $dateSeond)
     {
-        // $incomes = Balance::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        $incomes = Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $expenses = Balance::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $sumALlIncomes = Balance::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $sumALlExpenses = Balance::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
@@ -118,17 +118,17 @@ class Balances extends Authenticated
         // $expenseDetails = Balance::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $sum = $sumALlIncomes - $sumALlExpenses;
         $balance = true;
-        View::renderTemplate('Balances/index.html'); //, [
-        //     'balance' => $balance,
-        //     'dateFirst' => $dateFirst,
-        //     'dateSecond' => $dateSeond,
-        //     'incomes' => $incomes,
-        //     'expenses' => $expenses,
-        //     'sumALlIncomes' => $sumALlIncomes,
-        //     'sumALlExpenses' => $sumALlExpenses,
-        //     'incomeDetails' => $incomeDetails,
-        //     'expenseDetails' => $expenseDetails,
-        //     'sum' => $sum
-        // ]);
+        View::renderTemplate('Balances/index.html', [
+            'balance' => $balance,
+            'dateFirst' => $dateFirst,
+            'dateSecond' => $dateSeond,
+            'incomes' => $incomes,
+            //     'expenses' => $expenses,
+            //     'sumALlIncomes' => $sumALlIncomes,
+            //     'sumALlExpenses' => $sumALlExpenses,
+            //     'incomeDetails' => $incomeDetails,
+            //     'expenseDetails' => $expenseDetails,
+            //     'sum' => $sum
+        ]);
     }
 }
