@@ -266,4 +266,27 @@ class Expense extends \Core\Model
 
         return $results['Amount'];
     }
+
+    /**
+     * Get all the expenese from choosen period
+     *
+     * @return array
+     */
+    public static function getAllExpensesFromChoosenPeriod($id, $dateFirst, $dateSecond)
+    {
+
+        $sql = 'SELECT category_expenses.name as Category, SUM(expenses.amount) as Amount FROM expenses INNER JOIN expenses_category_assigned_to_users as category_expenses WHERE expenses.expense_category_assigned_to_user_id = category_expenses.id and expenses.user_id = :id AND date_of_expense >= :dateFirst AND date_of_expense <= :dateSecond GROUP BY Category';
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':dateFirst', $dateFirst,  PDO::PARAM_STR);
+        $stmt->bindValue(':dateSecond', $dateSecond, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
 }
