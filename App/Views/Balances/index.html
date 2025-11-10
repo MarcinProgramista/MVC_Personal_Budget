@@ -6,7 +6,11 @@
 
 {% if current_user %}
 <div class="border-bottom-1 border-light m-4" style="border-bottom: 2px solid; ">
+    {% if nameMonth %}
     <h1 class="text-start ">Balances for {{ nameMonth }}</h1>
+    {% else %}
+    <h1 class="text-start ">Balances from {{ dateFirst }} till {{ dateSecond }}</h1>
+    {% endif %}
 </div>
 <div class="expense-bg"></div>
 <div class="row justify-content-center align-items-center g-1 ">

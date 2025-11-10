@@ -220,4 +220,33 @@ class Income extends \Core\Model
 
         return $results['Amount'];
     }
+
+    /**
+     * Get all the incomes from choosen period
+     *
+     * @return array
+     */
+    public static function getAllIncomesFromChoosenPeriod($id, $dateFirst, $dateSecond)
+    {
+
+        $sql = 'SELECT category_incomes.name as Category, SUM(incomes.amount) as Amount 
+                FROM incomes INNER JOIN incomes_category_assigned_to_users as category_incomes 
+                WHERE incomes.income_category_assigned_to_user_id = category_incomes.id 
+                AND incomes.user_id=:id 
+                AND date_of_income >= :dateFirst 
+                AND date_of_income <= :dateSecond 
+                GROUP BY Category';
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':dateFirst', $dateFirst,  PDO::PARAM_STR);
+        $stmt->bindValue(':dateSecond', $dateSecond, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results;
+    }
 }
