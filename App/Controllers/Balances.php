@@ -111,7 +111,7 @@ class Balances extends Authenticated
     public static function showChoosenDatesAction($user_id, $dateFirst, $dateSeond)
     {
         $incomes = Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        // $expenses = Balance::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
+        $expenses = Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
         $sumALlIncomes = Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $sumALlExpenses = Balance::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $incomeDetails = Balance::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
@@ -123,7 +123,7 @@ class Balances extends Authenticated
             'dateFirst' => $dateFirst,
             'dateSecond' => $dateSeond,
             'incomes' => $incomes,
-            //     'expenses' => $expenses,
+            'expenses' => $expenses,
             'sumALlIncomes' => $sumALlIncomes,
             //     'sumALlExpenses' => $sumALlExpenses,
             //     'incomeDetails' => $incomeDetails,
