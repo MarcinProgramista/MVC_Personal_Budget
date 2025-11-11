@@ -71,6 +71,7 @@ class Balances extends Authenticated
             'sumALlExpenses' => $sumALlExpenses,
             'sum' => $sum,
             'incomeDetails' => $incomeDetails,
+            'expenseDetails' => $expenseDetails,
         ]);
     }
 

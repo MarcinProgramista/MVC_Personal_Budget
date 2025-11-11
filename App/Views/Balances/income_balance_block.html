@@ -73,8 +73,10 @@
 
 <!-- 🔹 Dane Twig -> JSON -->
 <script>
-    const incomesData = {{ incomes| json_encode | raw }};
+    let incomesData = {{ incomes ?incomes| json_encode | raw : '[]' }};
 </script>
+
+
 
 <!-- 🔹 Google Charts -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
