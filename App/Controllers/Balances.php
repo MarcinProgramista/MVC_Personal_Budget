@@ -60,6 +60,7 @@ class Balances extends Authenticated
         $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
         $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
         $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
+        $expenseDetails = Expense::getAllDetailExpenses($user_id, $month);
         $sum = $sumALlIncomes - $sumALlExpenses;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
