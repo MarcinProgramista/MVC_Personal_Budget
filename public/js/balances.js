@@ -41,3 +41,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleListExpensesDetailsBalanceBtn = document.getElementById("toggleListExpensesDetailsBalanceBtn");
+    const expenseDetailsBalanceListContainer = document.getElementById("expenseDetailsBalanceListContainer");
+    const toggleExpensesDetailsBalanceArrow = document.getElementById("toggleExpensesDetailsBalanceArrow"); // <-- unikalne
+
+    if (toggleListExpensesDetailsBalanceBtn && expenseDetailsBalanceListContainer && toggleExpensesDetailsBalanceArrow) {
+        toggleListExpensesDetailsBalanceBtn.addEventListener("click", function () {
+            expenseDetailsBalanceListContainer.classList.toggle("show");
+            toggleExpensesDetailsBalanceArrow.innerHTML = expenseDetailsBalanceListContainer.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
+});
