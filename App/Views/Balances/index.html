@@ -13,84 +13,175 @@
     {% endif %}
 </div>
 <div class="expense-bg"></div>
-<div class="row justify-content-center align-items-center g-1 ">
-    {% if incomes %}
-    <div id="piechart1" class="justify-content-center bg-dark col-5 left-column" style="height: 400px;"></div>
-    {% endif %}
-    {% if expenses %}
-    <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column " style="height: 400px;">
+{% if balance < 0 %} <div class="justify-content-center align-items-center g-1 text-center text-danger">
+    <h1>{{ sum }} PLN</h1>
+    </div>
+    {% elseif balance > 0 %}
+    <div class="just    ify-content-center align-items-center g-1 text-center text-success">
+        <h1>{{ sum }} PLN</h1>
+    </div>
+    {% elseif balance == 0 %}
+    <div class="justify-content-center align-items-center g-1 text-center text-success">
+        <h1>nic</h1>
+    </div>
+    {% else %}
+    <div class="justify-content-center align-items-center g-1 text-center text-success">
+        <h1>-</h1>
     </div>
     {% endif %}
-    <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
-        <!-- 🔘 Przycisk pokazujący listę incomes-->
-        {% include "Balances/income_balance_block.html" %}
+    <div class="mt-3">
+        {% if balance < 0 %} <div id="budgetAlert"
+            class="alert alert-danger custom-alert d-flex flex-column justify-content-center align-items-center"
+            role="alert">
+            <i class="bi bi-emoji-frown mb-2"></i>
+            <div>
+                You’re spending more than you earn right now. Don’t worry — every step toward balance counts!
+                Review your budget and see where small changes can make a big difference.
+            </div>
     </div>
-    <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
-        {% include "Balances/expense_balance_block.html" %}
+
+    {% elseif balance > 0 %}
+    <div id="budgetAlert"
+        class="alert alert-success custom-alert d-flex flex-column justify-content-center align-items-center"
+        role="alert">
+        <i class="bi bi-emoji-smile mb-2"></i>
+        <div>
+            Great job! You’re earning more than you spend. Keep up the good habits and consider setting
+            some of that extra income aside for your goals.
+        </div>
     </div>
-</div>
 
-{% endif %}
-<script src="/js/balances.js?v={{ random() }}"></script>
-{% endblock %}
-{% block footer %}
-<style>
-    /* 🔹 Obrazek jako tło — zawsze widoczny */
-    .expense-bg {
-        position: absolute;
-        inset: 0;
-        background: url('/images/balances.png') center center no-repeat;
-        background-size: contain;
-        opacity: 0.45;
-        filter: brightness(0.8);
-        margin-top: 60px;
-        z-index: 0;
-    }
+    {% else %}
+    <div id="budgetAlert"
+        class="alert alert-warning custom-alert d-flex flex-column justify-content-center align-items-center"
+        role="alert">
+        <i class="bi bi-emoji-neutral mb-2"></i>
+        <div>
+            Your budget is perfectly balanced. That’s a great start — now see if you can save a little extra next
+            time!
+        </div>
+    </div>
+    {% endif %}
+    </div>
 
-    .left-column {
-        background: linear-gradient(145deg, #1c1c1c, #222);
-        border: 1px solid #ffc107;
-        border-radius: 16px;
-        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-        transition: all 0.4s ease;
-        animation: fadeIn 0.5s ease;
-        position: relative;
-        z-index: 1;
-        margin: 10px;
-        opacity: 0.6;
-    }
+    </div>
 
-    .right-column {
-        background: linear-gradient(145deg, #1c1c1c, #222);
-        border: 1px solid #ffc107;
-        border-radius: 16px;
-        box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-        transition: all 0.4s ease;
-        animation: fadeIn 0.5s ease;
-        position: relative;
-        z-index: 1;
-        margin: 10px;
-        opacity: 0.6;
-    }
+    <div class="row justify-content-center align-items-center g-1 ">
 
-    @keyframes shake {
+        {% if incomes %}
+        <div id="piechart1" class="justify-content-center bg-dark col-5 left-column"
+            style="height: 400px; margin-bottom: 50px;"></div>
+        {% endif %}
+        {% if expenses %}
+        <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column "
+            style="height: 400px; margin-bottom: 50px;">
+        </div>
+        {% endif %}
+        <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+            <!-- 🔘 Przycisk pokazujący listę incomes-->
+            {% include "Balances/income_balance_block.html" %}
+        </div>
+        <!-- 🔘 Przycisk pokazujący listę expenses-->
+        <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
+            {% include "Balances/expense_balance_block.html" %}
+        </div>
+        <!-- 🔘 Przycisk pokazujący listę incomes details-->
+        <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+            <!-- 🔘 Przycisk pokazujący listę incomes-->
+            {% include "Balances/income_details_balance_block.html" %}
+        </div>
+    </div>
 
-        0%,
-        100% {
-            transform: translateX(0);
+    {% endif %}
+    <script src="/js/balances.js?v={{ random() }}"></script>
+    <script>
+        // automatyczne ukrycie po 3 sekundach
+        setTimeout(() => {
+            const alert = document.getElementById('budgetAlert');
+            if (alert) {
+                alert.classList.add('fade-out');
+                setTimeout(() => alert.remove(), 1000); // usuń element po zakończeniu animacji
+            }
+        }, 3000);
+    </script>
+    {% endblock %}
+    {% block footer %}
+    <style>
+        /* 🔹 Obrazek jako tło — zawsze widoczny */
+        .expense-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/balances.png') center center no-repeat;
+            background-size: contain;
+            opacity: 0.45;
+            filter: brightness(0.8);
+            margin-top: 60px;
+            z-index: 0;
         }
 
-        25% {
-            transform: translateX(-5px);
+        .left-column {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 10px;
+            opacity: 0.6;
         }
 
-        75% {
-            transform: translateX(5px);
+        .right-column {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 10px;
+            opacity: 0.6;
         }
-    }
 
-    .shake {
-        animation: shake 0.4s ease;
-    }
-</style>
-{% endblock %}
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        .custom-alert {
+            opacity: 0.9;
+            background-color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            font-style: italic;
+            border-radius: 0.75rem;
+            transition: opacity 1s ease-in-out;
+            /* płynne zanikanie */
+        }
+
+        .custom-alert.fade-out {
+            opacity: 0;
+        }
+
+        .custom-alert .bi {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+    {% endblock %}
