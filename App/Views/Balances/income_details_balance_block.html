@@ -14,7 +14,7 @@
         <!-- 🔹 Lista przychodów -->
         <ul id="incomeDetailsBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
             {% for incomeDetail in incomeDetails %}
-            <li
+            <li data-income-id="{{ incomeDetail.id }}"
                 class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
                 <div class="d-flex flex-column">
                     <div class="d-flex flex-row align-items-center">
@@ -23,7 +23,7 @@
                     </div>
 
                     {% if incomeDetail.info %}
-                    <div class="ms-4 text-start"> <!-- odsunęliśmy ikonę od lewej, dopasowując do poprzedniej ikony -->
+                    <div class="ms-4 text-start">
                         <small class="text-warning">
                             <i class="bi bi-journal-text me-1"></i>{{ incomeDetail.info }}
                         </small>
@@ -44,12 +44,19 @@
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-pencil-alt text-success open-edit-income-details-balance-modal"
                                 role="button" data-id="{{ incomeDetail.id }}"
-                                data-name="{{ incomeDetail.Category|escape }}"></i>
+                                data-idcategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
+                                data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
+                                data-info="{{ incomeDetail.info }}"
+                                data-date="{{ incomeDetail.Data|date('Y-m-d') }}"></i>
+
                         </button>
-                        <button
-                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                        <button class=" btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn
+                                m-1">
                             <i class="fas fa-trash-alt text-danger open-delete-income-details-balance-modal"
-                                data-id="{{ incomeDetail.id }}" data-name="{{ incomeDetail.Category|escape }}"></i>
+                                data-id="{{ incomeDetail.id }}"
+                                data-idCategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
+                                data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
+                                data-date="{{ incomeDetail.Data|date('Y-m-d') }}"></i>
                         </button>
                     </span>
                 </span>
@@ -57,11 +64,12 @@
             {% endfor %}
         </ul>
 
+
         <!-- 🔹 Suma przychodów -->
         <div class="d-flex align-items-center" style="width: 95%;">
             <div
                 class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
-                SUM :<strong class="text-light m-0">{{ sumALlIncomes }} PLN</strong>
+                SUM :<strong id="sumIncomesDetails" class="text-light m-0">{{ sumALlIncomes }} PLN</strong>
             </div>
         </div>
 
