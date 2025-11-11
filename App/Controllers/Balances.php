@@ -59,13 +59,17 @@ class Balances extends Authenticated
         $expenses = Expense::getAlExpenses($user_id, $month);
         $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
         $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
+        $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
+        $sum = $sumALlIncomes - $sumALlExpenses;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
             'incomes' => $incomes,
             'nameMonth' => $nameMonth,
             'sumALlIncomes' => $sumALlIncomes,
             'expenses' => $expenses,
-            'sumALlExpenses' => $sumALlExpenses
+            'sumALlExpenses' => $sumALlExpenses,
+            'sum' => $sum,
+            'incomeDetails' => $incomeDetails,
         ]);
     }
 
@@ -116,7 +120,7 @@ class Balances extends Authenticated
         $sumALlExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $incomeDetails = Balance::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         // $expenseDetails = Balance::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        // $sum = $sumALlIncomes - $sumALlExpenses;
+        $sum = $sumALlIncomes - $sumALlExpenses;
         $balance = true;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
@@ -128,7 +132,7 @@ class Balances extends Authenticated
             'sumALlExpenses' => $sumALlExpenses,
             //     'incomeDetails' => $incomeDetails,
             //     'expenseDetails' => $expenseDetails,
-            //     'sum' => $sum
+            'sum' => $sum
         ]);
     }
 }
