@@ -27,3 +27,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleListIncomesDetailsBalanceBtn = document.getElementById("toggleListIncomesDetailsBalanceBtn");
+    const incomeDetailsBalanceListContainer = document.getElementById("incomeDetailsBalanceListContainer");
+    const toggleIncomesDetailsBalanceArrow = document.getElementById("toggleIncomesDetailsBalanceArrow"); // <-- unikalne
+
+    if (toggleListIncomesDetailsBalanceBtn && incomeDetailsBalanceListContainer && toggleIncomesDetailsBalanceArrow) {
+        toggleListIncomesDetailsBalanceBtn.addEventListener("click", function () {
+            incomeDetailsBalanceListContainer.classList.toggle("show");
+            toggleIncomesDetailsBalanceArrow.innerHTML = incomeDetailsBalanceListContainer.classList.contains("show")
+                ? '<i class="fas fa-arrow-up text-warning"></i>'
+                : '<i class="fas fa-arrow-down text-warning"></i>';
+        });
+    }
+});
