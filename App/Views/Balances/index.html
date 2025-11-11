@@ -14,178 +14,183 @@
 </div>
 <div class="expense-bg"></div>
 {% if balance < 0 %} <div class="justify-content-center align-items-center g-1 text-center text-danger">
-    <h1>{{ sum }} PLN</h1>
+    <h1 id="balanceSum">{{ sum }} PLN</h1>
     </div>
     {% elseif balance > 0 %}
-    <div class="just    ify-content-center align-items-center g-1 text-center text-success">
-        <h1>{{ sum }} PLN</h1>
-    </div>
-    {% elseif balance == 0 %}
     <div class="justify-content-center align-items-center g-1 text-center text-success">
-        <h1>nic</h1>
+        <h1 id="balanceSum">{{ sum }} PLN</h1>
     </div>
     {% else %}
     <div class="justify-content-center align-items-center g-1 text-center text-success">
-        <h1>-</h1>
+        <h1 id="balanceSum">{{ sum }} PLN</h1>
     </div>
     {% endif %}
-    <div class="mt-3">
-        {% if balance < 0 %} <div id="budgetAlert"
-            class="alert alert-danger custom-alert d-flex flex-column justify-content-center align-items-center"
+    {% if (incomes is not defined or incomes|length == 0)
+    and (expenses is not defined or expenses|length == 0)
+    and (sum == 0) %}
+    <div id="budgetAlert"
+        class="alert alert-info custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+        role="alert">
+        <i class="bi bi-credit-card mb-2 fs-3"></i>
+        <div class="fst-italic">
+            It looks like you haven’t added any incomes or expenses yet.
+            Start by entering your first transaction to see your budget in action!
+        </div>
+    </div>
+    {% elseif balance < 0 %} <div id="budgetAlert"
+        class="alert alert-danger custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+        role="alert">
+        <i class="bi bi-emoji-frown mb-2 fs-3"></i>
+        <div class="fst-italic">
+            You’re spending more than you earn right now. Don’t worry — every step toward balance counts!
+            Review your budget and see where small changes can make a big difference.
+        </div>
+        </div>
+        {% elseif balance > 0 %}
+        <div id="budgetAlert"
+            class="alert alert-success custom-alert d-flex flex-column justify-content-center align-items-center text-center"
             role="alert">
-            <i class="bi bi-emoji-frown mb-2"></i>
-            <div>
-                You’re spending more than you earn right now. Don’t worry — every step toward balance counts!
-                Review your budget and see where small changes can make a big difference.
+            <i class="bi bi-emoji-smile mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Great job! You’re earning more than you spend. Keep up the good habits and consider setting
+                some of that extra income aside for your goals.
             </div>
-    </div>
-
-    {% elseif balance > 0 %}
-    <div id="budgetAlert"
-        class="alert alert-success custom-alert d-flex flex-column justify-content-center align-items-center"
-        role="alert">
-        <i class="bi bi-emoji-smile mb-2"></i>
-        <div>
-            Great job! You’re earning more than you spend. Keep up the good habits and consider setting
-            some of that extra income aside for your goals.
         </div>
-    </div>
-
-    {% else %}
-    <div id="budgetAlert"
-        class="alert alert-warning custom-alert d-flex flex-column justify-content-center align-items-center"
-        role="alert">
-        <i class="bi bi-emoji-neutral mb-2"></i>
-        <div>
-            Your budget is perfectly balanced. That’s a great start — now see if you can save a little extra next
-            time!
-        </div>
-    </div>
-    {% endif %}
-    </div>
-
-    </div>
-
-    <div class="row justify-content-center align-items-center g-1 ">
-
-        {% if incomes %}
-        <div id="piechart1" class="justify-content-center bg-dark col-5 left-column"
-            style="height: 400px; margin-bottom: 50px;"></div>
-        {% endif %}
-        {% if expenses %}
-        <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column "
-            style="height: 400px; margin-bottom: 50px;">
+        {% else %}
+        <div id="budgetAlert"
+            class="alert alert-warning custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+            role="alert">
+            <i class="bi bi-emoji-neutral mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Your budget is perfectly balanced.
+            </div>
         </div>
         {% endif %}
-        <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
-            <!-- 🔘 Przycisk pokazujący listę incomes-->
-            {% include "Balances/income_balance_block.html" %}
-        </div>
-        <!-- 🔘 Przycisk pokazujący listę expenses-->
-        <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
-            {% include "Balances/expense_balance_block.html" %}
-        </div>
-        <!-- 🔘 Przycisk pokazujący listę incomes details-->
-        <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
-            <!-- 🔘 Przycisk pokazujący listę incomes-->
-            {% include "Balances/income_details_balance_block.html" %}
-        </div>
-        <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+
+
+
+        <div class="row justify-content-center align-items-center g-1 ">
+
+            {% if incomes %}
+            <div id="piechart1" class="justify-content-center bg-dark col-5 left-column"
+                style="height: 400px; margin-bottom: 50px;"></div>
+            {% endif %}
+            {% if expenses %}
+            <div id="piechartExpenses" class="row justify-content-center bg-dark col-5 right-column "
+                style="height: 400px; margin-bottom: 50px;">
+            </div>
+            {% endif %}
+            <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+                <!-- 🔘 Przycisk pokazujący listę incomes-->
+                {% include "Balances/income_balance_block.html" %}
+            </div>
             <!-- 🔘 Przycisk pokazujący listę expenses-->
-            {% include "Balances/expense_details_balance_block.html" %}
+            <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
+                {% include "Balances/expense_balance_block.html" %}
+            </div>
+            <!-- 🔘 Przycisk pokazujący listę incomes details-->
+            <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+                <!-- 🔘 Przycisk pokazujący listę incomes-->
+                {% include "Balances/income_details_balance_block.html" %}
+            </div>
+            <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+                <!-- 🔘 Przycisk pokazujący listę expenses-->
+                {% include "Balances/expense_details_balance_block.html" %}
+            </div>
         </div>
-    </div>
 
-    {% endif %}
-    <script src="/js/balances.js?v={{ random() }}"></script>
-    <script>
-        // automatyczne ukrycie po 3 sekundach
-        setTimeout(() => {
-            const alert = document.getElementById('budgetAlert');
-            if (alert) {
-                alert.classList.add('fade-out');
-                setTimeout(() => alert.remove(), 1000); // usuń element po zakończeniu animacji
-            }
-        }, 3000);
-    </script>
-    {% endblock %}
-    {% block footer %}
-    <style>
-        /* 🔹 Obrazek jako tło — zawsze widoczny */
-        .expense-bg {
-            position: absolute;
-            inset: 0;
-            background: url('/images/balances.png') center center no-repeat;
-            background-size: contain;
-            opacity: 0.45;
-            filter: brightness(0.8);
-            margin-top: 60px;
-            z-index: 0;
-        }
+        {% endif %}
 
-        .left-column {
-            background: linear-gradient(145deg, #1c1c1c, #222);
-            border: 1px solid #ffc107;
-            border-radius: 16px;
-            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-            transition: all 0.4s ease;
-            animation: fadeIn 0.5s ease;
-            position: relative;
-            z-index: 1;
-            margin: 10px;
-            opacity: 0.6;
-        }
-
-        .right-column {
-            background: linear-gradient(145deg, #1c1c1c, #222);
-            border: 1px solid #ffc107;
-            border-radius: 16px;
-            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
-            transition: all 0.4s ease;
-            animation: fadeIn 0.5s ease;
-            position: relative;
-            z-index: 1;
-            margin: 10px;
-            opacity: 0.6;
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
+        <script src="/js/balances.js?v={{ random() }}"></script>
+        <script>
+            // automatyczne ukrycie po 3 sekundach
+            setTimeout(() => {
+                const alert = document.getElementById('budgetAlert');
+                if (alert) {
+                    alert.classList.add('fade-out');
+                    setTimeout(() => alert.remove(), 1000); // usuń element po zakończeniu animacji
+                }
+            }, 3000);
+        </script>
+        {% endblock %}
+        {% block footer %}
+        <style>
+            /* 🔹 Obrazek jako tło — zawsze widoczny */
+            .expense-bg {
+                position: absolute;
+                inset: 0;
+                background: url('/images/balances.png') center center no-repeat;
+                background-size: contain;
+                opacity: 0.45;
+                filter: brightness(0.8);
+                margin-top: 60px;
+                z-index: 0;
             }
 
-            25% {
-                transform: translateX(-5px);
+            .left-column,
+            .right-column {
+                background: linear-gradient(145deg, #1c1c1c, #222);
+                border: 1px solid #ffc107;
+                border-radius: 16px;
+                box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+                transition: all 0.4s ease;
+                animation: fadeIn 0.5s ease;
+                position: relative;
+                z-index: 1;
+                margin: 10px;
+                opacity: 0.6;
             }
 
-            75% {
-                transform: translateX(5px);
+            .custom-alert {
+                opacity: 0.9;
+                background-color: rgba(255, 255, 255, 0.5);
+                text-align: center;
+                font-style: italic;
+                border-radius: 0.75rem;
+                transition: opacity 1s ease-in-out;
             }
-        }
 
-        .shake {
-            animation: shake 0.4s ease;
-        }
+            .custom-alert.fade-out {
+                opacity: 0;
+            }
+        </style>
 
-        .custom-alert {
-            opacity: 0.9;
-            background-color: rgba(255, 255, 255, 0.5);
-            text-align: center;
-            font-style: italic;
-            border-radius: 0.75rem;
-            transition: opacity 1s ease-in-out;
-            /* płynne zanikanie */
-        }
+        {% include 'Balances/edit_income.html' %}
 
-        .custom-alert.fade-out {
-            opacity: 0;
-        }
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="/js/edit_income.js?v={{ random() }}"></script>
+        <script>
+            // 🔹 Globalna tablica danych dla przychodów
+            let incomesData = {{ incomes ?incomes| json_encode | raw : '[]' }};
 
-        .custom-alert .bi {
-            font-size: 2rem;
-            margin-right: 0.5rem;
-        }
-    </style>
-    {% endblock %}
+            // 🔹 Google Charts
+            google.charts.load('current', { packages: ['corechart'] });
+            google.charts.setOnLoadCallback(drawChart);
+            window.addEventListener('resize', drawChart);
+
+            function drawChart() {
+                const chartDiv = document.getElementById('piechart1');
+                if (!chartDiv || !incomesData || incomesData.length === 0) return;
+
+                const dataArray = [['Category', 'Amount']];
+                incomesData.forEach(income => {
+                    dataArray.push([income.Category, parseFloat(income.Amount)]);
+                });
+
+                const data = google.visualization.arrayToDataTable(dataArray);
+
+                const options = {
+                    title: 'Incomes',
+                    backgroundColor: '#212529',
+                    titleTextStyle: { color: '#f8f9fa' },
+                    legend: { textStyle: { color: '#f8f9fa' } },
+                    pieSliceTextStyle: { color: '#212529' },
+                    chartArea: { width: '90%', height: '80%' },
+                    animation: { startup: true, duration: 300, easing: 'out' }
+                };
+
+                const chart = new google.visualization.PieChart(chartDiv);
+                chart.draw(data, options);
+            }
+        </script>
+        {% endblock %}

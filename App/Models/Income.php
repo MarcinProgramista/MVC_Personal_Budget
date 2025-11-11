@@ -294,7 +294,8 @@ class Income extends \Core\Model
                         incomes.date_of_income as Data,
                         incomes.amount as Amount, 
                         category_incomes.name as Category, 
-                        incomes.income_comment as info 
+                        incomes.income_comment as info,
+                        incomes.income_category_assigned_to_user_id 
                 FROM incomes  
                 INNER JOIN incomes_category_assigned_to_users as category_incomes 
                 WHERE incomes.income_category_assigned_to_user_id = category_incomes.id 
@@ -324,7 +325,8 @@ class Income extends \Core\Model
                         incomes.date_of_income as Data, 
                         incomes.amount as Amount,
                         category_incomes.name as Category, 
-                        incomes.income_comment as info 
+                        incomes.income_comment as info,
+                        incomes.income_category_assigned_to_user_id
                         FROM incomes  INNER JOIN incomes_category_assigned_to_users as category_incomes 
                         WHERE incomes.income_category_assigned_to_user_id = category_incomes.id 
                         AND incomes.user_id = :id 
@@ -342,5 +344,54 @@ class Income extends \Core\Model
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $results;
+    }
+
+    /**
+     * Update income
+     *
+     * @param int $id
+     * @param int $categoryId
+     * @param float $amount
+     * @param string $comment
+     * @return bool
+     */
+    public static function updateIncome(int $id, int $categoryId, float $amount, string $comment, string $date): bool
+    {
+        $sql = 'UPDATE incomes 
+            SET income_category_assigned_to_user_id = :categoryId, 
+                amount = :amount, 
+                income_comment = :comment,
+                date_of_income = :date
+            WHERE id = :id';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':categoryId', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':amount', $amount);
+        $stmt->bindValue(':comment', $comment, PDO::PARAM_STR);
+        $stmt->bindValue(':date', $date, PDO::PARAM_STR);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+    /**
+     * Pobierz przychód po jego ID
+     *
+     * @param int $id
+     * @return object|null Zwraca obiekt przychodu lub null jeśli nie istnieje
+     */
+    public static function getIncomeById(int $id)
+    {
+        $sql = 'SELECT * FROM incomes WHERE id = :id LIMIT 1';
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_OBJ); // FETCH_OBJ daje dostęp przez $result->Amount itp.
+        return $result ?: null;
     }
 }

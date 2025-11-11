@@ -46,6 +46,12 @@ class Balances extends Authenticated
         $this->sentDetailsToPage($this->user->id, $month);
     }
 
+    public function showLastMonthAction()
+    {
+        $month = date('m') - 1;
+        $this->sentDetailsToPage($this->user->id, $month);
+    }
+
     /**
      * Send detail incomes and expenses to page 
      *
@@ -61,7 +67,11 @@ class Balances extends Authenticated
         $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
         $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
         $expenseDetails = Expense::getAllDetailExpenses($user_id, $month);
-        $sum = $sumALlIncomes - $sumALlExpenses;
+        $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
+        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
+        $sumALlIncomes = $sumALlIncomes ?? 0;
+        $sumALlExpenses = $sumALlExpenses ?? 0;
+        $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
             'incomes' => $incomes,
@@ -72,6 +82,7 @@ class Balances extends Authenticated
             'sum' => $sum,
             'incomeDetails' => $incomeDetails,
             'expenseDetails' => $expenseDetails,
+            'incomeCategories' => $incomeCategories,
         ]);
     }
 
@@ -122,7 +133,10 @@ class Balances extends Authenticated
         $sumALlExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         $incomeDetails = Income::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         $expenseDetails = Expense::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $sum = $sumALlIncomes - $sumALlExpenses;
+        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
+        $sumALlIncomes = $sumALlIncomes ?? 0;
+        $sumALlExpenses = $sumALlExpenses ?? 0;
+        $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
         $balance = true;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
@@ -134,7 +148,87 @@ class Balances extends Authenticated
             'sumALlExpenses' => $sumALlExpenses,
             'incomeDetails' => $incomeDetails,
             'expenseDetails' => $expenseDetails,
+            'incomeCategories' => $incomeCategories,
             'sum' => $sum
         ]);
+    }
+
+    public function updateIncomeAction()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        header('Content-Type: application/json');
+
+        if (!isset($data['id'], $data['category_id'], $data['amount'], $data['info'], $data['date'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
+            exit;
+        }
+
+        $oldIncome = Income::getIncomeById((int)$data['id']);
+        if (!$oldIncome) {
+            echo json_encode(['status' => 'error', 'message' => 'Income not found']);
+            exit;
+        }
+
+        $success = Income::updateIncome(
+            (int)$data['id'],
+            (int)$data['category_id'],
+            (float)$data['amount'],
+            $data['info'],
+            $data['date']
+        );
+
+        $sumAllIncomes = Income::getSumOfIncomes($oldIncome->user_id, date('m'));
+        $sumAllExpenses = Expense::getSumOfExpenses($oldIncome->user_id, date('m'));
+        $incomes = Income::getAllIncomes($oldIncome->user_id,  date('m'));
+        $newSum = $sumAllIncomes - $sumAllExpenses;
+
+        echo json_encode([
+            'status' => $success ? 'success' : 'error',
+            'received' => [
+                'id' => $data['id'],
+                'oldAmount' => $oldIncome->amount,
+                'newAmount' => $data['amount'],
+                'sumAllIncomes' => $sumAllIncomes,
+                'sumAllExpenses' => $sumAllExpenses,
+                'balanceSum' => $newSum,          // nowa suma balansu
+                'name' => $data['name'] ?? null,
+                'info' => $data['info'],
+                'date' => $data['date'],
+                'incomes' => $incomes,
+            ]
+        ]);
+
+        exit;
+    }
+
+    public function getIncomesAction()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $month = $_GET['month'] ?? null;
+        $dateFirst = $_GET['dateFirst'] ?? null;
+        $dateSecond = $_GET['dateSecond'] ?? null;
+
+        if ($dateFirst && $dateSecond) {
+            // 🔹 Okres niestandardowy
+            $incomes = Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSecond);
+        } else {
+            // 🔹 Standardowy miesiąc
+            $incomes = Income::getAllIncomes($user_id, $month);
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'incomes' => $incomes
+        ]);
+        exit;
     }
 }
