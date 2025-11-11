@@ -204,7 +204,9 @@ class Income extends \Core\Model
     /**
      * Get Sum of Incomes from month
      *
-     * @return array
+     * @param int $id
+     * @param int $month
+     * @return float|null
      */
     public static function getSumOfIncomes($id, $month)
     {
@@ -218,9 +220,8 @@ class Income extends \Core\Model
         $stmt->execute();
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $results['Amount'];
+        return (float) $results['Amount'];
     }
-
     /**
      * Get all the incomes from choosen period
      *
@@ -251,25 +252,35 @@ class Income extends \Core\Model
     }
 
     /**
-     * Get Sum of Incomes for choosen period
+     * Get Sum of Incomes for chosen period
      *
-     * @return array
+     * @param int $id
+     * @param string $dateFirst
+     * @param string $dateSecond
+     * @return float
      */
     public static function getSumOfIncomesForChoosenPeriod($id, $dateFirst, $dateSecond)
     {
-        $sql = 'SELECT sum(amount) as Amount from incomes WHERE  incomes.user_id = :id AND date_of_income >= :dateFirst AND date_of_income <= :dateSecond';
+        $sql = 'SELECT SUM(amount) AS Amount 
+            FROM incomes 
+            WHERE user_id = :id 
+            AND date_of_income >= :dateFirst 
+            AND date_of_income <= :dateSecond';
 
         $db = static::getDB();
         $stmt = $db->prepare($sql);
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':dateFirst', $dateFirst,  PDO::PARAM_STR);
+        $stmt->bindValue(':dateFirst', $dateFirst, PDO::PARAM_STR);
         $stmt->bindValue(':dateSecond', $dateSecond, PDO::PARAM_STR);
+
         $stmt->execute();
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $results['Amount'];
+        // Rzutowanie na float i obsługa NULL
+        return isset($results['Amount']) ? (float)$results['Amount'] : 0.0;
     }
+
 
 
     /**

@@ -249,8 +249,9 @@ class Expense extends \Core\Model
 
     /**
      * Get Sum of Expense from month
-     *
-     * @return array
+     * @param int $id
+     * @param int $month
+     * @return float|null
      */
     public static function getSumOfExpenses($id, $month)
     {
@@ -264,7 +265,7 @@ class Expense extends \Core\Model
         $stmt->execute();
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $results['Amount'];
+        return (float) $results['Amount'];
     }
 
     /**
@@ -293,7 +294,10 @@ class Expense extends \Core\Model
     /**
      * Get Sum of Expenses for choosen period
      *
-     * @return array
+     * @param int $id
+     * @param string $dateFirst
+     * @param string $dateSecond
+     * @return float
      */
     public static function getSumOfExpensesForChoosenPeriod($id, $dateFirst, $dateSecond)
     {
@@ -308,7 +312,7 @@ class Expense extends \Core\Model
         $stmt->execute();
         $results = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $results['Amount'];
+        return isset($results['Amount']) ? (float)$results['Amount'] : 0.0;
     }
 
     /**
