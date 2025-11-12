@@ -6,6 +6,7 @@ use \Core\View;
 use \App\Auth;
 use \App\Models\Income;
 use App\Models\IncomeCategory;
+use \App\Models\PaymentMethod;
 use \App\Models\Balance;
 use \App\Flash;
 use \App\Controllers\Authenticated;
@@ -69,6 +70,8 @@ class Balances extends Authenticated
         $expenseDetails = Expense::getAllDetailExpenses($user_id, $month);
         $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
         $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
+        $expenseCategories = Expense::getCategories($this->user->id);
+        $expensePayments = PaymentMethod::getPayments($this->user->id);
         $sumALlIncomes = $sumALlIncomes ?? 0;
         $sumALlExpenses = $sumALlExpenses ?? 0;
         $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
@@ -83,6 +86,8 @@ class Balances extends Authenticated
             'incomeDetails' => $incomeDetails,
             'expenseDetails' => $expenseDetails,
             'incomeCategories' => $incomeCategories,
+            'expenseCategories' => $expenseCategories,
+            'expensePayments' => $expensePayments
         ]);
     }
 
@@ -134,6 +139,8 @@ class Balances extends Authenticated
         $incomeDetails = Income::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         $expenseDetails = Expense::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
         $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
+        $expenseCategories = Expense::getCategories($user_id);
+        $expensePayments = PaymentMethod::getPayments($user_id);
         $sumALlIncomes = $sumALlIncomes ?? 0;
         $sumALlExpenses = $sumALlExpenses ?? 0;
         $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
@@ -149,6 +156,8 @@ class Balances extends Authenticated
             'incomeDetails' => $incomeDetails,
             'expenseDetails' => $expenseDetails,
             'incomeCategories' => $incomeCategories,
+            'expenseCategories' => $expenseCategories,
+            'expensePayments' => $expensePayments,
             'sum' => $sum
         ]);
     }

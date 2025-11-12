@@ -322,7 +322,19 @@ class Expense extends \Core\Model
      */
     public static function getAllDetailExpenses($id, $month)
     {
-        $sql = 'SELECT expenses.user_id, expenses.date_of_expense AS Data, expenses.amount AS Amount, expenses_category_assigned_to_users.name As Category, payment_methods_assigned_to_users.name AS Method_Payment, expenses.expense_comment AS info FROM expenses LEFT OUTER JOIN expenses_category_assigned_to_users ON expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id LEFT OUTER JOIN payment_methods_assigned_to_users ON expenses.payment_method_assigned_to_user_id = payment_methods_assigned_to_users.id WHERE expenses.user_id = :id AND Month(date_of_expense) = :month';
+        $sql = 'SELECT expenses.user_id, expenses.date_of_expense AS Data, 
+                        expenses.amount AS Amount, 
+                        expenses_category_assigned_to_users.name As Category, 
+                        payment_methods_assigned_to_users.name AS Method_Payment, 
+                        expenses.expense_comment AS info,
+                        expense_category_assigned_to_user_id,
+                        payment_method_assigned_to_user_id 
+                FROM expenses 
+                LEFT OUTER JOIN expenses_category_assigned_to_users 
+                ON expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id 
+                LEFT OUTER JOIN payment_methods_assigned_to_users 
+                ON expenses.payment_method_assigned_to_user_id = payment_methods_assigned_to_users.id 
+                WHERE expenses.user_id = :id AND Month(date_of_expense) = :month';
 
         $db = static::getDB();
 
