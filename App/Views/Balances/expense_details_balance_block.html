@@ -52,13 +52,13 @@
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-pencil-alt text-success open-edit-expense-details-balance-modal"
                                 role="button" data-id="{{ expenseDetail.id }}"
-                                data-idCategoryExpense="{{ expenseDetail.expense_category_assigned_to_user_id }}"
+                                data-id_category_expense="{{ expenseDetail.expense_category_assigned_to_user_id }}"
                                 data-nameCategoryExpense="{{ expenseDetail.Category|escape }}"
-                                data-idPaymentExpense="{{ expenseDetail.payment_method_assigned_to_user_id }}"
+                                data-id_payment_expense="{{ expenseDetail.payment_method_assigned_to_user_id }}"
                                 data-namePaymentExpense="{{ expenseDetail.Method_Payment|escape }}"
-                                data-amountExpense="{{ expenseDetail.Amount }}"
-                                data-infoExpense="{{ expenseDetail.info }}"
-                                data-dateExpense="{{ expenseDetail.Data|date('Y-m-d') }}"></i>
+                                data-amount_expense="{{ expenseDetail.Amount }}"
+                                data-info_expense="{{ expenseDetail.info }}"
+                                data-date="{{ expenseDetail.Data|date('Y-m-d') }}"></i>
                         </button>
                         <button
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">

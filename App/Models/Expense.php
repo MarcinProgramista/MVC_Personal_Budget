@@ -328,7 +328,8 @@ class Expense extends \Core\Model
                         payment_methods_assigned_to_users.name AS Method_Payment, 
                         expenses.expense_comment AS info,
                         expense_category_assigned_to_user_id,
-                        payment_method_assigned_to_user_id 
+                        payment_method_assigned_to_user_id, 
+                        expenses.id
                 FROM expenses 
                 LEFT OUTER JOIN expenses_category_assigned_to_users 
                 ON expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id 
