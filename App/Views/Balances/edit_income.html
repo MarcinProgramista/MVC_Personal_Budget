@@ -10,7 +10,12 @@
                 <form id="editIncomeForm">
                     <!-- Hidden fields -->
                     <input type="hidden" id="editIncomeId" name="id">
-
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label for="editIncomeDate" class="form-label text-warning">Date</label>
+                        <input type="date" class="form-control bg-warning text-dark" id="editIncomeDate" name="date"
+                            required>
+                    </div>
                     <!-- Category -->
                     <div class="mb-3">
                         <label for="editIncomeCategory" class="form-label text-warning">Category</label>
@@ -29,12 +34,7 @@
                             name="amount" step="0.01" required>
                     </div>
 
-                    <!-- Date -->
-                    <div class="mb-3">
-                        <label for="editIncomeDate" class="form-label text-warning">Date</label>
-                        <input type="date" class="form-control bg-warning text-dark" id="editIncomeDate" name="date"
-                            required>
-                    </div>
+
 
                     <!-- Info -->
                     <div class="mb-3">
