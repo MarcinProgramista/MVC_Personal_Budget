@@ -13,10 +13,10 @@
     {% endif %}
 </div>
 <div class="expense-bg"></div>
-{% if balance < 0 %} <div class="justify-content-center align-items-center g-1 text-center text-danger">
+{% if sum < 0 %} <div class="justify-content-center align-items-center g-1 text-center text-danger">
     <h1 id="balanceSum">{{ sum }} PLN</h1>
     </div>
-    {% elseif balance > 0 %}
+    {% elseif sum > 0 %}
     <div class="justify-content-center align-items-center g-1 text-center text-success">
         <h1 id="balanceSum">{{ sum }} PLN</h1>
     </div>
@@ -37,7 +37,7 @@
             Start by entering your first transaction to see your budget in action!
         </div>
     </div>
-    {% elseif balance < 0 %} <div id="budgetAlert"
+    {% elseif sum < 0 %} <div id="budgetAlert"
         class="alert alert-danger custom-alert d-flex flex-column justify-content-center align-items-center text-center"
         role="alert">
         <i class="bi bi-emoji-frown mb-2 fs-3"></i>
@@ -46,7 +46,7 @@
             Review your budget and see where small changes can make a big difference.
         </div>
         </div>
-        {% elseif balance > 0 %}
+        {% elseif sum > 0 %}
         <div id="budgetAlert"
             class="alert alert-success custom-alert d-flex flex-column justify-content-center align-items-center text-center"
             role="alert">
