@@ -361,7 +361,10 @@ class Expense extends \Core\Model
                         expenses.amount AS Amount, 
                         expenses_category_assigned_to_users.name As Category, 
                         payment_methods_assigned_to_users.name AS Method_Payment, 
-                        expenses.expense_comment AS info 
+                        expenses.expense_comment AS info,
+                         expense_category_assigned_to_user_id,
+                        payment_method_assigned_to_user_id, 
+                        expenses.id 
                         FROM expenses 
                         LEFT OUTER JOIN expenses_category_assigned_to_users 
                         ON expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id
@@ -380,5 +383,36 @@ class Expense extends \Core\Model
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $results;
+    }
+    public static function getExpenseById($id)
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare('SELECT * FROM expenses WHERE id = :id');
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public static function updateExpense($id, $categoryId, $paymentId, $amount, $info, $date)
+    {
+        $db = static::getDB();
+        $stmt = $db->prepare('
+        UPDATE expenses
+        SET expense_category_assigned_to_user_id = :category_id,
+            payment_method_assigned_to_user_id = :payment_id,
+            amount = :amount,
+            date_of_expense = :date,
+            expense_comment = :info
+        WHERE id = :id
+    ');
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':payment_id', $paymentId, PDO::PARAM_INT);
+        $stmt->bindValue(':amount', $amount);
+        $stmt->bindValue(':date', $date);
+        $stmt->bindValue(':info', $info);
+
+        return $stmt->execute();
     }
 }

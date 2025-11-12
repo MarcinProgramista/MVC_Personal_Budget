@@ -14,13 +14,12 @@
         <!-- 🔹 Lista przychodów -->
         <ul id="expenseDetailsBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
             {% for expenseDetail in expenseDetails %}
-            <li
-                class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+            <li data-expense-id="{{ expenseDetail.id }}" class=" list-group-item d-flex justify-content-between border border-warning align-items-center
+                text-light">
                 <div class="d-flex flex-column">
                     <div class="d-flex flex-row align-items-center">
                         <i class="fas fa-circle me-2 text-success"></i>
-                        <span class="fw-bold">{{ expenseDetail.Category }} {{
-                            expenseDetail.expense_category_assigned_to_user_id }}</span>
+                        <span class="fw-bold">{{ expenseDetail.Category }} </span>
                     </div>
 
                     {% if expenseDetail.info %}
@@ -38,8 +37,7 @@
                     </div>
                     <div class="ms-4 text-start">
                         <small class="text-primary">
-                            <i class="bi bi-credit-card me-1"></i>{{ expenseDetail.Method_Payment }} {{
-                            expenseDetail.payment_method_assigned_to_user_id }}
+                            <i class="bi bi-credit-card me-1"></i>{{ expenseDetail.Method_Payment }}
                         </small>
                     </div>
                 </div>
@@ -58,7 +56,8 @@
                                 data-namePaymentExpense="{{ expenseDetail.Method_Payment|escape }}"
                                 data-amount_expense="{{ expenseDetail.Amount }}"
                                 data-info_expense="{{ expenseDetail.info }}"
-                                data-date="{{ expenseDetail.Data|date('Y-m-d') }}"></i>
+                                data-date="{{ expenseDetail.Data|date('Y-m-d') }}" data-dateFirst="{{ dateFirst}}"
+                                data-dateSecond="{{ dateSecond}}"></i>
                         </button>
                         <button
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
@@ -75,7 +74,7 @@
         <div class="d-flex align-items-center" style="width: 95%;">
             <div
                 class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
-                SUM :<strong class="text-light m-0">{{ sumALlIncomes }} PLN</strong>
+                SUM :<strong id="sumDetailsExpense" class="text-light m-0">{{ sumALlExpenses }} PLN</strong>
             </div>
         </div>
 

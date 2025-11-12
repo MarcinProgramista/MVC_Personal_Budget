@@ -74,6 +74,8 @@ class Balances extends Authenticated
         $expensePayments = PaymentMethod::getPayments($this->user->id);
         $sumALlIncomes = $sumALlIncomes ?? 0;
         $sumALlExpenses = $sumALlExpenses ?? 0;
+        $dateFirst = null;
+        $dateSecond = null;
         $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
         View::renderTemplate('Balances/index.html', [
             'balance' => $balance,
@@ -87,7 +89,9 @@ class Balances extends Authenticated
             'expenseDetails' => $expenseDetails,
             'incomeCategories' => $incomeCategories,
             'expenseCategories' => $expenseCategories,
-            'expensePayments' => $expensePayments
+            'expensePayments' => $expensePayments,
+            'dateFirst' => $dateFirst,
+            'dateSecond' => $dateSecond
         ]);
     }
 
@@ -161,6 +165,91 @@ class Balances extends Authenticated
             'sum' => $sum
         ]);
     }
+
+    public function updateExpenseAction()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        header('Content-Type: application/json');
+
+        // ✅ Sprawdź dane wejściowe
+        if (
+            !isset(
+                $data['id'],
+                $data['category_id'],
+                $data['payment_id'],
+                $data['amount'],
+                $data['info'],
+                $data['date']
+            )
+        ) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
+            exit;
+        }
+
+        // 🔎 Pobierz istniejący rekord
+        $oldExpense = Expense::getExpenseById((int)$data['id']);
+        if (!$oldExpense) {
+            echo json_encode(['status' => 'error', 'message' => 'Expense not found']);
+            exit;
+        }
+
+        // 🛠️ Aktualizuj dane
+        $success = Expense::updateExpense(
+            (int)$data['id'],
+            (int)$data['category_id'],
+            (int)$data['payment_id'],
+            (float)$data['amount'],
+            $data['info'],
+            $data['date']
+        );
+
+        // 🔹 Ustal dane do ponownego przeliczenia
+        $user_id = $oldExpense->user_id;
+        $dateFirst = $data['dateFirst'] ?? null;
+        $dateSecond = $data['dateSecond'] ?? null;
+
+        // 🔹 Jeśli zakres dat jest pusty → liczymy za miesiąc bieżący
+        if (empty($dateFirst) || empty($dateSecond)) {
+            $month = date('m');
+
+            $expenses = Expense::getAlExpenses($user_id, $month);
+            $sumAllIncomes = Income::getSumOfIncomes($user_id, $month);
+            $sumAllExpenses = Expense::getSumOfExpenses($user_id, $month);
+        } else {
+            // 🔹 Jeśli daty podane → liczymy dla wybranego okresu
+            $expenses = Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSecond);
+            $sumAllIncomes = Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSecond);
+            $sumAllExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSecond);
+        }
+
+        $balance = $sumAllIncomes - $sumAllExpenses;
+
+        // 📤 Zwróć JSON z nowymi danymi
+        echo json_encode([
+            'status' => $success ? 'success' : 'error',
+            'message' => $success ? 'Expense updated successfully' : 'Failed to update expense',
+            'updatedExpense' => [
+                'id' => $data['id'],
+                'amount' => $data['amount'],
+                'category_id' => $data['category_id'],
+                'payment_id' => $data['payment_id'],
+                'info' => $data['info'],
+                'date' => $data['date'],
+                'name' => $data['name'] ?? null,
+                'name_payment' => $data['name_payment'] ?? null,
+            ],
+            'totals' => [
+                'sumAllIncomes' => $sumAllIncomes,
+                'sumAllExpenses' => $sumAllExpenses,
+                'balance' => $balance
+            ],
+            'expenses' => $expenses // jeśli chcesz odświeżyć listę asynchronicznie
+        ]);
+        exit;
+    }
+
 
     public function updateIncomeAction()
     {

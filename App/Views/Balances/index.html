@@ -194,4 +194,35 @@
                 chart.draw(data, options);
             }
         </script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            // 🔹 Globalna tablica danych dla przychodów
+            // let expensesData = {{ expenses ?expenses| json_encode | raw : '[]'}};
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawExpenseChart);
+            window.addEventListener('resize', drawExpenseChart); // responsywny wykres
+
+            function drawExpenseChart() {
+                if (!expensesData || expensesData.length === 0) return;
+
+                const dataArray = [['Category', 'Amount']];
+                expensesData.forEach(expense => {
+                    dataArray.push([expense.Category, parseFloat(expense.Amount)]);
+                });
+
+                const data = google.visualization.arrayToDataTable(dataArray);
+
+                const options = {
+                    title: 'Expenses',
+                    backgroundColor: '#212529', // 🔹 ciemne tło (bg-dark)
+                    titleTextStyle: { color: '#f8f9fa' }, // jasny tytuł
+                    legend: { textStyle: { color: '#f8f9fa' } }, // jasna legenda
+                    pieSliceTextStyle: { color: '#212529' }, // ciemny tekst na kawałkach
+                    chartArea: { width: '90%', height: '80%' }
+                };
+
+                const chart = new google.visualization.PieChart(document.getElementById('piechartExpenses'));
+                chart.draw(data, options);
+            }
+        </script>
         {% endblock %}
