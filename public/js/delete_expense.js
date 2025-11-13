@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalElementDelete = document.getElementById('deleteExpenseModal');
     let dateFirst = '';
     let dateSecond = '';
+    let date = '';
     if (!modalElementDelete) {
         console.error('Brak elementu #deleteExpenseModal w DOM!');
         return;
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(button.dataset);
 
             const id = button.dataset.id;
-            const date = button.dataset.date || '';
+            date = button.dataset.date || '';
             const amount = button.dataset.amount_expense;
             const nameCategoryExpense = button.dataset.namecategoryexpense || '';
             const namePaymentExpense = button.dataset.namepaymentexpense || '';
@@ -54,7 +55,21 @@ document.addEventListener('DOMContentLoaded', function () {
             date: date
         }
         console.log(formData);
+        try {
+            const response = await fetch('/balances/delete-expense', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                console.log('Nowy dane:', data);
+            }
 
 
+        } catch (err) {
+            console.error(err);
+        };
     });
 });
