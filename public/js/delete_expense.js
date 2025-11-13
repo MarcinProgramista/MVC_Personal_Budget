@@ -65,6 +65,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             if (data.status === 'success') {
                 console.log('Nowy dane:', data);
+
+                if (data.expenses && data.expenses.length > 0) {
+                    refreshExpenseList(data.expenses);
+                    expensesData = data.expenses.map(i => ({
+                        id: i.id,
+                        Category: i.Category,
+                        Amount: parseFloat(i.Amount),
+                        date: i.date,
+                        info: i.info || ''
+                    }));
+
+                    // 🔹 Ponowne narysowanie wykresu
+                    drawExpenseChart();
+                }
             }
 
 

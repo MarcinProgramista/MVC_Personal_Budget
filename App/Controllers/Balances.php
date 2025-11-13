@@ -187,6 +187,7 @@ class Balances extends Authenticated
         $dateFirst = $data['dateFirst'] ?? null;
         $dateSecond = $data['dateSecond'] ?? null;
         $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
+        $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
         // 📤 Zwróć JSON z nowymi danymi
         echo json_encode([
             'status' =>  'success',
@@ -194,7 +195,8 @@ class Balances extends Authenticated
             'month' => $financialData['month'],
             'expenses' => $financialData['expenses'],
             'sumAllIncomes' => $financialData['sumAllIncomes'],
-            'sumAllExpenses' => $financialData['sumAllExpenses']
+            'sumAllExpenses' => $financialData['sumAllExpenses'],
+            'sum' => $sum
         ]);
     }
 
@@ -277,7 +279,7 @@ class Balances extends Authenticated
             $sumAllExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSecond);
         }
 
-        $balance = $sumAllIncomes - $sumAllExpenses;
+        $sum = $sumAllIncomes - $sumAllExpenses;
 
         // 📤 Zwróć JSON z nowymi danymi
         echo json_encode([
@@ -296,7 +298,7 @@ class Balances extends Authenticated
             'totals' => [
                 'sumAllIncomes' => $sumAllIncomes,
                 'sumAllExpenses' => $sumAllExpenses,
-                'balance' => $balance
+                'sum' => $sum
             ],
             'expenses' => $expenses // jeśli chcesz odświeżyć listę asynchronicznie
         ]);
