@@ -160,6 +160,7 @@
         <script src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="/js/edit_income.js?v={{ random() }}"></script>
         <script src="/js/edit_expense.js?v={{ random() }}"></script>
+        <script src="/js/delete_expense.js?v={{ random() }}"></script>
         <script>
             // 🔹 Globalna tablica danych dla przychodów
             let incomesData = {{ incomes ?incomes| json_encode | raw : '[]' }};
