@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     sumElementTop.textContent = `${data.totals.sumAllExpenses} PLN`;
                 }
 
+
+                updateBalanceUI(data.totals.sum, data.incomes ? data.incomes.length : 0, data.expenses ? data.expenses.length : 0);
+
                 if (data.expenses && data.expenses.length > 0) {
                     refreshExpenseList(data.expenses);
                     expensesData = data.expenses.map(i => ({
@@ -137,6 +140,78 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+
+function updateBalanceUI(sum, incomesCount, expensesCount) {
+    sum = parseFloat(sum); // ✅ zamienia string "−50.00" na -50
+
+    const balanceSumEl = document.getElementById('balanceSum');
+    const balanceContainer = balanceSumEl ? balanceSumEl.closest('div') : null;
+    const alertContainer = document.getElementById('budgetAlert');
+
+    if (!balanceSumEl) return;
+
+    // 🔹 Aktualizacja wartości w nagłówku
+    balanceSumEl.textContent = `${sum.toFixed(2)} PLN`;
+
+    // 🔹 Kolor napisu
+    if (balanceContainer) {
+        balanceContainer.classList.remove('text-success', 'text-danger', 'text-warning');
+        if (sum > 0) balanceContainer.classList.add('text-success');
+        else if (sum < 0) balanceContainer.classList.add('text-danger');
+        else balanceContainer.classList.add('text-warning');
+    }
+
+    // 🔹 Treść komunikatu (alert)
+    if (alertContainer) alertContainer.remove();
+
+    const newAlert = document.createElement('div');
+    newAlert.id = 'budgetAlert';
+    newAlert.className = 'alert custom-alert d-flex flex-column justify-content-center align-items-center text-center';
+    newAlert.setAttribute('role', 'alert');
+
+    if ((incomesCount === 0 || !incomesCount) && (expensesCount === 0 || !expensesCount) && sum === 0) {
+        newAlert.classList.add('alert-info');
+        newAlert.innerHTML = `
+            <i class="bi bi-credit-card mb-2 fs-3"></i>
+            <div class="fst-italic">
+                It looks like you haven’t added any incomes or expenses yet.
+                Start by entering your first transaction to see your budget in action!
+            </div>
+        `;
+    } else if (sum < 0) {
+        newAlert.classList.add('alert-danger');
+        newAlert.innerHTML = `
+            <i class="bi bi-emoji-frown mb-2 fs-3"></i>
+            <div class="fst-italic">
+                You’re spending more than you earn right now. Don’t worry — every step toward balance counts!
+                Review your budget and see where small changes can make a big difference.
+            </div>
+        `;
+    } else if (sum > 0) {
+        newAlert.classList.add('alert-success');
+        newAlert.innerHTML = `
+            <i class="bi bi-emoji-smile mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Great job! You’re earning more than you spend. Keep up the good habits and consider setting some of that extra income aside for your goals.
+            </div>
+        `;
+    } else {
+        newAlert.classList.add('alert-warning');
+        newAlert.innerHTML = `
+            <i class="bi bi-emoji-neutral mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Your budget is perfectly balanced.
+            </div>
+        `;
+    }
+
+    const sumContainer = document.getElementById('balanceSum')?.closest('.justify-content-center');
+    if (sumContainer && sumContainer.parentNode) {
+        sumContainer.parentNode.insertBefore(newAlert, sumContainer.nextSibling);
+    }
+}
+
+
 function refreshExpenseList(expenses) {
     const list = document.getElementById('expenseBalanceCategoriesList');
     if (!list) return;

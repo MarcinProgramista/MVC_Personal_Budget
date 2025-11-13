@@ -184,13 +184,18 @@ class Balances extends Authenticated
             exit;
         }
 
+        $success = Expense::deleteExpense(
+            (int)$data['id'],
+            (int)$this->user->id
+        );
+
         $dateFirst = $data['dateFirst'] ?? null;
         $dateSecond = $data['dateSecond'] ?? null;
         $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
         $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
         // 📤 Zwróć JSON z nowymi danymi
         echo json_encode([
-            'status' =>  'success',
+            'status' => $success ? 'success' : 'error',
             'user_id' => $this->user->id,
             'month' => $financialData['month'],
             'expenses' => $financialData['expenses'],
