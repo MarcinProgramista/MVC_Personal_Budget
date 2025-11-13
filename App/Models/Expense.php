@@ -415,4 +415,26 @@ class Expense extends \Core\Model
 
         return $stmt->execute();
     }
+
+    /**
+     * Delete expense when you have id and user_id
+     *
+     * @param int $id
+     * @param int $user_id
+     * @return bool true jeśli usunięto, false jeśli nie znaleziono lub błąd
+     */
+    public static function deleteExpense($id, $user_id)
+    {
+        $db = static::getDB();
+
+        $sql = 'DELETE FROM expenses 
+                WHERE id = :id AND user_id = :user_id
+                LIMIT 1';
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':id', (int)$id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', (int)$user_id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
