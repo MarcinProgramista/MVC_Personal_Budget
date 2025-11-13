@@ -46,8 +46,8 @@
                                 role="button" data-id="{{ incomeDetail.id }}"
                                 data-idcategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
                                 data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
-                                data-info="{{ incomeDetail.info }}"
-                                data-date="{{ incomeDetail.Data|date('Y-m-d') }}"></i>
+                                data-info="{{ incomeDetail.info }}" data-date="{{ incomeDetail.Data|date('Y-m-d') }}"
+                                data-dateFirst="{{ dateFirst}}" data-dateSecond="{{ dateSecond}}"></i>
 
                         </button>
                         <button class=" btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn
@@ -56,7 +56,8 @@
                                 data-id="{{ incomeDetail.id }}"
                                 data-idCategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
                                 data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
-                                data-date="{{ incomeDetail.Data|date('Y-m-d') }}"></i>
+                                data-date="{{ incomeDetail.Data|date('Y-m-d') }}" data-dateFirst="{{ dateFirst}}"
+                                data-dateSecond="{{ dateSecond}}"></i>
                         </button>
                     </span>
                 </span>

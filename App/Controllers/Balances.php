@@ -212,6 +212,7 @@ class Balances extends Authenticated
 
             return [
                 'expenses' => Expense::getAlExpenses($user_id, $month),
+                'incomes' => Income::getAllIncomes($user_id,  $month),
                 'sumAllIncomes' => Income::getSumOfIncomes($user_id, $month),
                 'sumAllExpenses' => Expense::getSumOfExpenses($user_id, $month),
                 'month' => $month
@@ -219,6 +220,7 @@ class Balances extends Authenticated
         } else {
             return [
                 'expenses' => Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSecond),
+                'incomes' => Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSecond),
                 'sumAllIncomes' => Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSecond),
                 'sumAllExpenses' => Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSecond),
                 'month' => null
@@ -266,27 +268,12 @@ class Balances extends Authenticated
         );
 
         // 🔹 Ustal dane do ponownego przeliczenia
-        $user_id = $oldExpense->user_id;
         $dateFirst = $data['dateFirst'] ?? null;
         $dateSecond = $data['dateSecond'] ?? null;
 
-        // 🔹 Jeśli zakres dat jest pusty → liczymy za miesiąc bieżący
-        if (empty($dateFirst) || empty($dateSecond)) {
-            $month = date('m');
+        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
+        $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
 
-            $expenses = Expense::getAlExpenses($user_id, $month);
-            $sumAllIncomes = Income::getSumOfIncomes($user_id, $month);
-            $sumAllExpenses = Expense::getSumOfExpenses($user_id, $month);
-        } else {
-            // 🔹 Jeśli daty podane → liczymy dla wybranego okresu
-            $expenses = Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSecond);
-            $sumAllIncomes = Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSecond);
-            $sumAllExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSecond);
-        }
-
-        $sum = $sumAllIncomes - $sumAllExpenses;
-
-        // 📤 Zwróć JSON z nowymi danymi
         echo json_encode([
             'status' => $success ? 'success' : 'error',
             'message' => $success ? 'Expense updated successfully' : 'Failed to update expense',
@@ -301,11 +288,11 @@ class Balances extends Authenticated
                 'name_payment' => $data['name_payment'] ?? null,
             ],
             'totals' => [
-                'sumAllIncomes' => $sumAllIncomes,
-                'sumAllExpenses' => $sumAllExpenses,
+                'sumAllIncomes' => $financialData['sumAllIncomes'],
+                'sumAllExpenses' => $financialData['sumAllExpenses'],
                 'sum' => $sum
             ],
-            'expenses' => $expenses // jeśli chcesz odświeżyć listę asynchronicznie
+            'expenses' => $financialData['expenses'] ?? [] // jeśli chcesz odświeżyć listę
         ]);
         exit;
     }
@@ -336,11 +323,15 @@ class Balances extends Authenticated
             $data['info'],
             $data['date']
         );
+        // 🔹 Ustal dane do ponownego przeliczenia
+        $dateFirst = $data['dateFirst'] ?? null;
+        $dateSecond = $data['dateSecond'] ?? null;
 
+        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
         $sumAllIncomes = Income::getSumOfIncomes($oldIncome->user_id, date('m'));
         $sumAllExpenses = Expense::getSumOfExpenses($oldIncome->user_id, date('m'));
         $incomes = Income::getAllIncomes($oldIncome->user_id,  date('m'));
-        $newSum = $sumAllIncomes - $sumAllExpenses;
+        $newSum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
 
         echo json_encode([
             'status' => $success ? 'success' : 'error',
