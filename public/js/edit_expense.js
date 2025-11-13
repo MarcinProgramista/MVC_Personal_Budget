@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Otwieranie modala i wypełnianie pól
     editButtonsExpense.forEach(button => {
         button.addEventListener('click', () => {
-            console.log(button.dataset);
+            //console.log(button.dataset);
 
             const id = button.dataset.id;
             const date = button.dataset.date || '';
