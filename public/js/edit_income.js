@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const editButtons = document.querySelectorAll('.open-edit-income-details-balance-modal');
     const modalElement = document.getElementById('editIncomeModal');
     const modal = new bootstrap.Modal(modalElement);
-
+    let dateFirst = '';
+    let dateSecond = '';
     // Otwieranie modala i wypełnianie pól
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -11,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const amount = button.dataset.amount;
             const info = button.dataset.info || '';
             const date = button.dataset.date || '';
+            dateFirst = button.dataset.datefirst || '';
+            dateSecond = button.dataset.datesecond || '';
 
             document.getElementById('editIncomeId').value = id;
             document.getElementById('editIncomeAmount').value = amount;
@@ -34,7 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
             amount: parseFloat(document.getElementById('editIncomeAmount').value).toFixed(2),
             info: document.getElementById('editIncomeInfo').value,
             date: document.getElementById('editIncomeDate').value,
-            name: document.getElementById('editIncomeCategory').selectedOptions[0].text
+            name: document.getElementById('editIncomeCategory').selectedOptions[0].text,
+            dateFirst: dateFirst,
+            dateSecond: dateSecond
         };
 
         try {

@@ -116,7 +116,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
 
-                updateBalanceUI(data.totals.sum, data.incomes ? data.incomes.length : 0, data.expenses ? data.expenses.length : 0);
+                updateBalanceUI(
+                    data.totals?.sum ?? 0,
+                    data.incomes ? data.incomes.length : 0,
+                    data.expenses ? data.expenses.length : 0
+                );
+
 
                 if (data.expenses && data.expenses.length > 0) {
                     refreshExpenseList(data.expenses);
