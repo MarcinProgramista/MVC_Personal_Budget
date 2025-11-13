@@ -183,6 +183,40 @@ class Balances extends Authenticated
             echo json_encode(['status' => 'error', 'message' => 'Missing data']);
             exit;
         }
+
+        $dateFirst = $data['dateFirst'] ?? null;
+        $dateSecond = $data['dateSecond'] ?? null;
+        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
+        // 📤 Zwróć JSON z nowymi danymi
+        echo json_encode([
+            'status' =>  'success',
+            'user_id' => $this->user->id,
+            'month' => $financialData['month'],
+            'expenses' => $financialData['expenses'],
+            'sumAllIncomes' => $financialData['sumAllIncomes'],
+            'sumAllExpenses' => $financialData['sumAllExpenses']
+        ]);
+    }
+
+    private function getFinancialData(int $user_id, ?string $dateFirst, ?string $dateSecond, string $date): array
+    {
+        if (empty($dateFirst) && empty($dateSecond)) {
+            $month = date('m', strtotime($date));
+
+            return [
+                'expenses' => Expense::getAlExpenses($user_id, $month),
+                'sumAllIncomes' => Income::getSumOfIncomes($user_id, $month),
+                'sumAllExpenses' => Expense::getSumOfExpenses($user_id, $month),
+                'month' => $month
+            ];
+        } else {
+            return [
+                'expenses' => Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSecond),
+                'sumAllIncomes' => Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSecond),
+                'sumAllExpenses' => Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSecond),
+                'month' => null
+            ];
+        }
     }
 
     public function updateExpenseAction()
