@@ -1,9 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     const deleteButtonsExpense = document.querySelectorAll('.open-delete-expense-details-balance-modal');
     const modalElementDelete = document.getElementById('deleteExpenseModal');
+
+    if (!modalElementDelete) {
+        console.error('Brak elementu #deleteExpenseModal w DOM!');
+        return;
+    }
+
     const modal = new bootstrap.Modal(modalElementDelete);
 
-    // Otwieranie modala i wypełnianie pól
     deleteButtonsExpense.forEach(button => {
         button.addEventListener('click', () => {
             console.log(button.dataset);
