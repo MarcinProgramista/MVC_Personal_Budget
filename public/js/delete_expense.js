@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     const deleteButtonsExpense = document.querySelectorAll('.open-delete-expense-details-balance-modal');
     const modalElementDelete = document.getElementById('deleteExpenseModal');
+    let id = "";
     let dateFirst = '';
+    let nameCategoryExpense = '';
     let dateSecond = '';
     let date = '';
     if (!modalElementDelete) {
@@ -15,10 +17,10 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', () => {
             console.log(button.dataset);
 
-            const id = button.dataset.id;
+            id = button.dataset.id;
             date = button.dataset.date || '';
             const amount = button.dataset.amount_expense;
-            const nameCategoryExpense = button.dataset.namecategoryexpense || '';
+            nameCategoryExpense = button.dataset.namecategoryexpense || '';
             const namePaymentExpense = button.dataset.namepaymentexpense || '';
             dateFirst = button.dataset.datefirst || '';
             dateSecond = button.dataset.datesecond || '';
@@ -65,7 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             if (data.status === 'success') {
                 console.log('Nowy dane:', data);
+                // 🔹 Usuń element z listy bez odświeżania
+                const liToRemove = document.querySelector(
+                    `#expenseDetailsBalanceCategoriesList [data-id="${id}"]`
+                );
 
+                if (liToRemove) {
+                    liToRemove.closest('li').remove();
+                    showToast(`Expense category "${nameCategoryExpense}" deleted successfully.`);
+                } else {
+                    console.warn('⚠️ Nie znaleziono elementu <li> do usunięcia.');
+                }
                 if (data.expenses && data.expenses.length > 0) {
                     refreshExpenseList(data.expenses);
                     expensesData = data.expenses.map(i => ({
@@ -79,6 +91,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     // 🔹 Ponowne narysowanie wykresu
                     drawExpenseChart();
                 }
+
+                let sumEl = document.getElementById('balanceSum');
+                if (sumEl && data.sum && data.sum !== undefined) {
+                    sumEl.textContent = `${data.sum} PLN`;
+                } else {
+                    console.warn('Nie znaleziono elementu sumDetailsExpense lub brak danych w JSON:', data);
+                }
+
+                let sumEldetails = document.getElementById('sumDetailsExpense');
+                if (sumEldetails && data.sum && data.sumAllExpenses !== undefined) {
+                    sumEldetails.textContent = `${data.sumAllExpenses} PLN`;
+                } else {
+                    console.warn('Nie znaleziono elementu sumDetailsExpense lub brak danych w JSON:', data);
+                }
+
+                let sumElementTop = document.getElementById('sumALlExpensesTop');
+                if (sumElementTop) {
+                    sumElementTop.textContent = `${data.sumAllExpenses} PLN`;
+                }
+                modal.hide();
             }
 
 
