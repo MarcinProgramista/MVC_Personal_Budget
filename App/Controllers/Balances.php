@@ -165,6 +165,25 @@ class Balances extends Authenticated
             'sum' => $sum
         ]);
     }
+    public function deleteExpenseAction()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        header('Content-Type: application/json');
+        // ✅ Sprawdź dane wejściowe
+        if (
+            !isset(
+                $data['id'],
+                $data['dateFirst'],
+                $data['dateSecond'],
+                $data['date'],
+            )
+        ) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
+            exit;
+        }
+    }
 
     public function updateExpenseAction()
     {
