@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const deleteButtonsExpense = document.querySelectorAll('.open-delete-expense-details-balance-modal');
     const modalElementDelete = document.getElementById('deleteExpenseModal');
-
+    let dateFirst = '';
+    let dateSecond = '';
     if (!modalElementDelete) {
         console.error('Brak elementu #deleteExpenseModal w DOM!');
         return;
@@ -18,10 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const amount = button.dataset.amount_expense;
             const nameCategoryExpense = button.dataset.namecategoryexpense || '';
             const namePaymentExpense = button.dataset.namepaymentexpense || '';
-
+            dateFirst = button.dataset.datefirst || '';
+            dateSecond = button.dataset.datesecond || '';
             // ustaw ID do ukrytego pola, jeśli jest
             const hiddenInput = document.getElementById('deleteExpense');
             if (hiddenInput) hiddenInput.value = id;
+
 
             // 🧩 sformatuj szczegóły transakcji do wyświetlenia
             const detailsDiv = document.getElementById('deleteExpenseDetails');
@@ -36,5 +39,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
             modal.show();
         });
+
+    });
+
+    // Obsługa zapisu z modala
+    document.getElementById('deleteExpenseForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+
+        const formData = {
+            id: document.getElementById('deleteExpense').value,
+            dateFirst: dateFirst,
+            dateSecond: dateSecond,
+            date: date
+        }
+        console.log(formData);
+
+
     });
 });
