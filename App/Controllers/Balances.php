@@ -19,6 +19,7 @@ class Balances extends Authenticated
 {
     protected $controller; // 👈 dodaj to
     protected $action; // 👈 dodaj to
+    public string $dateFirst;
     public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
@@ -124,10 +125,21 @@ class Balances extends Authenticated
     public function sendChoosenDatesAction()
     {
         $this->user = Auth::getUser();
-        $dateFirst = $_POST['dateFirst'];
-        $dateSecond = $_POST['dateSecond'];
+
+        $json = file_get_contents("php://input");
+        $data = json_decode($json, true);
+
+        $dateFirst = $data['dateFirst'] ?? null;
+        $dateSecond = $data['dateSecond'] ?? null;
+
+        if (!$dateFirst || !$dateSecond) {
+            echo json_encode(['error' => 'Missing dates']);
+            return;
+        }
+
         static::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
     }
+
 
     /**
      * Show details from income and expenseDetails
@@ -184,6 +196,30 @@ class Balances extends Authenticated
             echo json_encode(['status' => 'error', 'message' => 'Missing data']);
             exit;
         }
+
+        $success = Income::deleteIncome(
+            (int)$data['id'],
+            (int)$this->user->id
+        );
+
+        $dateFirst = $data['dateFirst'] ?? null;
+        $dateSecond = $data['dateSecond'] ?? null;
+
+
+        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
+        $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
+
+        // 📤 Zwróć JSON z nowymi danymi
+        echo json_encode([
+            'status' => $success ? 'success' : 'error',
+            'user_id' => $this->user->id,
+            'month' => $financialData['month'],
+            'expenses' => $financialData['expenses'],
+            'incomes' => $financialData['incomes'],
+            'sumAllIncomes' => $financialData['sumAllIncomes'],
+            'sumAllExpenses' => $financialData['sumAllExpenses'],
+            'sum' => $sum
+        ]);
     }
 
     public function deleteExpenseAction()
@@ -349,9 +385,6 @@ class Balances extends Authenticated
         $dateSecond = $data['dateSecond'] ?? null;
 
         $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
-        $sumAllIncomes = Income::getSumOfIncomes($oldIncome->user_id, date('m'));
-        $sumAllExpenses = Expense::getSumOfExpenses($oldIncome->user_id, date('m'));
-        $incomes = Income::getAllIncomes($oldIncome->user_id,  date('m'));
         $newSum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
 
         echo json_encode([
@@ -360,13 +393,13 @@ class Balances extends Authenticated
                 'id' => $data['id'],
                 'oldAmount' => $oldIncome->amount,
                 'newAmount' => $data['amount'],
-                'sumAllIncomes' => $sumAllIncomes,
-                'sumAllExpenses' => $sumAllExpenses,
+                'sumAllIncomes' => $financialData['sumAllIncomes'],
+                'sumAllExpenses' => $financialData['sumAllExpenses'],
                 'balanceSum' => $newSum,          // nowa suma balansu
                 'name' => $data['name'] ?? null,
                 'info' => $data['info'],
                 'date' => $data['date'],
-                'incomes' => $incomes,
+                'incomes' => $financialData['incomes'],
             ]
         ]);
 

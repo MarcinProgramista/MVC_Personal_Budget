@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dateSecond: dateSecond,
             date: date
         }
-        console.log(formData);
+
         try {
             const response = await fetch('/balances/delete-expense', {
                 method: 'POST',
@@ -121,3 +121,31 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 });
+
+function refreshExpenseList(expenses) {
+    const list = document.getElementById('expenseBalanceCategoriesList');
+    if (!list) return;
+
+    // wyczyść starą listę
+    list.innerHTML = '';
+
+    // zbuduj nową listę
+    expenses.forEach(expense => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between border border-warning align-items-center text-light';
+        li.innerHTML = `
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">${expense.Category}</span>
+                    </div>
+                </div>
+                <span class="d-flex flex-row">
+                    <span class="d-flex align-items-center">
+                        <strong class="text-light text-center mx-2">${parseFloat(expense.Amount).toFixed(2)} PLN</strong>
+                    </span>
+                </span>
+            `;
+        list.appendChild(li);
+    });
+}
