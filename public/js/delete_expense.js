@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const data = await response.json();
             if (data.status === 'success') {
-                console.log('Nowy dane:', data);
                 // 🔹 Usuń element z listy bez odświeżania
                 const liToRemove = document.querySelector(
                     `#expenseDetailsBalanceCategoriesList [data-id="${id}"]`
@@ -111,6 +110,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     sumElementTop.textContent = `${data.sumAllExpenses} PLN`;
                 }
                 modal.hide();
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
             }
 
 

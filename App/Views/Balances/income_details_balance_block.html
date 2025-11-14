@@ -43,7 +43,7 @@
                         <button
                             class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
                             <i class="fas fa-pencil-alt text-success open-edit-income-details-balance-modal"
-                                role="button" data-id="{{ incomeDetail.id }}"
+                                data-id="{{ incomeDetail.id }}"
                                 data-idcategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
                                 data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
                                 data-info="{{ incomeDetail.info }}" data-date="{{ incomeDetail.Data|date('Y-m-d') }}"
@@ -54,8 +54,10 @@
                                 m-1">
                             <i class="fas fa-trash-alt text-danger open-delete-income-details-balance-modal"
                                 data-id="{{ incomeDetail.id }}"
-                                data-idCategory="{{ incomeDetail.income_category_assigned_to_user_id }}"
-                                data-name="{{ incomeDetail.Category|escape }}" data-amount="{{ incomeDetail.Amount }}"
+                                data-id_category_income="{{ incomeDetail.income_category_assigned_to_user_id }}"
+                                data-nameCategoryIncome="{{ incomeDetail.Category|escape }}"
+                                data-amount_income="{{ incomeDetail.Amount }}"
+                                data-info_income="{{ expenseDetail.info }}"
                                 data-date="{{ incomeDetail.Data|date('Y-m-d') }}" data-dateFirst="{{ dateFirst}}"
                                 data-dateSecond="{{ dateSecond}}"></i>
                         </button>

@@ -158,11 +158,13 @@
         {% include 'Balances/edit_income.html' %}
         {% include 'Balances/edit_expense.html' %}
         {% include 'Balances/delete_expense.html' %}
+        {% include 'Balances/delete_income.html' %}
         <script src="/js/toast.js?v={{ random() }}"></script>
         <script src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="/js/edit_income.js?v={{ random() }}"></script>
         <script src="/js/edit_expense.js?v={{ random() }}"></script>
         <script src="/js/delete_expense.js?v={{ random() }}"></script>
+        <script src="/js/delete_income.js?v={{ random() }}"></script>
         <script>
             // 🔹 Globalna tablica danych dla przychodów
             let incomesData = {{ incomes ?incomes| json_encode | raw : '[]' }};
