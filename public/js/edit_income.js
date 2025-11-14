@@ -112,17 +112,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     sumDivDetails.textContent = parseFloat(data.received.sumAllIncomes) + ' PLN';
                 }
 
-                // ---- 3. Aktualizacja górnego balansu ----
-                const balanceSumDiv = document.getElementById('balanceSum');
-                if (balanceSumDiv && data.received.balanceSum !== undefined) {
-                    balanceSumDiv.textContent = parseFloat(data.received.balanceSum).toFixed(2) + ' PLN';
 
-                    const parentDiv = balanceSumDiv.parentElement;
-                    parentDiv.classList.remove('text-success', 'text-danger', 'text-warning');
-                    if (data.received.balanceSum > 0) parentDiv.classList.add('text-success');
-                    else if (data.received.balanceSum < 0) parentDiv.classList.add('text-danger');
-                    else parentDiv.classList.add('text-warning');
-                }
+
+
+                updateBalanceUIForIncomes(
+                    data.received.balanceSum,
+                    data.received.incomes ? data.received.incomes.length : 0,
+                    data.received.sumAllExpenses
+                );
 
 
                 drawChart(); // funkcja rysująca wykres Google Charts
@@ -134,6 +131,78 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function updateBalanceUIForIncomes(sum, incomesCount, expensesCount) {
+    sum = parseFloat(sum);
+
+    const balanceSumEl = document.getElementById('balanceSum');
+    const balanceContainer = balanceSumEl ? balanceSumEl.closest('div') : null;
+
+    // Usuń stary alert
+    const oldAlert = document.getElementById('budgetAlert');
+    if (oldAlert) oldAlert.remove();
+
+    if (!balanceSumEl) return;
+
+    // 🔹 Zaktualizuj wartość balansu
+    balanceSumEl.textContent = `${sum.toFixed(2)} PLN`;
+
+    // 🔹 Kolor kwoty
+    if (balanceContainer) {
+        balanceContainer.classList.remove('text-success', 'text-danger', 'text-warning');
+        if (sum > 0) balanceContainer.classList.add('text-success');
+        else if (sum < 0) balanceContainer.classList.add('text-danger');
+        else balanceContainer.classList.add('text-warning');
+    }
+
+    // 🔹 Zbuduj alert
+    const alert = document.createElement('div');
+    alert.id = 'budgetAlert';
+    alert.className = 'alert custom-alert d-flex flex-column justify-content-center align-items-center text-center';
+    alert.setAttribute('role', 'alert');
+
+    if ((incomesCount === 0 || !incomesCount) && (expensesCount === 0 || !expensesCount) && sum === 0) {
+        alert.classList.add('alert-info');
+        alert.innerHTML = `
+            <i class="bi bi-credit-card mb-2 fs-3"></i>
+            <div class="fst-italic">
+                It looks like you haven’t added any incomes or expenses yet.
+                Start adding your first transactions!
+            </div>
+        `;
+    } else if (sum < 0) {
+        alert.classList.add('alert-danger');
+        alert.innerHTML = `
+            <i class="bi bi-emoji-frown mb-2 fs-3"></i>
+            <div class="fst-italic">
+                You're spending more than you earn. Try to review your expenses!
+            </div>
+        `;
+    } else if (sum > 0) {
+        alert.classList.add('alert-success');
+        alert.innerHTML = `
+            <i class="bi bi-emoji-smile mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Great! You're earning more than you spend. Keep it going!
+            </div>
+        `;
+    } else {
+        alert.classList.add('alert-warning');
+        alert.innerHTML = `
+            <i class="bi bi-emoji-neutral mb-2 fs-3"></i>
+            <div class="fst-italic">
+                Your budget is perfectly balanced.
+            </div>
+        `;
+    }
+
+    // Wstaw alert pod sekcją balansu
+    const sumContainer = balanceSumEl.closest('.justify-content-center');
+    if (sumContainer && sumContainer.parentNode) {
+        sumContainer.parentNode.insertBefore(alert, sumContainer.nextSibling);
+    }
+}
+
 function refreshIncomeList(incomes) {
     const list = document.getElementById('incomeBalanceCategoriesList');
     if (!list) return;
