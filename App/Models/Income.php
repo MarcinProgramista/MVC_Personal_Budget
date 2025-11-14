@@ -394,4 +394,27 @@ class Income extends \Core\Model
         $result = $stmt->fetch(PDO::FETCH_OBJ); // FETCH_OBJ daje dostęp przez $result->Amount itp.
         return $result ?: null;
     }
+
+    /**
+     * Usuwa przychód użytkownika.
+     *
+     * @param int $id ID przychodu
+     * @param int $userId ID użytkownika
+     * @return bool
+     */
+    public static function deleteIncome($id, $userId)
+    {
+        $sql = "DELETE FROM incomes 
+                WHERE id = :id 
+                AND user_id = :user_id
+                LIMIT 1";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
