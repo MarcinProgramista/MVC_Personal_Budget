@@ -51,20 +51,33 @@ class Expense extends \Core\Model
      * 
      * return void
      */
-    public  static function updateCategoryForAnother($id, $user_id, $category_another_id)
+    public static function updateCategoryForAnother(int $id, int $user_id, int $category_another_id): bool
     {
-        $sql = 'UPDATE  expenses
-                SET 	expense_category_assigned_to_user_id = :expense_category_assigned_to_user_id 
-                WHERE user_id = :user_id and expense_category_assigned_to_user_id = :id';
-        $db = static::getDB();
-        $stmt = $db->prepare($sql);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-        $stmt->bindValue(':expense_category_assigned_to_user_id', $category_another_id, PDO::PARAM_INT);
+        // Walidacja parametrów
+        if ($id <= 0 || $user_id <= 0 || $category_another_id <= 0) {
+            throw new \InvalidArgumentException('All IDs must be positive integers');
+        }
 
-        $stmt->execute();
+        $sql = 'UPDATE expenses
+            SET expense_category_assigned_to_user_id = :expense_category_assigned_to_user_id 
+            WHERE user_id = :user_id 
+            AND expense_category_assigned_to_user_id = :id';
 
-        return true;
+        try {
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindValue(':expense_category_assigned_to_user_id', $category_another_id, PDO::PARAM_INT);
+
+            $result = $stmt->execute();
+
+            // Sprawdź czy cokolwiek zostało zaktualizowane
+            return $result && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('Failed to update category: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
