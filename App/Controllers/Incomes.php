@@ -94,6 +94,7 @@ class Incomes extends Authenticated
 
     public function checkAmountForMonthAction()
     {
+
         $input = json_decode(file_get_contents('php://input'), true);
 
         $categoryId = $input['id'] ?? null;

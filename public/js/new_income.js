@@ -23,7 +23,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedDate = dateInput.value;
         const selectedAmount = amountInput.value;
 
-        if (!selectedId || !selectedDate) return;
+        if (!selectedId || selectedId === "undefined" || selectedId === null) {
+            return;
+        }
+        if (!selectedDate) {
+            return;
+        }
+
 
         const monthNumber = new Date(selectedDate).getMonth() + 1;
         const monthName = monthNames[monthNumber - 1];

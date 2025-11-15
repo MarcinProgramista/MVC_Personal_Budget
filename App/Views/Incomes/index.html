@@ -42,7 +42,8 @@
                     </option>
                     {% endfor %}
                     {% else %}
-                    <option selected disabled>-- Select income category --</option>
+                    <option value="" selected disabled>-- Select income category --</option>
+
                     {% for incomeCategory in incomeCategories %}
                     <option value="{{ incomeCategory.name | escape }}" data-id="{{ incomeCategory.id }}">
                         {{ incomeCategory.name }}

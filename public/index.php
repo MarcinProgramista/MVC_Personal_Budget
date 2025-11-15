@@ -10,7 +10,11 @@
  * Composer
  */
 require dirname(__DIR__) . '/vendor/autoload.php';
-
+/**
+ * Load .env (dotenv)
+ */
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
 
 /**
  * Error and Exception handling

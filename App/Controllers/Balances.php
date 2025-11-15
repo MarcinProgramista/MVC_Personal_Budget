@@ -126,18 +126,19 @@ class Balances extends Authenticated
     {
         $this->user = Auth::getUser();
 
-        $json = file_get_contents("php://input");
-        $data = json_decode($json, true);
-
-        $dateFirst = $data['dateFirst'] ?? null;
-        $dateSecond = $data['dateSecond'] ?? null;
+        // Tu używamy POST, bo formularz w base.html wysyła dane jako POST FORM,
+        // a NIE JSON.
+        $dateFirst = $_POST['dateFirst'] ?? null;
+        $dateSecond = $_POST['dateSecond'] ?? null;
 
         if (!$dateFirst || !$dateSecond) {
-            echo json_encode(['error' => 'Missing dates']);
+            Flash::addMessage("You must set both dates!", Flash::WARNING);
+            $this->redirect('/balances/index');
             return;
         }
 
-        static::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
+        // Wyświetl okres wybrany
+        self::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
     }
 
 

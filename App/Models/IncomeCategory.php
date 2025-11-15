@@ -226,19 +226,21 @@ class IncomeCategory extends \Core\Model
      */
     public static function findExpectedMonetForChosenCategory($user_id, $categoryId)
     {
-        $nameCategory = static::findNameIncomeCategory($user_id, $categoryId);
-        $sql = 'SELECT cash_limit FROM incomes_category_assigned_to_users WHERE user_id = :user_id AND name=:nameCategory';
+        $sql = 'SELECT cash_limit 
+            FROM incomes_category_assigned_to_users 
+            WHERE user_id = :user_id AND id = :categoryId';
+
         $db = static::getDB();
         $stmt = $db->prepare($sql);
 
         $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-        $stmt->bindValue(':nameCategory', $nameCategory, PDO::PARAM_STR);
+        $stmt->bindValue(':categoryId', $categoryId, PDO::PARAM_INT);
 
         $stmt->execute();
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result['cash_limit'] ?: 0;
+        return $result && isset($result['cash_limit']) ? (float)$result['cash_limit'] : 0;
     }
 
     /**

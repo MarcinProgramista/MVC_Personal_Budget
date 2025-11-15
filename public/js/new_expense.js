@@ -95,7 +95,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedId = selectedOption.dataset.id;
         const selectedName = selectedOption.value;
         const selectedDate = dateInput.value;
-        if (!selectedId || !selectedDate) return;
+        if (!selectedId || selectedId === "undefined" || selectedId === null) return;
+
 
         const monthNumber = new Date(selectedDate).getMonth() + 1;
         const monthName = monthNames[monthNumber - 1];
