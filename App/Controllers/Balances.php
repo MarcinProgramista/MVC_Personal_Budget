@@ -117,31 +117,34 @@ class Balances extends Authenticated
         if ($month == 12) return $month = 'December';
     }
 
-    /**
-     * Send date to bala;ances page income
-     *
-     * @return void
-     */
     public function sendChoosenDatesAction()
     {
         $this->user = Auth::getUser();
 
-        // Tu używamy POST, bo formularz w base.html wysyła dane jako POST FORM,
-        // a NIE JSON.
+        // Z FORMULARZA (POST)
         $dateFirst = $_POST['dateFirst'] ?? null;
         $dateSecond = $_POST['dateSecond'] ?? null;
 
-        if (!$dateFirst || !$dateSecond) {
-            Flash::addMessage("You must set both dates!", Flash::WARNING);
+        if (!$this->isValidDate($dateFirst) || !$this->isValidDate($dateSecond)) {
+            Flash::addMessage('Invalid date format', Flash::WARNING);
             $this->redirect('/balances/index');
             return;
         }
 
-        // Wyświetl okres wybrany
-        self::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
+        if (strtotime($dateFirst) > strtotime($dateSecond)) {
+            Flash::addMessage('Start date must be before end date', Flash::WARNING);
+            $this->redirect('/balances/index');
+            return;
+        }
+
+        static::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
     }
 
-
+    private function isValidDate(string $date): bool
+    {
+        $d = \DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
+    }
     /**
      * Show details from income and expenseDetails
      *
