@@ -3,6 +3,7 @@
     <div class="modal-dialog">
         <div class="modal-content bg-dark">
             <form id="addCategoryExpenseForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <div class="modal-header bg-dark text-warning">
                     <h5 class="modal-title" id="addCategoryExpenseModalLabel">Add Category</h5>
                     <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
