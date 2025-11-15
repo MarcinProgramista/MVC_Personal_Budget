@@ -17,30 +17,59 @@ class CategoryExpense extends Authenticated
         header('Content-Type: application/json');
 
         try {
+            // 🔒 Sprawdzenie użytkownika
             $userId = $_SESSION['user_id'] ?? null;
-            if (!$userId) throw new \Exception('User not logged in');
-            $name = trim($_POST['name'] ?? '');
-            $cashLimit = $_POST['cash_limit'] ?? null;
-            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
-
-            if (!$userId) throw new \Exception('User not logged in');
-            if ($name === '') throw new \Exception('Category name is required');
-
-            $existing = ExpenseCategory::existCategoryName($name, $userId);
-            if ($existing) {
-                echo json_encode(['success' => false, 'field' => 'name', 'message' => 'This category already exists.']);
-                exit;
-                return;
+            if (!$userId) {
+                throw new \Exception('User not logged in');
             }
 
-            $newId = ExpenseCategory::addCategory($userId, $name, $isLimitActive, $cashLimit);
-            if (!$newId) throw new \Exception('Failed to add category');
+            // 🔹 Pobranie danych z formularza
+            $name = trim($_POST['name'] ?? '');
+            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
 
+            // Cash limit może być:
+            // - liczbą
+            // - pustym stringiem => wtedy null
+            $cashLimit = $_POST['cash_limit'] ?? null;
+            if ($cashLimit === '' || $isLimitActive === 0) {
+                $cashLimit = null;
+            }
+
+            // 🔍 Walidacja
+            if ($name === '') {
+                echo json_encode([
+                    'success' => false,
+                    'field' => 'name',
+                    'message' => 'Category name is required'
+                ]);
+                exit;
+            }
+
+            // 🔍 Czy taka nazwa istnieje?
+            $existing = ExpenseCategory::existCategoryName($name, $userId);
+            if ($existing) {
+                echo json_encode([
+                    'success' => false,
+                    'field' => 'name',
+                    'message' => 'This category already exists.'
+                ]);
+                exit;
+            }
+
+            // 🟢 Dodanie do bazy
+            $newId = ExpenseCategory::addCategory($userId, $name, $isLimitActive, $cashLimit);
+
+            if (!$newId) {
+                throw new \Exception('Failed to add category');
+            }
+
+            // 🟢 Odpowiedź JSON
             echo json_encode([
                 'success' => true,
                 'message' => 'Category added successfully!',
                 'category' => [
                     'id' => $newId,
+                    'user_id' => $userId,
                     'name' => $name,
                     'cash_limit' => $cashLimit,
                     'is_limit_active' => $isLimitActive
@@ -49,9 +78,14 @@ class CategoryExpense extends Authenticated
         } catch (\Throwable $e) {
             http_response_code(500);
             error_log("💥 Error adding expense category: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
+
 
 
 

@@ -49,100 +49,99 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const name = nameInput.value.trim();
-        const isLimitActive = checkbox.checked ? 1 : 0;
-        const cashLimit = checkbox.checked && cashLimitInput.value
-            ? parseFloat(cashLimitInput.value)
-            : null;
+        const formData = new FormData(form);
+        const csrfToken = formData.get('csrf_token');
 
-        if (!name) {
-            nameInput.classList.add('is-invalid');
-            categoryError.textContent = 'Please enter a name.';
-            return;
+        // Jeśli checkbox nie jest zaznaczony – usuń wartości limitu
+        if (!checkbox.checked) {
+            formData.set('is_limit_active', 0);
+            formData.set('cash_limit', '');
+        } else {
+            formData.set('is_limit_active', 1);
         }
 
-        nameInput.classList.remove('is-invalid');
-        categoryError.textContent = '';
-
         try {
-            console.log("➡️ Sending request:", {
-                name,
-                is_limit_active: isLimitActive,
-                cash_limit: cashLimit
-            });
-
             const res = await fetch('/category-expense/add-expense-category', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `name=${encodeURIComponent(name)}&is_limit_active=${isLimitActive}&cash_limit=${encodeURIComponent(cashLimit ?? '')}`
+                body: formData,
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                }
             });
 
             const data = await res.json();
             console.log("⬅️ Response:", data);
 
             if (data.success) {
-                // ✅ Dodaj nowy element do listy metod płatności bez odświeżania
+
                 const list = document.getElementById('expenseCategoriesList');
+
                 if (list) {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between border border-warning align-items-center text-light';
+
                     li.innerHTML = `
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold">${data.category.name}</span>
-                            ${data.category.is_limit_active && data.category.cash_limit
+            <div class="d-flex flex-column">
+                <div class="d-flex flex-row align-items-center ">
+                    <i class="fas fa-circle me-2 text-success"></i>
+                    <span class="fw-bold">${data.category.name}</span>
+                </div>
+
+                ${data.category.cash_limit !== null
                             ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
-                            : ''}
-                        </div>
-                         <span class="d-flex flex-row">
-                        <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                            <i class="fas fa-pencil-alt text-success me-2 open-edit-category-modal" 
-                                role="button"
-                                data-id="${data.category.id}"
-                                data-name="${data.category.name}"
-                                data-cash_limit="${data.category.cash_limit || ''}"
-                                data-is_limit_active="${data.category.is_limit_active}"
-                                data-user_id="${data.category.user_id}"
-                                data-type="payment"></i></button>
-                        <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                            <i class="fas fa-trash-alt text-danger open-delete-category-modal" 
-                                role="button" 
-                                data-type="payment"
-                                data-id="${data.category.id}" 
-                                data-name="${data.category.name}"
-                                data-user_id="${data.category.user_id}"></i></button>
-                        </span>
-                    `;
+                            : ''
+                        }
+            </div>
+
+            <span class="d-flex flex-row">
+                <button class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                    <i class="fas fa-pencil-alt text-success open-edit-expense-category-modal"
+                        data-id="${data.category.id}"
+                        data-name="${data.category.name}"
+                        data-cash_limit="${data.category.cash_limit ?? ''}"
+                        data-is_limit_active="${data.category.is_limit_active}"
+                        data-user_id="${data.category.user_id}"
+                        data-type="expense"></i>
+                </button>
+
+                <button class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                    <i class="fas fa-trash-alt text-danger open-delete-expense-category-modal"
+                        data-id="${data.category.id}"
+                        data-name="${data.category.name}"
+                        data-user_id="${data.category.user_id}"
+                        data-type="expense"></i>
+                </button>
+            </span>
+        `;
+
                     list.appendChild(li);
-                    // 🔹 Podpięcie eventów po dodaniu
-                    li.querySelector('.open-edit-category-modal')?.addEventListener('click', (e) => {
-                        console.log("🟢 Edit clicked:", e.target.dataset);
-                        showToast('Edit clicked!');
-                    });
-                    li.querySelector('.open-delete-category-modal')?.addEventListener('click', (e) => {
-                        console.log("🗑️ Delete clicked:", e.target.dataset);
-                        showToast('Delete clicked!');
-                    });
+
+                    // podpinamy eventy
+                    li.querySelector('.open-edit-expense-category-modal')
+                        .addEventListener('click', (e) => {
+                            console.log("🟢 Edit clicked:", e.target.dataset);
+                            showToast('Edit clicked!');
+                        });
+
+                    li.querySelector('.open-delete-expense-category-modal')
+                        .addEventListener('click', (e) => {
+                            console.log("🗑️ Delete clicked:", e.target.dataset);
+                            showToast('Delete clicked!');
+                        });
                 }
 
                 modal.hide();
-                showToast('Payment method added successfully!');
+                showToast('Category added successfully!');
                 form.reset();
-            } else {
-                // ❌ Obsługa błędów
-                if (data.field === 'name') {
-                    nameInput.classList.add('is-invalid');
-                    categoryError.textContent = data.message || 'Invalid name.';
-                } else {
-                    showToast(data.message || 'An error occurred.', 'error');
-                }
             }
+
+
         } catch (error) {
             console.error('❌ Error sending request:', error);
             categoryError.textContent = 'Server error.';
         }
     });
+
 
 
 });
