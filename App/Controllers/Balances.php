@@ -45,13 +45,13 @@ class Balances extends Authenticated
     public function indexAction()
     {
         $month = date('m');
-        $this->sentDetailsToPage($this->user->id, $month);
+        $this->sendDetailsToPage($this->user->id, $month);
     }
 
     public function showLastMonthAction()
     {
         $month = date('m') - 1;
-        $this->sentDetailsToPage($this->user->id, $month);
+        $this->sendDetailsToPage($this->user->id, $month);
     }
 
     /**
@@ -59,7 +59,7 @@ class Balances extends Authenticated
      *
      * @return page
      */
-    public function sentDetailsToPage($user_id, $month)
+    public function sendDetailsToPage($user_id, $month)
     {
         $balance = true;
         $nameMonth = $this->getMonth($month);
@@ -184,82 +184,57 @@ class Balances extends Authenticated
 
     public function deleteIncomeAction()
     {
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-
-        header('Content-Type: application/json');
-        // ✅ Sprawdź dane wejściowe
-        if (
-            !isset(
-                $data['id'],
-                $data['dateFirst'],
-                $data['dateSecond'],
-                $data['date'],
-            )
-        ) {
-            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
-            exit;
-        }
-
-        $success = Income::deleteIncome(
-            (int)$data['id'],
-            (int)$this->user->id
-        );
-
-        $dateFirst = $data['dateFirst'] ?? null;
-        $dateSecond = $data['dateSecond'] ?? null;
-
-
-        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
-        $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
-
-        // 📤 Zwróć JSON z nowymi danymi
-        echo json_encode([
-            'status' => $success ? 'success' : 'error',
-            'user_id' => $this->user->id,
-            'month' => $financialData['month'],
-            'expenses' => $financialData['expenses'],
-            'incomes' => $financialData['incomes'],
-            'sumAllIncomes' => $financialData['sumAllIncomes'],
-            'sumAllExpenses' => $financialData['sumAllExpenses'],
-            'sum' => $sum
-        ]);
+        $this->handleDeleteTransaction('income');
     }
 
     public function deleteExpenseAction()
     {
+        $this->handleDeleteTransaction('expense');
+    }
+
+    private function handleDeleteTransaction(string $type)
+    {
+        header('Content-Type: application/json');
+
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
-        header('Content-Type: application/json');
-        // ✅ Sprawdź dane wejściowe
-        if (
-            !isset(
-                $data['id'],
-                $data['dateFirst'],
-                $data['dateSecond'],
-                $data['date'],
-            )
-        ) {
-            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
-            exit;
+        // Walidacja
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON']);
+            return;
         }
 
-        $success = Expense::deleteExpense(
-            (int)$data['id'],
-            (int)$this->user->id
+        $requiredFields = ['id', 'dateFirst', 'dateSecond', 'date'];
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field])) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => "Missing field: $field"]);
+                return;
+            }
+        }
+
+        // Wywołanie odpowiedniej metody usuwania
+        $success = match ($type) {
+            'income' => Income::deleteIncome((int)$data['id'], (int)$this->user->id),
+            'expense' => Expense::deleteExpense((int)$data['id'], (int)$this->user->id),
+            default => false
+        };
+
+        $financialData = $this->getFinancialData(
+            $this->user->id,
+            $data['dateFirst'],
+            $data['dateSecond'],
+            $data['date']
         );
 
-        $dateFirst = $data['dateFirst'] ?? null;
-        $dateSecond = $data['dateSecond'] ?? null;
-        $financialData = $this->getFinancialData($this->user->id, $dateFirst, $dateSecond, $data['date']);
         $sum = $financialData['sumAllIncomes'] - $financialData['sumAllExpenses'];
-        // 📤 Zwróć JSON z nowymi danymi
+
         echo json_encode([
             'status' => $success ? 'success' : 'error',
             'user_id' => $this->user->id,
             'month' => $financialData['month'],
-            'expenses' => $financialData['expenses'],
             'sumAllIncomes' => $financialData['sumAllIncomes'],
             'sumAllExpenses' => $financialData['sumAllExpenses'],
             'sum' => $sum
