@@ -117,7 +117,7 @@ class Balances extends Authenticated
         if ($month == 12) return $month = 'December';
     }
 
-    public function sendChoosenDatesAction()
+    public function sendChosenDatesAction()
     {
         $this->user = Auth::getUser();
 
