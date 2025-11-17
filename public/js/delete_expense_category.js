@@ -1,25 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('deleteExpenseCategoryModal');
-    if (!modalEl) {
-        console.error('❌ Modal element not found: #deleteExpenseCategoryModal');
-        return;
-    }
+    if (!modalEl) return;
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
     const nameField = document.getElementById('deleteExpenseCategoryName');
     const idField = document.getElementById('deleteExpenseCategoryId');
     const userIdField = document.getElementById('deleteExpenseUserId');
-    const confirmButton = document.getElementById('confirmDeleteExpenseCategoryButton');
+    const csrfField = document.getElementById('deleteExpenseCsrf');
+    const form = document.getElementById('deleteExpenseCategoryForm');
 
     // 🔹 Otwieranie modala po kliknięciu kosza
     document.querySelectorAll('.open-delete-expense-category-modal[data-type="expense"]').forEach(btn => {
         btn.addEventListener('click', () => {
             const { id, name, user_id } = btn.dataset;
 
-            console.log("🗑️ Usuwanie kategorii:", { id, name, user_id });
-
-            // 🔹 Ustaw dane w modalu
-            nameField.textContent = name || 'Unknown category';
+            nameField.textContent = name || 'Unknown';
             idField.value = id;
             userIdField.value = user_id;
 
@@ -27,49 +23,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 🔹 Kliknięcie przycisku "Delete"
-    confirmButton.addEventListener('click', async () => {
+    // 🔥 Obsługa submit formularza
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
         const id = idField.value;
         const user_id = userIdField.value;
+        const csrfToken = csrfField.value;
 
         if (!id) {
-            console.error("❌ Brak ID kategorii do usunięcia.");
+            console.error("❌ No category ID.");
             return;
         }
 
         try {
             const res = await fetch('/category-expense/delete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': csrfToken
+                },
                 credentials: 'include',
-                body: new URLSearchParams({ id, user_id })
+                body: new URLSearchParams({ id, user_id, csrf_token: csrfToken })
             });
 
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-
             const data = await res.json();
+            console.log("⬅️ Response:", data);
 
             if (data.success) {
-                // 🔹 Usuń element z listy bez odświeżania
+
+                // 👇 usuń element z listy
                 const liToRemove = document.querySelector(
                     `#expenseCategoriesList [data-id="${id}"]`
                 );
 
                 if (liToRemove) {
                     liToRemove.closest('li').remove();
-                    showToast(`Expnese category "${nameField.textContent}" deleted successfully.`);
-                } else {
-                    console.warn('⚠️ Nie znaleziono elementu <li> do usunięcia.');
+                    showToast(`Expense category "${nameField.textContent}" deleted.`);
                 }
 
                 modal.hide();
             } else {
-                showToast(data.message || 'An error occurred while deleting.', 'error');
+                showToast(data.message || 'Failed to delete category.', 'error');
             }
+
         } catch (error) {
-            console.error('❌ Error during deletion:', error);
+            console.error('❌ Error:', error);
             showToast('Server error.', 'error');
         }
     });

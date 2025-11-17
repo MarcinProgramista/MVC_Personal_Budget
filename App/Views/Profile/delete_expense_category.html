@@ -4,20 +4,21 @@
             <form id="deleteExpenseCategoryForm">
                 <div class="modal-header bg-dark text-warning">
                     <h5 class="modal-title" id="deleteExpenseCategoryModalLabel">Delete Category</h5>
-                    <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body text-center">
-                    <p id="deleteExpenseCategoryInfo" class="fw-bold mb-2 text-warning">Do you want to delete bellow
-                        category?:
-                    </p>
+                    <p class="fw-bold mb-2 text-warning">Do you want to delete this category?</p>
                     <p id="deleteExpenseCategoryName" class="text-danger fw-bold mb-2"></p>
+
                     <input type="hidden" id="deleteExpenseCategoryId">
                     <input type="hidden" id="deleteExpenseUserId" name="user_id">
+                    <input type="hidden" id="deleteExpenseCsrf" name="csrf_token" value="{{ csrf_token }}">
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="confirmDeleteExpenseCategoryButton" class="btn btn-danger">Delete</button>
+                    <button type="submit" id="confirmDeleteExpenseCategoryButton" class="btn btn-danger">Delete</button>
                 </div>
             </form>
         </div>

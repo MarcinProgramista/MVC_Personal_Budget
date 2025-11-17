@@ -106,6 +106,14 @@ class CategoryExpense extends Authenticated
     {
         header('Content-Type: application/json');
 
+        // 🔐 CSRF token
+        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        if (!\App\Csrf::validateToken($token)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+            return;
+        }
+
         $id = $_POST['id'] ?? null;
         $user_id = $_POST['user_id'] ?? null;
 
@@ -118,16 +126,15 @@ class CategoryExpense extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
+
         $idAnotherCategory = ExpenseCategory::getCategoryIdByName("Another", (int)$user_id);
         Expense::updateCategoryForAnother($id, $user_id, $idAnotherCategory);
+
         $deleted = ExpenseCategory::deleteCategoryById((int)$id, (int)$user_id);
 
-        if ($deleted) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to delete category.']);
-        }
+        echo json_encode(['success' => $deleted]);
     }
+
 
 
     /**
