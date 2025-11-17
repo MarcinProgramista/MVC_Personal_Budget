@@ -188,6 +188,17 @@ class CategoryIncome extends Authenticated
     {
         header('Content-Type: application/json');
 
+        // 🔐 CSRF
+        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        if (!\App\Csrf::validateToken($token)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid CSRF token'
+            ]);
+            return;
+        }
+
         $id = $_POST['id'] ?? null;
         $user_id = $_POST['user_id'] ?? null;
 
@@ -200,11 +211,11 @@ class CategoryIncome extends Authenticated
             echo json_encode(['success' => false, 'error' => 'Category ID not provided.']);
             return;
         }
+
         $idAnotherCategory = IncomeCategory::getCategoryIdByName("Another", (int)$user_id);
         Income::updateCategoryForAnother($id, $user_id, $idAnotherCategory);
 
         $deleted = IncomeCategory::deleteCategoryById((int)$id, (int)$user_id);
-
 
         if ($deleted) {
             echo json_encode(['success' => true]);

@@ -27,10 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 🔹 Kliknięcie przycisku "Delete"
     confirmButton.addEventListener('click', async () => {
         const id = idField.value;
         const user_id = userIdField.value;
+        const csrfToken = document.getElementById('deleteIncomeCsrf').value;
 
         if (!id) {
             console.error("❌ Brak ID kategorii do usunięcia.");
@@ -40,9 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch('/category-income/delete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': csrfToken // 🔥 header
+                },
                 credentials: 'include',
-                body: new URLSearchParams({ id, user_id })
+                body: new URLSearchParams({
+                    id,
+                    user_id,
+                    csrf_token: csrfToken // 🔥 body
+                })
             });
 
             if (!res.ok) {
@@ -53,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(data);
 
             if (data.success) {
-                // 🔹 Usuń element z listy bez odświeżania
                 const liToRemove = document.querySelector(
                     `#incomeCategoriesList [data-id="${id}"]`
                 );
@@ -74,4 +80,5 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Server error.', 'error');
         }
     });
+
 });

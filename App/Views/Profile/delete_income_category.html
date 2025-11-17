@@ -14,6 +14,8 @@
                     <p id="deleteIncomeCategoryName" class="text-danger fw-bold mb-2"></p>
                     <input type="hidden" id="deleteIncomeCategoryId">
                     <input type="hidden" id="deleteIncomeUserId" name="user_id">
+                    <!-- 🔥 CSRF -->
+                    <input type="hidden" id="deleteIncomeCsrf" name="csrf_token" value="{{ csrf_token }}">
 
                 </div>
                 <div class="modal-footer">
