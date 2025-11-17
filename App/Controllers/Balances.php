@@ -64,7 +64,7 @@ class Balances extends Authenticated
         $balance = true;
         $nameMonth = $this->getMonth($month);
         $incomes = Income::getAllIncomes($user_id, $month);
-        $expenses = Expense::getAlExpenses($user_id, $month);
+        $expenses = Expense::getAllExpenses($user_id, $month);
         $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
         $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
         $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
@@ -111,7 +111,7 @@ class Balances extends Authenticated
         if ($month == 6) return $month = 'June';
         if ($month == 7) return $month = 'July';
         if ($month == 8) return $month = 'August';
-        if ($month == 9) return $month = 'Spetember';
+        if ($month == 9) return $month = 'September';
         if ($month == 10) return $month = 'October';
         if ($month == 11) return $month = 'November';
         if ($month == 12) return $month = 'December';
@@ -247,7 +247,7 @@ class Balances extends Authenticated
             $month = date('m', strtotime($date));
 
             return [
-                'expenses' => Expense::getAlExpenses($user_id, $month),
+                'expenses' => Expense::getAllExpenses($user_id, $month),
                 'incomes' => Income::getAllIncomes($user_id,  $month),
                 'sumAllIncomes' => Income::getSumOfIncomes($user_id, $month),
                 'sumAllExpenses' => Expense::getSumOfExpenses($user_id, $month),

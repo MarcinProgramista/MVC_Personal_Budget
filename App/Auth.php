@@ -13,12 +13,12 @@ use App\Models\RememberedLogin;
 class Auth
 {
     /**
-    * Login the user
-    *
-    * @param User $user The user model
-    *
-    * @return void
-    */
+     * Login the user
+     *
+     * @param User $user The user model
+     *
+     * @return void
+     */
     public static function login($user, $remember_me)
     {
 
@@ -36,10 +36,10 @@ class Auth
     }
 
     /**
-    * Logout the user
-    *
-    * @return void
-    */
+     * Logout the user
+     *
+     * @return void
+     */
     public static function logout()
     {
         // Unset all of the session variables
@@ -66,10 +66,10 @@ class Auth
     }
 
     /**
-    * Remember the originally-requested page in the session
-    *
-    * @return void
-    */
+     * Remember the originally-requested page in the session
+     *
+     * @return void
+     */
     public static function rememberRequestedPage()
     {
         $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
@@ -95,19 +95,17 @@ class Auth
         if (isset($_SESSION['user_id'])) {
 
             return User::findByID($_SESSION['user_id']);
-
         } else {
 
             return static::loginFromRememberCookie();
-
         }
     }
 
     /**
-      * Login the user from a remembered login cookie
-      *
-      * @return mixed The user model if login cookie found; null otherwise
-      */
+     * Login the user from a remembered login cookie
+     *
+     * @return mixed The user model if login cookie found; null otherwise
+     */
     protected static function loginFromRememberCookie()
     {
         $cookie = $_COOKIE['remember_me'] ?? false;
@@ -128,7 +126,7 @@ class Auth
     }
 
     /**
-     * Fogert the remember login , if presnet
+     * Forget the remember login , if presnet
      *
      * @return void
      */

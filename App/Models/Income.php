@@ -70,22 +70,40 @@ class Income extends \Core\Model
      * @param int $monthNumber
      * @return float
      */
-    public static function getSumForCategoryAndMonth($userId, $categoryId, $monthNumber)
-    {
+    public static function getSumForCategoryAndMonth(
+        int $userId,
+        int $categoryId,
+        int $monthNumber
+    ): float {
+        // Walidacja parametrów
+        if ($userId <= 0 || $categoryId <= 0) {
+            throw new \InvalidArgumentException('User ID and Category ID must be positive');
+        }
+
+        if ($monthNumber < 1 || $monthNumber > 12) {
+            throw new \InvalidArgumentException('Month must be between 1 and 12');
+        }
+
         $sql = "SELECT SUM(amount) AS total
-                FROM incomes
-                WHERE user_id = :user_id
-                AND income_category_assigned_to_user_id = :category_id
-                AND MONTH(date_of_income) = :month";
+            FROM incomes
+            WHERE user_id = :user_id
+            AND income_category_assigned_to_user_id = :category_id
+            AND MONTH(date_of_income) = :month";
 
-        $db = static::getDB();
-        $stmt = $db->prepare($sql);
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
-        $stmt->bindValue(':month', $monthNumber, PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+            $stmt->bindValue(':month', $monthNumber, PDO::PARAM_INT);
+            $stmt->execute();
 
-        return $stmt->fetchColumn() ?: 0;
+            $result = $stmt->fetchColumn();
+            return $result !== false ? (float)$result : 0.0;
+        } catch (PDOException $e) {
+            error_log('Database error in getSumForCategoryAndMonth: ' . $e->getMessage());
+            throw new \RuntimeException('Failed to calculate sum for category');
+        }
     }
 
     /**

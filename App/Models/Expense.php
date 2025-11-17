@@ -243,7 +243,7 @@ class Expense extends \Core\Model
      *
      * @return array
      */
-    public static function getAlExpenses($id, $month)
+    public static function getAllExpenses($id, $month)
     {
 
         $sql = 'SELECT category_expenses.name as Category, SUM(expenses.amount) as Amount FROM expenses INNER JOIN expenses_category_assigned_to_users as category_expenses WHERE expenses.expense_category_assigned_to_user_id = category_expenses.id and expenses.user_id = :id AND Month(date_of_expense) = :month GROUP BY Category';
