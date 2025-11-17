@@ -81,17 +81,22 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const id = form.dataset.id;
             const user_id = document.getElementById('categoryEditMethodPyamentUserId').value;
+            const csrfToken = document.getElementById('editPaymentCsrf').value;
 
             const res = await fetch('/method-payment/edit', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                credentials: 'include', // 🔹 zapewnia, że cookies (sesja) są wysyłane!
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': csrfToken
+                },
+                credentials: 'include',
                 body: new URLSearchParams({
                     id,
                     user_id,
                     name,
                     is_limit_active: isLimitActive,
-                    cash_limit: cashLimit ?? ''
+                    cash_limit: cashLimit ?? '',
+                    csrf_token: csrfToken
                 })
             });
 
