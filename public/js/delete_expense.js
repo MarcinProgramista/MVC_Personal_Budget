@@ -1,151 +1,179 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const deleteButtonsExpense = document.querySelectorAll('.open-delete-expense-details-balance-modal');
-    const modalElementDelete = document.getElementById('deleteExpenseModal');
-    let id = "";
+    const modalElement = document.getElementById('deleteExpenseModal');
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    const idField = document.getElementById('deleteExpenseId');
+    const csrfField = document.getElementById('deleteExpenseCsrf');
+
+    const deleteButtons = document.querySelectorAll('.open-delete-expense-details-balance-modal');
+
     let dateFirst = '';
-    let nameCategoryExpense = '';
     let dateSecond = '';
     let date = '';
-    if (!modalElementDelete) {
-        console.error('Brak elementu #deleteExpenseModal w DOM!');
-        return;
-    }
+    let nameCategoryExpense = '';
+    let id = '';
 
-    const modal = new bootstrap.Modal(modalElementDelete);
-
-    deleteButtonsExpense.forEach(button => {
+    deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
-            console.log(button.dataset);
 
             id = button.dataset.id;
             date = button.dataset.date || '';
-            const amount = button.dataset.amount_expense;
+            const amount = button.dataset.amount_expense || '0';
             nameCategoryExpense = button.dataset.namecategoryexpense || '';
             const namePaymentExpense = button.dataset.namepaymentexpense || '';
+
             dateFirst = button.dataset.datefirst || '';
             dateSecond = button.dataset.datesecond || '';
-            // ustaw ID do ukrytego pola, jeśli jest
-            const hiddenInput = document.getElementById('deleteExpense');
-            if (hiddenInput) hiddenInput.value = id;
 
+            idField.value = id;
 
-            // 🧩 sformatuj szczegóły transakcji do wyświetlenia
-            const detailsDiv = document.getElementById('deleteExpenseDetails');
-            if (detailsDiv) {
-                detailsDiv.innerHTML = `
-                    <div>📅 <strong>Date:</strong> ${date}</div>
-                    <div>📂 <strong>Category:</strong> ${nameCategoryExpense}</div>
-                    <div>💳 <strong>Payment method:</strong> ${namePaymentExpense}</div>
-                    <div>💰 <strong>Amount:</strong> ${parseFloat(amount).toFixed(2)} PLN</div>
-                `;
-            }
+            // Wyświetl szczegóły
+            const details = document.getElementById('deleteExpenseDetails');
+            details.innerHTML = `
+                <div>📅 <strong>Date:</strong> ${date}</div>
+                <div>📂 <strong>Category:</strong> ${nameCategoryExpense}</div>
+                <div>💳 <strong>Payment:</strong> ${namePaymentExpense}</div>
+                <div>💰 <strong>Amount:</strong> ${parseFloat(amount).toFixed(2)} PLN</div>
+            `;
 
             modal.show();
         });
-
     });
 
-    // Obsługa zapisu z modala
-    document.getElementById('deleteExpenseForm').addEventListener('submit', async (e) => {
+    // =============================
+    //   DELETE — pełny fetch
+    // =============================
+    const form = document.getElementById('deleteExpenseForm');
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const csrfToken = csrfField.value;
+        const idValue = idField.value;
 
-        const formData = {
-            id: document.getElementById('deleteExpense').value,
+        const payload = {
+            id: idValue,
             dateFirst: dateFirst,
             dateSecond: dateSecond,
-            date: date
-        }
+            date: date,
+            csrf_token: csrfToken
+        };
+
+        // 🔒 Blokada przycisku
+        const submitBtn = document.getElementById('confirmDeleteExpenseButton');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Deleting...";
+
+        // Timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         try {
-            const response = await fetch('/balances/delete-expense', {
+            const res = await fetch('/balances/delete-expense', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
 
-            const data = await response.json();
-            if (data.status === 'success') {
-                // 🔹 Usuń element z listy bez odświeżania
-                const liToRemove = document.querySelector(
-                    `#expenseDetailsBalanceCategoriesList [data-id="${id}"]`
-                );
+            clearTimeout(timeoutId);
 
-                if (liToRemove) {
-                    liToRemove.closest('li').remove();
-                    showToast(`Expense category "${nameCategoryExpense}" deleted successfully.`);
-                } else {
-                    console.warn('⚠️ Nie znaleziono elementu <li> do usunięcia.');
+            // 🔥 Obsługa HTTP errorów
+            if (!res.ok) {
+                if (res.status === 403) {
+                    showToast("Access denied. Please log in again.", "error");
+                    setTimeout(() => window.location.href = "/login", 2000);
+                    return;
                 }
-                if (data.expenses && data.expenses.length > 0) {
-                    refreshExpenseList(data.expenses);
-                    expensesData = data.expenses.map(i => ({
-                        id: i.id,
-                        Category: i.Category,
-                        Amount: parseFloat(i.Amount),
-                        date: i.date,
-                        info: i.info || ''
-                    }));
-
-                    // 🔹 Ponowne narysowanie wykresu
-                    drawExpenseChart();
+                if (res.status >= 500) {
+                    showToast("Server error. Try again later.", "error");
+                    return;
                 }
-
-                let sumEl = document.getElementById('balanceSum');
-                if (sumEl && data.sum && data.sum !== undefined) {
-                    sumEl.textContent = `${data.sum} PLN`;
-                } else {
-                    console.warn('Nie znaleziono elementu sumDetailsExpense lub brak danych w JSON:', data);
-                }
-
-                let sumEldetails = document.getElementById('sumDetailsExpense');
-                if (sumEldetails && data.sum && data.sumAllExpenses !== undefined) {
-                    sumEldetails.textContent = `${data.sumAllExpenses} PLN`;
-                } else {
-                    console.warn('Nie znaleziono elementu sumDetailsExpense lub brak danych w JSON:', data);
-                }
-
-                let sumElementTop = document.getElementById('sumALlExpensesTop');
-                if (sumElementTop) {
-                    sumElementTop.textContent = `${data.sumAllExpenses} PLN`;
-                }
-                modal.hide();
-                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('padding-right');
+                showToast("Unexpected server error.", "error");
+                return;
             }
 
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                showToast("Invalid server response.", "error");
+                return;
+            }
 
-        } catch (err) {
-            console.error(err);
-        };
+            if (data.status !== 'success') {
+                showToast(data.message || "Failed to delete expense.", "error");
+                return;
+            }
+
+            // ==========================
+            //  🗑️ Usuń element z listy
+            // ==========================
+            const liToRemove = document.querySelector(
+                `#expenseDetailsBalanceCategoriesList [data-id="${idValue}"]`
+            );
+
+            if (liToRemove) {
+                liToRemove.closest('li').remove();
+            }
+
+            showToast(`Expense "${nameCategoryExpense}" deleted.`);
+
+            // ==========================
+            //  🔄 Odśwież sumy
+            // ==========================
+            if (data.sum !== undefined) {
+                const sumEl = document.getElementById('balanceSum');
+                if (sumEl) sumEl.textContent = `${data.sum} PLN`;
+            }
+
+            const totalExpensesEl = document.getElementById('sumDetailsExpense');
+            if (totalExpensesEl && data.sumAllExpenses !== undefined) {
+                totalExpensesEl.textContent = `${data.sumAllExpenses} PLN`;
+            }
+
+            const topEl = document.getElementById('sumALlExpensesTop');
+            if (topEl && data.sumAllExpenses !== undefined) {
+                topEl.textContent = `${data.sumAllExpenses} PLN`;
+            }
+
+            // ==========================
+            // 🔄 Odśwież wykres
+            // ==========================
+            if (data.expenses && Array.isArray(data.expenses)) {
+                expensesData = data.expenses.map(exp => ({
+                    id: exp.id,
+                    Category: exp.Category,
+                    Amount: parseFloat(exp.Amount),
+                    date: exp.date,
+                    info: exp.info || ''
+                }));
+                drawExpenseChart();
+            }
+
+            modal.hide();
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+        } catch (error) {
+
+            if (error.name === "AbortError") {
+                showToast("Request timed out.", "error");
+            } else {
+                showToast("Network error.", "error");
+            }
+
+            console.error("❌ Error:", error);
+
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+
     });
+
 });
-
-function refreshExpenseList(expenses) {
-    const list = document.getElementById('expenseBalanceCategoriesList');
-    if (!list) return;
-
-    // wyczyść starą listę
-    list.innerHTML = '';
-
-    // zbuduj nową listę
-    expenses.forEach(expense => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between border border-warning align-items-center text-light';
-        li.innerHTML = `
-                <div class="d-flex flex-column">
-                    <div class="d-flex flex-row align-items-center">
-                        <i class="fas fa-circle me-2 text-success"></i>
-                        <span class="fw-bold">${expense.Category}</span>
-                    </div>
-                </div>
-                <span class="d-flex flex-row">
-                    <span class="d-flex align-items-center">
-                        <strong class="text-light text-center mx-2">${parseFloat(expense.Amount).toFixed(2)} PLN</strong>
-                    </span>
-                </span>
-            `;
-        list.appendChild(li);
-    });
-}
