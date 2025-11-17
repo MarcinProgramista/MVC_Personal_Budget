@@ -58,17 +58,60 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.set('is_limit_active', 1);
         }
 
+        // 🔥 Blokada przycisku aby użytkownik nie klikał 5x
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Saving...";
+
+        // 🔥 TIMEOUT dla fetch (np. po 10 sekundach)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
         try {
             const res = await fetch('/category-income/add-income-category', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'X-CSRF-Token': csrfToken
-                }
+                },
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
+            // 🔥 Obsługa błędów HTTP
+            if (!res.ok) {
+                if (res.status === 403) {
+                    showToast("Access denied. Please log in again.", "error");
+                    setTimeout(() => (window.location.href = "/login"), 1500);
+                    throw new Error("403 Forbidden");
+                }
 
-            const data = await res.json();
+                if (res.status >= 500) {
+                    showToast("Server error. Try again later.", "error");
+                    throw new Error(`Server error ${res.status}`);
+                }
+            }
+
+            // 🔥 Bezpieczne pobieranie JSON
+            let data;
+            try {
+                data = await res.json();
+            } catch (parseError) {
+                showToast("Invalid server response.", "error");
+                console.error("JSON parse error:", parseError);
+                return;
+            }
             console.log("⬅️ Response:", data);
+            // 🔥 Obsługa błędów zwróconych przez backend
+            if (!data.success) {
+                if (data.field === 'name') {
+                    nameInput.classList.add('is-invalid');
+                    categoryError.textContent = data.message || "Invalid name.";
+                } else {
+                    showToast(data.message || "Unknown error.", "error");
+                }
+                return;
+            }
 
             if (data.success) {
 
@@ -127,8 +170,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } catch (error) {
-            console.error('❌ Error sending request:', error);
-            categoryError.textContent = 'Server error.';
+            console.error("❌ Error sending request:", error);
+
+            if (error.name === "AbortError") {
+                showToast("Request timed out. Try again.", "error");
+            } else {
+                showToast("Unexpected error occurred.", "error");
+            }
+
+        } finally {
+            // 🔥 Przywróć przycisk
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
     });
 
