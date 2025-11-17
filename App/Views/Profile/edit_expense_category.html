@@ -38,6 +38,8 @@
 
                     <!-- 🔹 DODAJ TEN UKRYTY INPUT -->
                     <input type="hidden" id="categoryEditExpenseUserId" name="user_id">
+                    <!-- 🔥 CSRF token -->
+                    <input type="hidden" id="editExpenseCsrf" name="csrf_token" value="{{ csrf_token }}">
 
                 </div>
 

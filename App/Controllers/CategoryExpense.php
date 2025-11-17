@@ -145,11 +145,19 @@ class CategoryExpense extends Authenticated
         header('Content-Type: application/json');
 
         try {
+            // 🔐 CSRF
+            $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+            if (!\App\Csrf::validateToken($token)) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+                return;
+            }
+
             $userId = $_SESSION['user_id'] ?? null;
             $id = $_POST['id'] ?? null;
             $name = trim($_POST['name'] ?? '');
             $cashLimit = $_POST['cash_limit'] ?? null;
-            $is_limit_active = $_POST['is_limit_active'] ?? null;
+            $is_limit_active = $_POST['is_limit_active'] ?? 0;
 
             if (!$userId) {
                 throw new \Exception('User not logged in.');
@@ -169,17 +177,21 @@ class CategoryExpense extends Authenticated
                 return;
             }
 
+            if ($cashLimit === '' || $is_limit_active == 0) {
+                $cashLimit = null;
+            }
 
             $updated = ExpenseCategory::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
+
             if ($updated) {
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Category updated successfully.',
                     'category' => [
                         'id' => $id,
                         'name' => $name,
                         'cash_limit' => $cashLimit,
-                        'is_limit_active' => (int)$is_limit_active
+                        'is_limit_active' => (int)$is_limit_active,
+                        'user_id' => $userId
                     ]
                 ]);
             } else {
