@@ -67,6 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
         nameInput.classList.remove('is-invalid');
         categoryError.textContent = '';
 
+        // 🔥 Blokada przycisku aby użytkownik nie klikał 5x
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Saving...";
+
+        // 🔥 TIMEOUT dla fetch (np. po 10 sekundach)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         try {
             console.log("➡️ Sending request:", {
                 name,
@@ -79,11 +88,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
                 headers: {
                     'X-CSRF-Token': csrfToken
-                }
+                },
+                signal: controller.signal
             });
 
-            const data = await res.json();
+            clearTimeout(timeoutId);
+            // 🔥 Obsługa błędów HTTP
+            if (!res.ok) {
+                if (res.status === 403) {
+                    showToast("Access denied. Please log in again.", "error");
+                    setTimeout(() => (window.location.href = "/login"), 1500);
+                    throw new Error("403 Forbidden");
+                }
+
+                if (res.status >= 500) {
+                    showToast("Server error. Try again later.", "error");
+                    throw new Error(`Server error ${res.status}`);
+                }
+            }
+
+            // 🔥 Bezpieczne pobieranie JSON
+            let data;
+            try {
+                data = await res.json();
+            } catch (parseError) {
+                showToast("Invalid server response.", "error");
+                console.error("JSON parse error:", parseError);
+                return;
+            }
+
             console.log("⬅️ Response:", data);
+
+            // 🔥 Obsługa błędów zwróconych przez backend
+            if (!data.success) {
+                if (data.field === 'name') {
+                    nameInput.classList.add('is-invalid');
+                    categoryError.textContent = data.message || "Invalid name.";
+                } else {
+                    showToast(data.message || "Unknown error.", "error");
+                }
+                return;
+            }
+
 
             if (data.success) {
                 // ✅ Dodaj nowy element do listy metod płatności bez odświeżania
