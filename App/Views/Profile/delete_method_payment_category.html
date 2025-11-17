@@ -14,6 +14,8 @@
                     <p id="deleteMethodPaymentCategoryName" class="text-danger fw-bold mb-2"></p>
                     <input type="hidden" id="deleteMethodPaymentCategoryId">
                     <input type="hidden" id="deleteMethodPaymentUserId" name="user_id">
+                    <!-- 🔥 CSRF -->
+                    <input type="hidden" id="deletePaymentCsrf" name="csrf_token" value="{{ csrf_token }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

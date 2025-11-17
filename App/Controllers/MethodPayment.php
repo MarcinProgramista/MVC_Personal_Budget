@@ -137,6 +137,18 @@ class MethodPayment extends Authenticated
     {
         header('Content-Type: application/json');
 
+        // 🔐 CSRF token validation
+        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+
+        if (!\App\Csrf::validateToken($token)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid CSRF token'
+            ]);
+            return;
+        }
+
         $id = $_POST['id'] ?? null;
         $user_id = $_POST['user_id'] ?? null;
 

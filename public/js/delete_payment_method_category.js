@@ -38,12 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const csrfToken = document.getElementById('deletePaymentCsrf').value;
+
             const res = await fetch('/method-payment/delete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': csrfToken
+                },
                 credentials: 'include',
-                body: new URLSearchParams({ id, user_id })
+                body: new URLSearchParams({
+                    id,
+                    user_id,
+                    csrf_token: csrfToken
+                })
             });
+
 
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
