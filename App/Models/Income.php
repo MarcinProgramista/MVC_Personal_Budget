@@ -205,7 +205,12 @@ class Income extends \Core\Model
     public static function getAllIncomes($id, $month)
     {
 
-        $sql = 'SELECT category_incomes.name as Category, SUM(incomes.amount) as Amount FROM incomes INNER JOIN incomes_category_assigned_to_users as category_incomes WHERE incomes.income_category_assigned_to_user_id = category_incomes.id and incomes.user_id = :id AND Month(date_of_income) = :month  GROUP BY Category';
+        $sql = 'SELECT category_incomes.name as Category, 
+                SUM(incomes.amount) as Amount 
+                FROM incomes INNER JOIN incomes_category_assigned_to_users as category_incomes 
+                WHERE incomes.income_category_assigned_to_user_id = category_incomes.id 
+                and incomes.user_id = :id 
+                AND Month(date_of_income) = :month  GROUP BY Category';
 
         $db = static::getDB();
 
@@ -309,8 +314,8 @@ class Income extends \Core\Model
     public static function getAllDetailIncomes($id, $month)
     {
         $sql = 'SELECT incomes.user_id, incomes.id as id, 
-                        incomes.date_of_income as Data,
-                        incomes.amount as Amount, 
+                        date_of_income as Data,
+                        amount as Amount,
                         category_incomes.name as Category, 
                         incomes.income_comment as info,
                         incomes.income_category_assigned_to_user_id 

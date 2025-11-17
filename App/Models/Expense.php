@@ -246,7 +246,9 @@ class Expense extends \Core\Model
     public static function getAllExpenses($id, $month)
     {
 
-        $sql = 'SELECT category_expenses.name as Category, SUM(expenses.amount) as Amount FROM expenses INNER JOIN expenses_category_assigned_to_users as category_expenses WHERE expenses.expense_category_assigned_to_user_id = category_expenses.id and expenses.user_id = :id AND Month(date_of_expense) = :month GROUP BY Category';
+        $sql = 'SELECT category_expenses.name as Category, 
+        SUM(expenses.amount) as Amount 
+        FROM expenses INNER JOIN expenses_category_assigned_to_users as category_expenses WHERE expenses.expense_category_assigned_to_user_id = category_expenses.id and expenses.user_id = :id AND Month(date_of_expense) = :month GROUP BY Category';
 
         $db = static::getDB();
 
@@ -335,7 +337,7 @@ class Expense extends \Core\Model
      */
     public static function getAllDetailExpenses($id, $month)
     {
-        $sql = 'SELECT expenses.user_id, expenses.date_of_expense AS Data, 
+        $sql = 'SELECT expenses.user_id, expenses.date_of_expense AS date, 
                         expenses.amount AS Amount, 
                         expenses_category_assigned_to_users.name As Category, 
                         payment_methods_assigned_to_users.name AS Method_Payment, 
@@ -370,7 +372,7 @@ class Expense extends \Core\Model
     public static function getAllDetailExpensesForChoosenPeriod($id, $dateFirst, $dateSecond)
     {
         $sql = 'SElECT expenses.user_id, 
-                        expenses.date_of_expense AS Date, 
+                        expenses.date_of_expense AS date, 
                         expenses.amount AS Amount, 
                         expenses_category_assigned_to_users.name As Category, 
                         payment_methods_assigned_to_users.name AS Method_Payment, 

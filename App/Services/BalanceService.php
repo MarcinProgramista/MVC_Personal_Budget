@@ -33,8 +33,8 @@ class BalanceService
         return [
             'incomes' => $incomes,
             'expenses' => $expenses,
-            'sumIncomes' => (float)$sumIncomes,
-            'sumExpenses' => (float)$sumExpenses,
+            'sumAllIncomes' => (float)$sumIncomes,
+            'sumAllExpenses' => (float)$sumExpenses,
             'sum' => (float)$sumIncomes - (float)$sumExpenses,
             'incomeDetails' => Income::getAllDetailIncomes($userId, $month),
             'expenseDetails' => Expense::getAllDetailExpenses($userId, $month),
@@ -51,8 +51,8 @@ class BalanceService
         return [
             'incomes' => $incomes,
             'expenses' => $expenses,
-            'sumIncomes' => (float)$sumIncomes,
-            'sumExpenses' => (float)$sumExpenses,
+            'sumAllIncomes' => (float)$sumIncomes,
+            'sumAllExpenses' => (float)$sumExpenses,
             'sum' => (float)$sumIncomes - (float)$sumExpenses,
             'incomeDetails' => Income::getAllDetailIncomesForChoosenPeriod($userId, $startDate, $endDate),
             'expenseDetails' => Expense::getAllDetailExpensesForChoosenPeriod($userId, $startDate, $endDate),

@@ -53,15 +53,23 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(formData);
 
         try {
+            const csrfToken = document.getElementById('deleteIncomeCsrf').value;
+
             const response = await fetch('/balances/delete-income', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    csrf_token: csrfToken
+                })
             });
 
             const data = await response.json();
             if (data.status === 'success') {
-                //console.log(data);
+                console.log(data);
                 // 🔹 Usuń element z listy bez odświeżania
                 const liToRemove = document.querySelector(
                     `#incomeDetailsBalanceCategoriesList [data-id="${id}"]`
@@ -87,13 +95,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     console.warn('Nie znaleziono elementu sumIncomesDetails lub brak danych w JSON:', data);
                 }
-
+                let sumElBalances = document.getElementById('balanceSum');
+                if (sumElBalances) {
+                    sumElBalances.textContent = `${data.sumAllIncomes} PLN`;
+                }
                 let sumElementTop = document.getElementById('sumIncomes');
                 if (sumElementTop) {
                     sumElementTop.textContent = `${data.sumAllIncomes} PLN`;
                 }
+                let sumElementDown = document.getElementById('sumIncomesDetails');
+                if (sumElementDown) {
+                    sumElementDown.textContent = `${data.sumAllIncomes} PLN`;
+                }
 
-                if (data.incomes && data.incomes.length > 0) {
+                if (data.incomes && data.incomes.length >= 0) {
                     refreshIncomeList(data.incomes);
                     incomesData = data.incomes.map(i => ({
                         id: i.id,
@@ -105,6 +120,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // 🔹 Ponowne narysowanie wykresu
                     drawChart();
+                }
+
+                if (data.incomes.length == 0) {
+                    document.getElementById('piechart1').remove();
                 }
                 modal.hide();
             }

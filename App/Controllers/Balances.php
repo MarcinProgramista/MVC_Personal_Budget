@@ -55,11 +55,17 @@ class Balances extends Authenticated
                 'expenseCategories' => Expense::getCategories($this->user->id),
                 'expensePayments' => PaymentMethod::getPayments($this->user->id),
                 'balance' => $balance,
+
+                // 👇 DODAJ TO!
+                'sum' => $balanceData['sum'],
+                'sumAllIncomes' => $balanceData['sumAllIncomes'],
+                'sumAllExpenses' => $balanceData['sumAllExpenses'],
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
-            Flash::addMessage('Failed to load balance data', Flash::WARNING);
-            $this->redirect('/');
+            // Flash::addMessage('Failed to load balance data', Flash::WARNING);
+            //$this->redirect('/');
+            throw $e;
         }
     }
 
@@ -87,6 +93,11 @@ class Balances extends Authenticated
                 'expenseCategories' => Expense::getCategories($this->user->id),
                 'expensePayments' => PaymentMethod::getPayments($this->user->id),
                 'balance' => $balance,
+
+                // 👇 DODAJ TO!
+                'sum' => $balanceData['sum'],
+                'sumAllIncomes' => $balanceData['sumAllIncomes'],
+                'sumAllExpenses' => $balanceData['sumAllExpenses'],
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
@@ -167,6 +178,10 @@ class Balances extends Authenticated
                 'expenseCategories' => Expense::getCategories($this->user->id),
                 'expensePayments' => PaymentMethod::getPayments($this->user->id),
                 'balance' => $balance,
+                // 👇 DODAJ TO!
+                'sum' => $balanceData['sum'],
+                'sumAllIncomes' => $balanceData['sumAllIncomes'],
+                'sumAllExpenses' => $balanceData['sumAllExpenses'],
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
@@ -237,6 +252,8 @@ class Balances extends Authenticated
             'month' => $financialData['month'],
             'sumAllIncomes' => $financialData['sumAllIncomes'],
             'sumAllExpenses' => $financialData['sumAllExpenses'],
+            'incomes' => $financialData['incomes'],
+            'expenses' => $financialData['expenses'],
             'sum' => $sum
         ]);
     }

@@ -15,8 +15,9 @@
         <!-- 🔹 Lista przychodów -->
         <ul id="incomeBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
             {% for income in incomes %}
-            <li
+            <li data-id="{{ income.id }}"
                 class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+
                 <div class="d-flex flex-column">
                     <div class="d-flex flex-row align-items-center ">
                         <i class="fas fa-circle me-2 text-success"></i>
@@ -36,7 +37,7 @@
         <div class="d-flex align-items-center" style="width: 95%;">
             <div
                 class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
-                SUM :<strong id="sumIncomes" class="text-light m-0">{{ sumALlIncomes }} PLN</strong>
+                SUM :<strong id="sumIncomes" class="text-light m-0">{{ sumAllIncomes }} PLN</strong>
             </div>
         </div>
 

@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // Wyświetl szczegóły
             const details = document.getElementById('deleteExpenseDetails');
             details.innerHTML = `
-                <div>📅 <strong>Date:</strong> ${date}</div>
-                <div>📂 <strong>Category:</strong> ${nameCategoryExpense}</div>
-                <div>💳 <strong>Payment:</strong> ${namePaymentExpense}</div>
-                <div>💰 <strong>Amount:</strong> ${parseFloat(amount).toFixed(2)} PLN</div>
-            `;
+                    <div>📅 <strong>Date:</strong> ${date}</div>
+                    <div>📂 <strong>Category:</strong> ${nameCategoryExpense}</div>
+                    <div>💳 <strong>Payment:</strong> ${namePaymentExpense}</div>
+                    <div>💰 <strong>Amount:</strong> ${parseFloat(amount).toFixed(2)} PLN</div>
+                `;
 
             modal.show();
         });
@@ -141,11 +141,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (topEl && data.sumAllExpenses !== undefined) {
                 topEl.textContent = `${data.sumAllExpenses} PLN`;
             }
+            console.log(data.expenses);
 
             // ==========================
             // 🔄 Odśwież wykres
             // ==========================
-            if (data.expenses && Array.isArray(data.expenses)) {
+            if (data.expenses && data.expenses.length > 0) {
                 expensesData = data.expenses.map(exp => ({
                     id: exp.id,
                     Category: exp.Category,
@@ -154,6 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     info: exp.info || ''
                 }));
                 drawExpenseChart();
+            }
+
+            if (data.incomes.length == 0) {
+                document.getElementById('piechartExpenses').remove();
             }
 
             modal.hide();

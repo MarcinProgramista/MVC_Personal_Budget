@@ -6,6 +6,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Config
 {
+    const SHOW_ERRORS = true;
     public static function getDbHost(): string
     {
         return $_ENV['DB_HOST'] ?? 'localhost';
