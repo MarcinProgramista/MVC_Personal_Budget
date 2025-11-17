@@ -4,6 +4,7 @@
         <div class="modal-content bg-dark">
             <form id="addCategoryIncomeForm">
                 <div class="modal-header bg-dark text-warning">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <h5 class="modal-title" id="addCategoryIncomeModalLabel">Add Category</h5>
                     <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
                         aria-label="Close"></button>

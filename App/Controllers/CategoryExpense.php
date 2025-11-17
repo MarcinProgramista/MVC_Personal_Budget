@@ -17,53 +17,63 @@ class CategoryExpense extends Authenticated
         header('Content-Type: application/json');
 
         try {
+            // 🔒 Pobierz token CSRF zarówno z POST jak i z nagłówka X-CSRF-Token
+            $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+
+            if (!\App\Csrf::validateToken($token)) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid CSRF token'
+                ]);
+                return;
+            }
+
             // 🔒 Sprawdzenie użytkownika
             $userId = $_SESSION['user_id'] ?? null;
             if (!$userId) {
+                http_response_code(401);
                 throw new \Exception('User not logged in');
             }
 
-            // 🔹 Pobranie danych z formularza
+            // 🔹 Pobieranie danych
             $name = trim($_POST['name'] ?? '');
             $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
 
-            // Cash limit może być:
-            // - liczbą
-            // - pustym stringiem => wtedy null
+            // cash_limit: jeśli pusty lub limit OFF → null
             $cashLimit = $_POST['cash_limit'] ?? null;
             if ($cashLimit === '' || $isLimitActive === 0) {
                 $cashLimit = null;
             }
 
-            // 🔍 Walidacja
+            // 🔍 Walidacja nazwy
             if ($name === '') {
                 echo json_encode([
                     'success' => false,
                     'field' => 'name',
                     'message' => 'Category name is required'
                 ]);
-                exit;
+                return;
             }
 
-            // 🔍 Czy taka nazwa istnieje?
-            $existing = ExpenseCategory::existCategoryName($name, $userId);
-            if ($existing) {
+            // 🔍 Unikalność nazwy
+            if (ExpenseCategory::existCategoryName($name, $userId)) {
                 echo json_encode([
                     'success' => false,
                     'field' => 'name',
                     'message' => 'This category already exists.'
                 ]);
-                exit;
+                return;
             }
 
-            // 🟢 Dodanie do bazy
+            // 🟢 Dodawanie do bazy
             $newId = ExpenseCategory::addCategory($userId, $name, $isLimitActive, $cashLimit);
 
             if (!$newId) {
                 throw new \Exception('Failed to add category');
             }
 
-            // 🟢 Odpowiedź JSON
+            // 🟢 Sukces
             echo json_encode([
                 'success' => true,
                 'message' => 'Category added successfully!',

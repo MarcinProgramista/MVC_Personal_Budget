@@ -14,62 +14,80 @@ class CategoryIncome extends Authenticated
      */
     public function addIncomeCategoryAction()
     {
+        header('Content-Type: application/json');
 
         try {
-            $userId = $_SESSION['user_id'] ?? null;
-            $name = trim($_POST['name'] ?? '');
-            $cashLimit = $_POST['cash_limit'] ?? null;
-            if ($cashLimit === '' || strtolower($cashLimit) === 'null') {
-                $cashLimit = null;
+            // 🔒 Pobierz token CSRF (POST lub nagłówek)
+            $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+
+            if (!\App\Csrf::validateToken($token)) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid CSRF token'
+                ]);
+                return;
             }
 
-            $is_limit_active = isset($_POST['is_limit_active']) && (int)$_POST['is_limit_active'] === 1 ? 1 : 0;
-
-
+            // 🔒 Pobierz ID użytkownika
+            $userId = $_SESSION['user_id'] ?? null;
             if (!$userId) {
                 throw new \Exception('User not logged in');
             }
 
-            if ($name === '') {
-                throw new \Exception('Category name is required');
+            // 🔹 Pobranie danych z formularza
+            $name = trim($_POST['name'] ?? '');
+            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
+
+            // cash_limit może być '' → null
+            $cashLimit = $_POST['cash_limit'] ?? null;
+            if ($cashLimit === '' || strtolower($cashLimit) === 'null' || $isLimitActive === 0) {
+                $cashLimit = null;
             }
 
-            // Sprawdzenie czy kategoria już istnieje
-            $existing = IncomeCategory::existCategoryIncomeName($name, $userId);
-            if ($existing) {
+            // 🔍 Walidacja
+            if ($name === '') {
                 echo json_encode([
                     'success' => false,
-                    'field' => 'name',
+                    'field'   => 'name',
+                    'message' => 'Category name is required'
+                ]);
+                return;
+            }
+
+            // 🔍 Czy kategoria już istnieje?
+            if (IncomeCategory::existCategoryName($name, $userId)) {
+                echo json_encode([
+                    'success' => false,
+                    'field'   => 'name',
                     'message' => 'This category already exists.'
                 ]);
                 return;
             }
 
-            // Obsługa pustego cashLimit
-            if ($cashLimit === '') {
-                $cashLimit = null;
-            }
 
-            $newId = IncomeCategory::addIncomeCategory($userId, $name, $is_limit_active, $cashLimit);
+            // 🟢 Dodanie kategorii
+            $newId = IncomeCategory::addIncomeCategory($userId, $name, $isLimitActive, $cashLimit);
 
             if (!$newId) {
-                $stmtError = error_get_last();
-                throw new \Exception('Failed to add category: ' . ($stmtError['message'] ?? 'unknown'));
+                throw new \Exception('Failed to add income category');
             }
 
             echo json_encode([
                 'success' => true,
-                'message' => 'Category added successfully!',
+                'message' => 'Income category added successfully!',
                 'category' => [
-                    'id' => $newId,
-                    'name' => $name,
-                    'cash_limit' => $cashLimit,
-                    'is_limit_active' => $is_limit_active
+                    'id'              => $newId,
+                    'user_id'         => $userId,
+                    'name'            => $name,
+                    'cash_limit'      => $cashLimit,
+                    'is_limit_active' => $isLimitActive
                 ]
             ]);
         } catch (\Throwable $e) {
             http_response_code(500);
             error_log("💥 addIncomeCategoryAction error: " . $e->getMessage());
+
             echo json_encode([
                 'success' => false,
                 'message' => 'Server error: ' . $e->getMessage()

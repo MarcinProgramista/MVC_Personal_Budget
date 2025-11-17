@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const formData = new FormData(form);
+        const csrfToken = formData.get('csrf_token');
+
         const name = nameInput.value.trim();
         const isLimitActive = checkbox.checked ? 1 : 0;
         const cashLimit = checkbox.checked && cashLimitInput.value
@@ -73,8 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const res = await fetch('/method-payment/add-payment-method', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `name=${encodeURIComponent(name)}&is_limit_active=${isLimitActive}&cash_limit=${encodeURIComponent(cashLimit ?? '')}`
+                body: formData,
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                }
             });
 
             const data = await res.json();

@@ -12,59 +12,97 @@ class MethodPayment extends Authenticated
     /**
      * Add new method payment (AJAX)
      */
+    /**
+     * Add new payment method (AJAX)
+     */
     public function addPaymentMethodAction()
     {
         header('Content-Type: application/json');
 
-        $userId = $_SESSION['user_id'] ?? null;
-        $name = trim($_POST['name'] ?? '');
-        $cashLimit = $_POST['cash_limit'] ?? null;
-        $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
+        try {
+            // 🔒 Pobierz token CSRF (POST lub nagłówek X-CSRF-Token)
+            $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
 
-        if (!$userId) {
-            echo json_encode(['success' => false, 'message' => 'User not logged in.']);
-            return;
-        }
+            if (!\App\Csrf::validateToken($token)) {
+                http_response_code(403);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Invalid CSRF token'
+                ]);
+                return;
+            }
 
-        if ($name === '') {
-            echo json_encode(['success' => false, 'message' => 'Category name is required.']);
-            return;
-        }
+            // 🔒 Użytkownik
+            $userId = $_SESSION['user_id'] ?? null;
+            if (!$userId) {
+                echo json_encode(['success' => false, 'message' => 'User not logged in.']);
+                return;
+            }
 
-        $existing = PaymentMethod::existMethodPaymentName($name, $userId);
+            // 🔹 Dane z formularza
+            $name = trim($_POST['name'] ?? '');
+            $isLimitActive = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
+
+            $cashLimit = $_POST['cash_limit'] ?? null;
+
+            if ($cashLimit === '' || $cashLimit === null || $isLimitActive === 0) {
+                $cashLimit = null;
+            }
 
 
-        if (!empty($existing)) {
-            echo json_encode([
-                'success' => false,
-                'field' => 'name',
-                'message' => 'This category already exists.'
-            ]);
-            return;
-        }
+            // 🔍 Nazwa pusta?
+            if ($name === '') {
+                echo json_encode([
+                    'success' => false,
+                    'field' => 'name',
+                    'message' => 'Category name is required.'
+                ]);
+                return;
+            }
 
+            // 🔍 Czy istnieje?
+            $existing = PaymentMethod::existMethodPaymentName($name, $userId);
+            if (!empty($existing)) {
+                echo json_encode([
+                    'success' => false,
+                    'field' => 'name',
+                    'message' => 'This category already exists.'
+                ]);
+                return;
+            }
 
+            error_log("💡 Adding payment method: name=$name, limit=$cashLimit, active=$isLimitActive");
 
-        error_log("💡 Adding payment method: name=$name, limit=$cashLimit, active=$isLimitActive");
+            // 🟢 Dodaj do bazy
+            $newId = PaymentMethod::addCategory($userId, $name, $isLimitActive, $cashLimit);
 
-        // ✅ Przekazujemy is_limit_active do modelu
-        $newId = PaymentMethod::addCategory($userId, $name, $isLimitActive, $cashLimit);
+            if (!$newId) {
+                throw new \Exception("Failed to add category");
+            }
 
-        if ($newId) {
+            // 🟢 Sukces
             echo json_encode([
                 'success' => true,
                 'message' => 'Category added successfully!',
                 'category' => [
                     'id' => $newId,
+                    'user_id' => $userId,
                     'name' => $name,
                     'cash_limit' => $cashLimit,
                     'is_limit_active' => $isLimitActive
                 ]
             ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add category.']);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            error_log("💥 addPaymentMethodAction error: " . $e->getMessage());
+
+            echo json_encode([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ]);
         }
     }
+
     public function checkNameAction()
     {
         header('Content-Type: application/json');
