@@ -7,7 +7,6 @@ use \App\Auth;
 use \App\Models\Income;
 use App\Models\IncomeCategory;
 use \App\Models\PaymentMethod;
-use \App\Models\Balance;
 use \App\Flash;
 use \App\Controllers\Authenticated;
 use App\Models\Expense;
@@ -44,14 +43,30 @@ class Balances extends Authenticated
      */
     public function indexAction()
     {
-        $month = date('m');
-        $this->sendDetailsToPage($this->user->id, $month);
+        $month = (int)date('m');
+        $balanceService = new \App\Services\BalanceService();
+        $balance = true;
+        try {
+            $balanceData = $balanceService->getBalanceData($this->user->id, $month);
+
+            View::renderTemplate('Balances/index.html', array_merge($balanceData, [
+                'nameMonth' => $this->getMonthName($month),
+                'incomeCategories' => IncomeCategory::getAllIncomesAssignedToUser($this->user->id),
+                'expenseCategories' => Expense::getCategories($this->user->id),
+                'expensePayments' => PaymentMethod::getPayments($this->user->id),
+                'balance' => $balance,
+            ]));
+        } catch (\Exception $e) {
+            error_log('Balance error: ' . $e->getMessage());
+            Flash::addMessage('Failed to load balance data', Flash::WARNING);
+            $this->redirect('/');
+        }
     }
 
     public function showLastMonthAction()
     {
         $month = date('m') - 1;
-        $this->sendDetailsToPage($this->user->id, $month);
+        $this->sendDetailsToPage($month);
     }
 
     /**
@@ -59,62 +74,45 @@ class Balances extends Authenticated
      *
      * @return page
      */
-    public function sendDetailsToPage($user_id, $month)
+    public function sendDetailsToPage($month)
     {
+        $balanceService = new \App\Services\BalanceService();
         $balance = true;
-        $nameMonth = $this->getMonth($month);
-        $incomes = Income::getAllIncomes($user_id, $month);
-        $expenses = Expense::getAllExpenses($user_id, $month);
-        $sumALlIncomes = Income::getSumOfIncomes($user_id, $month);
-        $sumALlExpenses = Expense::getSumOfExpenses($user_id, $month);
-        $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
-        $expenseDetails = Expense::getAllDetailExpenses($user_id, $month);
-        $incomeDetails = Income::getAllDetailIncomes($user_id, $month);
-        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
-        $expenseCategories = Expense::getCategories($this->user->id);
-        $expensePayments = PaymentMethod::getPayments($this->user->id);
-        $sumALlIncomes = $sumALlIncomes ?? 0;
-        $sumALlExpenses = $sumALlExpenses ?? 0;
-        $dateFirst = null;
-        $dateSecond = null;
-        $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
-        View::renderTemplate('Balances/index.html', [
-            'balance' => $balance,
-            'incomes' => $incomes,
-            'nameMonth' => $nameMonth,
-            'sumALlIncomes' => $sumALlIncomes,
-            'expenses' => $expenses,
-            'sumALlExpenses' => $sumALlExpenses,
-            'sum' => $sum,
-            'incomeDetails' => $incomeDetails,
-            'expenseDetails' => $expenseDetails,
-            'incomeCategories' => $incomeCategories,
-            'expenseCategories' => $expenseCategories,
-            'expensePayments' => $expensePayments,
-            'dateFirst' => $dateFirst,
-            'dateSecond' => $dateSecond
-        ]);
+        try {
+            $balanceData = $balanceService->getBalanceData($this->user->id, $month);
+
+            View::renderTemplate('Balances/index.html', array_merge($balanceData, [
+                'nameMonth' => $this->getMonthName($month),
+                'incomeCategories' => IncomeCategory::getAllIncomesAssignedToUser($this->user->id),
+                'expenseCategories' => Expense::getCategories($this->user->id),
+                'expensePayments' => PaymentMethod::getPayments($this->user->id),
+                'balance' => $balance,
+            ]));
+        } catch (\Exception $e) {
+            error_log('Balance error: ' . $e->getMessage());
+            Flash::addMessage('Failed to load balance data', Flash::WARNING);
+            $this->redirect('/');
+        }
     }
 
-    /**
-     * Get month
-     *
-     * @return string
-     */
-    public function getMonth($month)
+    private function getMonthName(int $month): string
     {
-        if ($month == 1) return $month = 'Januray';
-        if ($month == 2) return $month = 'February';
-        if ($month == 3) return $month = 'March';
-        if ($month == 4) return $month = 'April';
-        if ($month == 5) return $month = 'May';
-        if ($month == 6) return $month = 'June';
-        if ($month == 7) return $month = 'July';
-        if ($month == 8) return $month = 'August';
-        if ($month == 9) return $month = 'September';
-        if ($month == 10) return $month = 'October';
-        if ($month == 11) return $month = 'November';
-        if ($month == 12) return $month = 'December';
+        $months = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
+
+        return $months[$month] ?? 'Unknown';
     }
 
     public function sendChosenDatesAction()
@@ -137,7 +135,7 @@ class Balances extends Authenticated
             return;
         }
 
-        static::showChoosenDatesAction($this->user->id, $dateFirst, $dateSecond);
+        $this->showChoosenDatesAction($dateFirst, $dateSecond);
     }
 
     private function isValidDate(string $date): bool
@@ -150,36 +148,31 @@ class Balances extends Authenticated
      *
      * @return void
      */
-    public static function showChoosenDatesAction($user_id, $dateFirst, $dateSeond)
+    public  function showChoosenDatesAction($dateFirst, $dateSeond)
     {
-        $incomes = Income::getAllIncomesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $expenses = Expense::getAllExpensesFromChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $sumALlIncomes = Income::getSumOfIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $sumALlExpenses = Expense::getSumOfExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $incomeDetails = Income::getAllDetailIncomesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $expenseDetails = Expense::getAllDetailExpensesForChoosenPeriod($user_id, $dateFirst, $dateSeond);
-        $incomeCategories = IncomeCategory::getAllIncomesAssignedToUser($user_id);
-        $expenseCategories = Expense::getCategories($user_id);
-        $expensePayments = PaymentMethod::getPayments($user_id);
-        $sumALlIncomes = $sumALlIncomes ?? 0;
-        $sumALlExpenses = $sumALlExpenses ?? 0;
-        $sum = (float)$sumALlIncomes - (float)$sumALlExpenses;
+        $balanceService = new \App\Services\BalanceService();
         $balance = true;
-        View::renderTemplate('Balances/index.html', [
-            'balance' => $balance,
-            'dateFirst' => $dateFirst,
-            'dateSecond' => $dateSeond,
-            'incomes' => $incomes,
-            'expenses' => $expenses,
-            'sumALlIncomes' => $sumALlIncomes,
-            'sumALlExpenses' => $sumALlExpenses,
-            'incomeDetails' => $incomeDetails,
-            'expenseDetails' => $expenseDetails,
-            'incomeCategories' => $incomeCategories,
-            'expenseCategories' => $expenseCategories,
-            'expensePayments' => $expensePayments,
-            'sum' => $sum
-        ]);
+        try {
+            $balanceData = $balanceService->getBalanceData(
+                $this->user->id,
+                null,              // miesiąc pomijamy
+                $dateFirst,        // początek zakresu
+                $dateSeond         // koniec zakresu
+            );
+
+            View::renderTemplate('Balances/index.html', array_merge($balanceData, [
+                'dateFirst' => $dateFirst,
+                'dateSecond' => $dateSeond,
+                'incomeCategories' => IncomeCategory::getAllIncomesAssignedToUser($this->user->id),
+                'expenseCategories' => Expense::getCategories($this->user->id),
+                'expensePayments' => PaymentMethod::getPayments($this->user->id),
+                'balance' => $balance,
+            ]));
+        } catch (\Exception $e) {
+            error_log('Balance error: ' . $e->getMessage());
+            Flash::addMessage('Failed to load balance data', Flash::WARNING);
+            $this->redirect('/');
+        }
     }
 
     public function deleteIncomeAction()
