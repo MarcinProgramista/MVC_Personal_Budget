@@ -358,7 +358,7 @@ class Balances extends Authenticated
 
         header('Content-Type: application/json');
 
-        if (!isset($data['id'], $data['category_id'], $data['amount'], $data['info'], $data['date'])) {
+        if (!isset($data['id'], $data['category_id'], $data['amount'], $data['info'], $data['date'], $data['csrf_token'])) {
             echo json_encode(['status' => 'error', 'message' => 'Missing data']);
             exit;
         }

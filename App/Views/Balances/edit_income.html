@@ -10,6 +10,7 @@
                 <form id="editIncomeForm">
                     <!-- Hidden fields -->
                     <input type="hidden" id="editIncomeId" name="id">
+                    <input type="hidden" id="editIncomeCsrf" value="{{ csrf_token }}">
                     <!-- Date -->
                     <div class="mb-3">
                         <label for="editIncomeDate" class="form-label text-warning">Date</label>

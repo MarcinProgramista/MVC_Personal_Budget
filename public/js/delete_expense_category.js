@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const userIdField = document.getElementById('deleteExpenseUserId');
     const csrfField = document.getElementById('deleteExpenseCsrf');
     const form = document.getElementById('deleteExpenseCategoryForm');
-
+    const safeToast = (msg, type = "info") => {
+        if (typeof showToast === "function") showToast(msg, type);
+        else console.log(msg);
+    };
     // 🔹 Otwieranie modala po kliknięciu kosza
     document.querySelectorAll('.open-delete-expense-category-modal[data-type="expense"]').forEach(btn => {
         btn.addEventListener('click', () => {

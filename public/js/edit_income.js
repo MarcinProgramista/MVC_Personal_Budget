@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(modalElement);
     let dateFirst = '';
     let dateSecond = '';
+    const safeToast = (msg, type = "info") => {
+        if (typeof showToast === "function") showToast(msg, type);
+        else console.log(msg);
+    };
     // Otwieranie modala i wypełnianie pól
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -39,17 +43,40 @@ document.addEventListener('DOMContentLoaded', function () {
             date: document.getElementById('editIncomeDate').value,
             name: document.getElementById('editIncomeCategory').selectedOptions[0].text,
             dateFirst: dateFirst,
-            dateSecond: dateSecond
+            dateSecond: dateSecond,
+            csrf_token: document.getElementById('editIncomeCsrf').value,
         };
 
+        // ⏳ Timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
         try {
-            const response = await fetch('/balances/update-income', {
+            const res = await fetch('/balances/update-income', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
+                signal: controller.signal,
             });
 
-            const data = await response.json();
+            clearTimeout(timeoutId);
+            if (res.status === 403) {
+                showToast("Access denied. Please log in again.", "error");
+                setTimeout(() => (window.location.href = "/login"), 1500);
+                return;
+            }
+
+            if (res.status >= 500) {
+                showToast("Server error. Try again later.", "error");
+                return;
+            }
+
+            let data = await res.json();
+
+            if (!data.status) {
+                showToast(data.message || "Failed to edit category.", "error");
+                return;
+            }
             console.log('Server response:', data);
 
             if (data.status === 'success') {
