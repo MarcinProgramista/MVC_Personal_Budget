@@ -13,20 +13,23 @@
         <!-- 🔹 Lista przychodów -->
         <ul id="expenseBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
             {% for expense in expenses %}
-            <li
+            <li data-id="{{ expense.id }}"
                 class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+
                 <div class="d-flex flex-column">
                     <div class="d-flex flex-row align-items-center ">
                         <i class="fas fa-circle me-2 text-success"></i>
                         <span class="fw-bold">{{ expense.Category }}</span>
                     </div>
                 </div>
+
                 <span class="d-flex flex-row">
                     <span class="d-flex align-items-center">
                         <strong class="text-light text-center mx-2">{{ expense.Amount }} PLN</strong>
                     </span>
                 </span>
             </li>
+
             {% endfor %}
         </ul>
         <!-- 🔹 Suma przychodów -->

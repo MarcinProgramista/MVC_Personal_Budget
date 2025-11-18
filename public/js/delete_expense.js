@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //  LIST REFRESH FUNCTION
     // =====================================================
     function refreshExpenseList(expenses) {
-        const list = document.getElementById("expenseDetailsBalanceCategoriesList");
+        const list = document.getElementById("expenseBalanceCategoriesList");
         if (!list) return;
 
         list.innerHTML = "";
@@ -199,20 +199,20 @@ document.addEventListener("DOMContentLoaded", function () {
             li.dataset.id = exp.id;
 
             li.innerHTML = `
-                <div class="d-flex flex-column">
-                    <div class="d-flex flex-row align-items-center">
-                        <i class="fas fa-circle me-2 text-danger"></i>
-                        <span class="fw-bold">${exp.Category}</span>
-                    </div>
+            <div class="d-flex flex-column">
+                <div class="d-flex flex-row align-items-center">
+                    <i class="fas fa-circle me-2 text-danger"></i>
+                    <span class="fw-bold">${exp.Category}</span>
                 </div>
-
-                <span class="d-flex flex-row">
-                    <strong class="text-light text-center mx-2">${parseFloat(exp.Amount).toFixed(2)} PLN</strong>
-                </span>
-            `;
+            </div>
+            <span class="d-flex flex-row">
+                <strong class="text-light text-center mx-2">${parseFloat(exp.Amount).toFixed(2)} PLN</strong>
+            </span>
+        `;
 
             list.appendChild(li);
         });
     }
+
 
 });
