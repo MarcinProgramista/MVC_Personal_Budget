@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkbox = document.getElementById('categoryEditMethodPyamentLimitActive'); // poprawione
     const cashLimitInput = document.getElementById('categoryEditMethodPyamentCashLimit'); // poprawione
     const categoryError = document.getElementById('categoryEditMethodPyamentError');
-
+    const safeToast = (msg, type = "info") => {
+        if (typeof showToast === "function") showToast(msg, type);
+        else console.log(msg);
+    };
     // Zamknij wszystkie inne otwarte modale przed otwarciem nowego
     function closeAllOtherModals() {
         const openModals = document.querySelectorAll('.modal.show');
@@ -82,6 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = form.dataset.id;
             const user_id = document.getElementById('categoryEditMethodPyamentUserId').value;
             const csrfToken = document.getElementById('editPaymentCsrf').value;
+            // ⏳ Timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             const res = await fetch('/method-payment/edit', {
                 method: 'POST',
@@ -97,14 +103,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     is_limit_active: isLimitActive,
                     cash_limit: cashLimit ?? '',
                     csrf_token: csrfToken
-                })
+                }),
+                signal: controller.signal,
             });
+            clearTimeout(timeoutId);
+            if (res.status === 403) {
+                showToast("Access denied. Please log in again.", "error");
+                setTimeout(() => (window.location.href = "/login"), 1500);
+                return;
+            }
 
+            if (res.status >= 500) {
+                showToast("Server error. Try again later.", "error");
+                return;
+            }
 
+            let data = await res.json();
+
+            if (!data.success) {
+                showToast(data.message || "Failed to edit method payment.", "error");
+                return;
+            }
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
             }
-            const data = await res.json();
+
 
             if (data.success) {
                 // ✅ Znajdź istniejący element <li> po ID
