@@ -1,66 +1,67 @@
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('editCategoryIncomeModal');
-    if (!modalEl) {
-        console.error('❌ Modal element not found: #editCategoryIncomeModal');
-        return;
-    }
+    if (!modalEl) return;
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     const form = document.getElementById('editCategoryIncomeForm');
-    const nameInput = document.getElementById('categoryEditIncomeName');
-    const checkbox = document.getElementById('categoryEditIncomeLimitActive'); // poprawione
-    const cashLimitInput = document.getElementById('categoryEditIncomeCashLimit'); // poprawione
-    const categoryError = document.getElementById('categoryEditIncomeError');
+    const submitBtn = form.querySelector("button[type='submit']");
 
-    // Zamknij wszystkie inne otwarte modale przed otwarciem nowego
+    const nameInput = document.getElementById('categoryEditIncomeName');
+    const checkbox = document.getElementById('categoryEditIncomeLimitActive');
+    const cashLimitInput = document.getElementById('categoryEditIncomeCashLimit');
+    const categoryError = document.getElementById('categoryEditIncomeError');
+    const csrfToken = document.getElementById('editIncomeCsrf').value;
+
     function closeAllOtherModals() {
-        const openModals = document.querySelectorAll('.modal.show');
-        openModals.forEach(m => {
+        document.querySelectorAll('.modal.show').forEach(m => {
             const modalInstance = bootstrap.Modal.getInstance(m);
-            if (modalInstance) modalInstance.hide();
+            modalInstance?.hide();
         });
     }
 
-    // Checkbox - aktywacja/ dezaktywacja pola limitu
     checkbox.addEventListener('change', () => {
         cashLimitInput.disabled = !checkbox.checked;
         cashLimitInput.placeholder = checkbox.checked
             ? "Enter limit or leave empty"
             : "Limit is blocked now";
-        if (!checkbox.checked) cashLimitInput.value = '';
+
+        if (!checkbox.checked) cashLimitInput.value = "";
     });
 
-    // Otwierania modala 
+    // -----------------------------------------------------------
+    // OPEN MODAL
+    // -----------------------------------------------------------
     document.querySelectorAll('.open-edit-income-category-modal[data-type="income"]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener("click", () => {
             closeAllOtherModals();
 
             const { id, name, cash_limit, is_limit_active, user_id } = btn.dataset;
-            console.log("✏️ Dane z ikony:", { id, name, cash_limit, is_limit_active, user_id });
 
-            nameInput.value = name || '';
-            checkbox.checked = (is_limit_active == 1 || is_limit_active === true || is_limit_active === 'true');
+            nameInput.value = name || "";
+            checkbox.checked = is_limit_active == 1 || is_limit_active === "true";
 
             if (checkbox.checked) {
                 cashLimitInput.disabled = false;
-                cashLimitInput.placeholder = 'Enter limit or leave empty';
-                cashLimitInput.value = cash_limit || '';
+                cashLimitInput.value = cash_limit || "";
             } else {
                 cashLimitInput.disabled = true;
-                cashLimitInput.placeholder = 'Limit is blocked now';
-                cashLimitInput.value = '';
+                cashLimitInput.value = "";
             }
 
             form.dataset.id = id;
             document.getElementById('categoryEditIncomeUserId').value = user_id;
-            categoryError.textContent = '';
-            nameInput.classList.remove('is-invalid');
+
+            nameInput.classList.remove("is-invalid");
+            categoryError.textContent = "";
+
             modal.show();
         });
     });
 
-    // 🔹 Wysłanie formularza
-    form.addEventListener('submit', async (e) => {
+    // -----------------------------------------------------------
+    // SUBMIT FORM
+    // -----------------------------------------------------------
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const name = nameInput.value.trim();
@@ -70,114 +71,147 @@ document.addEventListener('DOMContentLoaded', () => {
             : null;
 
         if (!name) {
-            nameInput.classList.add('is-invalid');
-            categoryError.textContent = 'Please enter a name.';
+            nameInput.classList.add("is-invalid");
+            categoryError.textContent = "Please enter a name.";
             return;
         }
 
-        nameInput.classList.remove('is-invalid');
-        categoryError.textContent = '';
+        const payload = {
+            id: form.dataset.id,
+            user_id: document.getElementById('categoryEditIncomeUserId').value,
+            name,
+            is_limit_active: isLimitActive,
+            cash_limit: cashLimit ?? "",
+            csrf_token: csrfToken
+        };
+
+        // Disable button
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Saving...";
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+
+        let res;
 
         try {
-            const id = form.dataset.id;
-            const user_id = document.getElementById('categoryEditIncomeUserId').value;
-            const csrfToken = document.getElementById('editIncomeCsrf').value;
-
-            const res = await fetch('/category-income/edit-category', {
+            res = await fetch('/category-income/edit-category', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRF-Token': csrfToken   // ← nagłówek CSRF
+                    'X-CSRF-Token': csrfToken
                 },
+                body: new URLSearchParams(payload),
                 credentials: 'include',
-                body: new URLSearchParams({
-                    id,
-                    user_id,
-                    name,
-                    is_limit_active: isLimitActive,
-                    cash_limit: cashLimit ?? '',
-                    csrf_token: csrfToken      // ← CSRF w body
-                })
+                signal: controller.signal
             });
+        } catch (err) {
+            if (err.name === "AbortError") showToast("Request timeout", "error");
+            else showToast("Network error", "error");
+            resetButton();
+            return;
+        }
 
+        clearTimeout(timeout);
 
+        if (res.status === 403) {
+            showToast("Access denied. Please log in again.", "error");
+            setTimeout(() => window.location.href = "/login", 1200);
+            return;
+        }
 
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-            const data = await res.json();
+        if (res.status >= 500) {
+            showToast("Server error. Try again later.", "error");
+            resetButton();
+            return;
+        }
 
-            if (data.success) {
-                // ✅ Znajdź istniejący element <li> po ID
-                const existingLi = document.querySelector(
-                    `#incomeCategoriesList [data-id="${data.category.id}"]`
-                );
+        let data;
+        try {
+            data = await res.json();
+        } catch {
+            showToast("Invalid server response.", "error");
+            resetButton();
+            return;
+        }
 
-                if (existingLi) {
-                    // 🔹 Znajdź najbliższy <li> — ikony są wewnątrz <span>, więc musimy wejść wyżej
-                    const li = existingLi.closest('li');
-                    if (li) {
-                        // 🔹 Zaktualizuj zawartość elementu
-                        li.innerHTML = `
+        if (!data.success) {
+            showToast(data.message || "Error updating category.", "error");
+            resetButton();
+            return;
+        }
+
+        // -----------------------------------------------------------
+        // REFRESH LIST
+        // -----------------------------------------------------------
+        refreshIncomeList(data.categories);
+
+        showToast("Income category updated successfully!", "success");
+
+        modal.hide();
+        resetButton();
+    });
+
+    function resetButton() {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save";
+    }
+
+    // -----------------------------------------------------------
+    // REFRESH LIST FUNCTION
+    // -----------------------------------------------------------
+    function refreshIncomeList(categories) {
+        if (!Array.isArray(categories)) {
+            console.warn("refreshIncomeList: no category list returned");
+            return;
+        }
+
+        const list = document.getElementById("incomeCategoriesList");
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        categories.forEach(cat => {
+            const li = document.createElement("li");
+            li.dataset.id = cat.id;
+            li.className =
+                "list-group-item d-flex justify-content-between border border-warning align-items-center text-light";
+
+            li.innerHTML = `
                 <div class="d-flex flex-column">
-                    <div class="d-flex flex-row   align-items-center ">
+                    <div class="d-flex flex-row align-items-center">
                         <i class="fas fa-circle me-2 text-success"></i>
-                        <span class="fw-bold">${data.category.name}</span>
+                        <span class="fw-bold">${cat.name}</span>
                     </div>
-                    ${data.category.is_limit_active && data.category.cash_limit
-                                ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
-                                : ''}
+                    ${cat.is_limit_active && cat.cash_limit
+                    ? `<small class="text-info">Limited: ${cat.cash_limit} PLN</small>`
+                    : ""
+                }
                 </div>
+
                 <span class="d-flex flex-row">
-                <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                         
-                    <i class="fas fa-pencil-alt text-success me-2 open-edit-income-category-modal"
-                        role="button"
-                        data-id="${data.category.id}"
-                        data-name="${data.category.name}"
-                        data-cash_limit="${data.category.cash_limit || ''}"
-                        data-is_limit_active="${data.category.is_limit_active}"
-                        data-user_id="${data.category.user_id}"
-                        data-type="income"></i></button>
-                <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                         
-                    <i class="fas fa-trash-alt text-danger open-delete-category-income-modal"
-                        role="button"
-                        data-type="income"
-                        data-id="${data.category.id}"
-                        data-name="${data.category.name}"
-                        data-user_id="${data.category.user_id}"></i></button>
+                    <button class="btn btn-outline-warning icon-btn m-1">
+                        <i class="fas fa-pencil-alt text-success open-edit-income-category-modal"
+                           data-id="${cat.id}"
+                           data-name="${cat.name}"
+                           data-cash_limit="${cat.cash_limit ?? ''}"
+                           data-is_limit_active="${cat.is_limit_active}"
+                           data-user_id="${cat.user_id}"
+                           data-type="income"></i>
+                    </button>
+
+                    <button class="btn btn-outline-warning icon-btn m-1">
+                        <i class="fas fa-trash-alt text-danger open-delete-category-income-modal"
+                           data-id="${cat.id}"
+                           data-name="${cat.name}"
+                           data-user_id="${cat.user_id}"
+                           data-type="income"></i>
+                    </button>
                 </span>
             `;
 
-                        // 🔹 Podłącz ponownie event do nowo wstawionej ikony edycji
-                        li.querySelector('.open-edit-income-category-modal')
-                            ?.addEventListener('click', () => {
-                                showToast('You just edited this item — reopen to edit again!');
-                            });
-                    }
-                } else {
-                    console.warn('⚠️ Nie znaleziono elementu li o id:', data.category.id);
-                }
-
-                modal.hide();
-                showToast('Expense category updated successfully!');
-                form.reset();
-            } else {
-                // ❌ Obsługa błędów
-                if (data.field === 'name') {
-                    nameInput.classList.add('is-invalid');
-                    categoryError.textContent = data.message || 'Invalid name.';
-                } else {
-                    showToast(data.message || 'An error occurred.', 'error');
-                }
-            }
-        } catch (error) {
-            console.error('❌ Error sending request:', error);
-            categoryError.textContent = 'Server error.';
-        }
-    });
-
+            list.appendChild(li);
+        });
+    }
 });

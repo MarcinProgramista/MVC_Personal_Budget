@@ -101,8 +101,9 @@ class CategoryIncome extends Authenticated
     public function editCategoryAction()
     {
         header('Content-Type: application/json');
-        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
 
+        // CSRF
+        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
         if (!\App\Csrf::validateToken($token)) {
             http_response_code(403);
             echo json_encode([
@@ -112,13 +113,12 @@ class CategoryIncome extends Authenticated
             return;
         }
 
-
         try {
             $userId = $_SESSION['user_id'] ?? null;
             $id = $_POST['id'] ?? null;
             $name = trim($_POST['name'] ?? '');
-            $cashLimit = $_POST['cash_limit'] ?? null;
-            $is_limit_active = $_POST['is_limit_active'] ?? null;
+            $cashLimit = $_POST['cash_limit'] !== '' ? (float)$_POST['cash_limit'] : null;
+            $is_limit_active = isset($_POST['is_limit_active']) ? (int)$_POST['is_limit_active'] : 0;
 
             if (!$userId) {
                 throw new \Exception('User not logged in.');
@@ -129,37 +129,57 @@ class CategoryIncome extends Authenticated
             }
 
             if ($name === '') {
-                throw new \Exception('Category name cannot be empty.');
-            }
-
-            $existing = IncomeCategory::existCategoryName($name, $userId, $id);
-            if ($existing) {
-                echo json_encode(['success' => false, 'field' => 'name', 'message' => 'This category name already exists.']);
+                echo json_encode([
+                    'success' => false,
+                    'field'   => 'name',
+                    'message' => 'Category name cannot be empty.'
+                ]);
                 return;
             }
 
+            // Name exists?
+            if (IncomeCategory::existCategoryName($name, $userId, $id)) {
+                echo json_encode([
+                    'success' => false,
+                    'field'   => 'name',
+                    'message' => 'This category name already exists.'
+                ]);
+                return;
+            }
 
+            // Update
             $updated = IncomeCategory::updateCategory($userId, $id, $name, $cashLimit, $is_limit_active);
+
             if ($updated) {
+
+                // <<< 🔥 NAJWAŻNIEJSZE — wysyłamy listę kategorii do JS
+                $categories = IncomeCategory::getAllIncomesAssignedToUser($userId);
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'Category updated successfully.',
                     'category' => [
-                        'id' => $id,
-                        'name' => $name,
-                        'cash_limit' => $cashLimit,
-                        'is_limit_active' => (int)$is_limit_active
-                    ]
+                        'id'              => (int)$id,
+                        'name'            => $name,
+                        'cash_limit'      => $cashLimit,
+                        'is_limit_active' => $is_limit_active,
+                        'user_id'         => $userId
+                    ],
+                    'categories' => $categories
                 ]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Failed to update category.']);
             }
         } catch (\Throwable $e) {
             http_response_code(500);
-            error_log("💥 Error editing income category: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            error_log("🔥 Error editing income category: " . $e->getMessage());
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
+
 
     /**
      * Check category name uniqueness (AJAX)
