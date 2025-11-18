@@ -1,164 +1,187 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const deleteButtonsIncome = document.querySelectorAll('.open-delete-income-details-balance-modal');
-    const modalElementDelete = document.getElementById('deleteIncomeModal');
-    let id = "";
-    let dateFirst = '';
-    let nameCategoryIncome = '';
-    let dateSecond = '';
-    let date = '';
-    if (!modalElementDelete) {
-        console.error('Brak elementu #deleteIncomeModal w DOM!');
+// delete_income.js — PART 1/4
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteButtonsIncome = document.querySelectorAll(".open-delete-income-details-balance-modal");
+    const modalElementDelete = document.getElementById("deleteIncomeModal");
+    const form = document.getElementById("deleteIncomeForm");
+    const deleteIdInput = document.getElementById("deleteIncomeId");
+    const deleteCsrfInput = document.getElementById("deleteIncomeCsrf");
+    const confirmButton = document.getElementById("confirmDeleteIncomeButton");
+
+    let selected = {
+        id: "",
+        date: "",
+        dateFirst: "",
+        dateSecond: "",
+        name: "",
+        amount: 0
+    };
+
+    const safeToast = (msg, type = "info") => {
+        if (typeof showToast === "function") showToast(msg, type);
+        else console.log(msg);
+    };
+
+    if (!modalElementDelete || !form || !deleteIdInput || !deleteCsrfInput || !confirmButton) {
+        console.warn("delete_income.js: Missing DOM elements!");
         return;
     }
 
     const modal = new bootstrap.Modal(modalElementDelete);
 
-    deleteButtonsIncome.forEach(button => {
-        button.addEventListener('click', () => {
-            console.log(button.dataset);
+    deleteButtonsIncome.forEach(btn => {
+        btn.addEventListener("click", () => {
+            selected.id = btn.dataset.id;
+            selected.date = btn.dataset.date || "";
+            selected.name = btn.dataset.namecategoryincome || btn.dataset.name || "";
+            selected.amount = btn.dataset.amount_income || 0;
+            selected.dateFirst = btn.dataset.datefirst || "";
+            selected.dateSecond = btn.dataset.datesecond || "";
 
+            deleteIdInput.value = selected.id;
 
-            id = button.dataset.id;
-            date = button.dataset.date || '';
-            const amount = button.dataset.amount_income;
-            nameCategoryIncome = button.dataset.namecategoryincome || '';
+            const details = document.getElementById("deleteIncomeDetails");
+            details.innerHTML = `
+                <div>📅 <strong>Date:</strong> ${selected.date}</div>
+                <div>📂 <strong>Category:</strong> ${selected.name}</div>
+                <div>💰 <strong>Amount:</strong> ${parseFloat(selected.amount).toFixed(2)} PLN</div>
+            `;
 
-            dateFirst = button.dataset.datefirst || '';
-            dateSecond = button.dataset.datesecond || '';
-            // ustaw ID do ukrytego pola, jeśli jest
-            const hiddenInput = document.getElementById('deleteIncome');
-            if (hiddenInput) hiddenInput.value = id;
-            // 🧩 sformatuj szczegóły transakcji do wyświetlenia
-            const detailsDiv = document.getElementById('deleteIncomeDetails');
-            if (detailsDiv) {
-                detailsDiv.innerHTML = `
-                    <div>📅 <strong>Date:</strong> ${date}</div>
-                    <div>📂 <strong>Category:</strong> ${nameCategoryIncome}</div>
-                    <div>💰 <strong>Amount:</strong> ${parseFloat(amount).toFixed(2)} PLN</div>
-                `;
-            }
             modal.show();
         });
     });
+    // delete_income.js — PART 2/4
 
-    // Obsługa zapisu z modala
-    document.getElementById('deleteIncomeForm').addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const formData = {
-            id: document.getElementById('deleteIncome').value,
-            dateFirst: dateFirst,
-            dateSecond: dateSecond,
-            date: date
-        }
-        console.log(formData);
+
+        const csrf = deleteCsrfInput.value;
+
+        const payload = {
+            id: selected.id,
+            date: selected.date,
+            dateFirst: selected.dateFirst,
+            dateSecond: selected.dateSecond,
+            csrf_token: csrf
+        };
+
+        confirmButton.disabled = true;
+        confirmButton.textContent = "Deleting...";
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+
+        let res;
 
         try {
-            const csrfToken = document.getElementById('deleteIncomeCsrf').value;
-
-            const response = await fetch('/balances/delete-income', {
-                method: 'POST',
+            res = await fetch("/balances/delete-income", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrf
                 },
-                body: JSON.stringify({
-                    ...formData,
-                    csrf_token: csrfToken
-                })
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
-
-            const data = await response.json();
-            if (data.status === 'success') {
-                console.log(data);
-                // 🔹 Usuń element z listy bez odświeżania
-                const liToRemove = document.querySelector(
-                    `#incomeDetailsBalanceCategoriesList [data-id="${id}"]`
-                );
-
-                if (liToRemove) {
-                    liToRemove.closest('li').remove();
-                    showToast(`Income category "${nameCategoryIncome}" deleted successfully.`);
-                } else {
-                    console.warn('⚠️ Nie znaleziono elementu <li> do usunięcia.');
-                }
-
-                let sumEl = document.getElementById('balanceSum');
-                if (sumEl && data.sum && data.sum !== undefined) {
-                    sumEl.textContent = `${data.sum} PLN`;
-                } else {
-                    console.warn('Nie znaleziono elementu sumIncomesDetails lub brak danych w JSON:', data);
-                }
-
-                let sumEldetails = document.getElementById('sumIncomesDetails');
-                if (sumEldetails && data.sum && data.sumAllIncomes !== undefined) {
-                    sumEldetails.textContent = `${data.sumAllIncomes} PLN`;
-                } else {
-                    console.warn('Nie znaleziono elementu sumIncomesDetails lub brak danych w JSON:', data);
-                }
-                let sumElBalances = document.getElementById('balanceSum');
-                if (sumElBalances) {
-                    sumElBalances.textContent = `${data.sumAllIncomes} PLN`;
-                }
-                let sumElementTop = document.getElementById('sumIncomes');
-                if (sumElementTop) {
-                    sumElementTop.textContent = `${data.sumAllIncomes} PLN`;
-                }
-                let sumElementDown = document.getElementById('sumIncomesDetails');
-                if (sumElementDown) {
-                    sumElementDown.textContent = `${data.sumAllIncomes} PLN`;
-                }
-
-                if (data.incomes && data.incomes.length >= 0) {
-                    refreshIncomeList(data.incomes);
-                    incomesData = data.incomes.map(i => ({
-                        id: i.id,
-                        Category: i.Category,
-                        Amount: parseFloat(i.Amount),
-                        date: i.date,
-                        info: i.info || ''
-                    }));
-
-                    // 🔹 Ponowne narysowanie wykresu
-                    drawChart();
-                }
-
-                if (data.incomes.length == 0) {
-                    document.getElementById('piechart1').remove();
-                }
-                modal.hide();
-            }
         } catch (err) {
-            console.error(err);
-        };
+            safeToast("Connection timeout", "error");
+            confirmButton.disabled = false;
+            confirmButton.textContent = "Delete";
+            return;
+        }
+
+        clearTimeout(timeout);
+
+        if (!res.ok) {
+            safeToast("Server error", "error");
+            confirmButton.disabled = false;
+            confirmButton.textContent = "Delete";
+            return;
+        }
+
+        const data = await res.json();
+        if (data.status !== "success") {
+            safeToast("Failed to delete income", "error");
+            confirmButton.disabled = false;
+            confirmButton.textContent = "Delete";
+            return;
+        }
+
+        // remove li
+        const li = document.querySelector(
+            `#incomeBalanceCategoriesList li[data-id="${selected.id}"]`
+        );
+        if (li) li.remove();
+
+        safeToast(`Deleted: ${selected.name}`, "success");
+        // delete_income.js — PART 3/4
+
+        // update sums
+        if (document.getElementById("sumIncomes"))
+            document.getElementById("sumIncomes").textContent =
+                `${data.sumAllIncomes} PLN`;
+
+        if (document.getElementById("sumIncomesDetails"))
+            document.getElementById("sumIncomesDetails").textContent =
+                `${data.sumAllIncomes} PLN`;
+
+        if (document.getElementById("balanceSum"))
+            document.getElementById("balanceSum").textContent =
+                `${data.sum} PLN`;
+
+        // refresh incomes
+        if (Array.isArray(data.incomes)) {
+            refreshIncomeList(data.incomes);
+
+            // refresh chart
+            if (typeof drawChart === "function") {
+                incomesData = data.incomes.map(i => ({
+                    id: i.id,
+                    Category: i.Category,
+                    Amount: parseFloat(i.Amount),
+                    date: i.date,
+                    info: i.info || ""
+                }));
+
+                if (incomesData.length > 0) drawChart();
+                else {
+                    const chart = document.getElementById("piechart1");
+                    if (chart) chart.remove();
+                }
+            }
+        }
+
+        confirmButton.disabled = false;
+        confirmButton.textContent = "Delete";
+        modal.hide();
     });
-});
+    // delete_income.js — PART 4/4
 
-function refreshIncomeList(incomes) {
-    const list = document.getElementById('incomeBalanceCategoriesList');
-    if (!list) return;
+    function refreshIncomeList(incomes) {
+        const list = document.getElementById("incomeBalanceCategoriesList");
+        if (!list) return;
 
-    // 🔹 Wyczyść starą listę
-    list.innerHTML = '';
+        list.innerHTML = "";
 
-    // 🔹 Przebuduj ją na podstawie danych z serwera
-    incomes.forEach(income => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between border border-warning align-items-center text-light';
+        incomes.forEach(income => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between border border-warning align-items-center text-light";
+            li.dataset.id = income.id;
 
-        li.innerHTML = `
-            <div class="d-flex flex-column">
-                <div class="d-flex flex-row align-items-center">
-                    <i class="fas fa-circle me-2 text-success"></i>
-                    <span class="fw-bold">${income.Category}</span>
+            li.innerHTML = `
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">${income.Category}</span>
+                    </div>
                 </div>
-            </div>
-            <span class="d-flex flex-row">
-                <span class="d-flex align-items-center">
+                <span class="d-flex flex-row">
                     <strong class="text-light text-center mx-2">${parseFloat(income.Amount).toFixed(2)} PLN</strong>
                 </span>
-            </span>
-        `;
+            `;
 
-        list.appendChild(li);
-    });
-}
+            list.appendChild(li);
+        });
+    }
+
+}); // END DOMContentLoaded
