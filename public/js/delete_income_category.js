@@ -26,16 +26,31 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.show();
         });
     });
-
-    confirmButton.addEventListener('click', async () => {
+    const form = document.getElementById('deleteIncomeCategoryForm');
+    form.addEventListener('submit', async () => {
         const id = idField.value;
         const user_id = userIdField.value;
         const csrfToken = document.getElementById('deleteIncomeCsrf').value;
+        const payload = {
+            id: idValue,
+            user_id,
+            csrf_token: csrfToken,
+
+        };
 
         if (!id) {
             console.error("❌ Brak ID kategorii do usunięcia.");
             return;
         }
+        // 🔒 Blokada przycisku
+        const submitBtn = document.getElementById('confirmDeleteIncomeCategoryButton');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Deleting...";
+
+        // Timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         try {
             const res = await fetch('/category-income/delete', {
@@ -45,20 +60,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-CSRF-Token': csrfToken // 🔥 header
                 },
                 credentials: 'include',
-                body: new URLSearchParams({
-                    id,
-                    user_id,
-                    csrf_token: csrfToken // 🔥 body
-                })
+                body: JSON.stringify(payload),
+                signal: controller.signal,
             });
+            clearTimeout(timeoutId);
 
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
             }
 
-            const data = await res.json();
-            console.log(data);
+            // 🔥 Obsługa HTTP errorów
+            if (!res.ok) {
+                if (res.status === 403) {
+                    showToast("Access denied. Please log in again.", "error");
+                    setTimeout(() => window.location.href = "/login", 2000);
+                    return;
+                }
+                if (res.status >= 500) {
+                    showToast("Server error. Try again later.", "error");
+                    return;
+                }
+                showToast("Unexpected server error.", "error");
+                return;
+            }
 
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                showToast("Invalid server response.", "error");
+                return;
+            }
+
+            if (data.status !== 'success') {
+                showToast(data.message || "Failed to delete expense.", "error");
+                return;
+            }
+            //
             if (data.success) {
                 const liToRemove = document.querySelector(
                     `#incomeCategoriesList [data-id="${id}"]`
@@ -76,9 +114,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(data.message || 'An error occurred while deleting.', 'error');
             }
         } catch (error) {
-            console.error('❌ Error during deletion:', error);
-            showToast('Server error.', 'error');
+
+            if (error.name === "AbortError") {
+                showToast("Request timed out.", "error");
+            } else {
+                showToast("Network error.", "error");
+            }
+
+            console.error("❌ Error:", error);
+
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
+
     });
 
 });
+
+

@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRF-Token': csrfToken
                 },
                 body: JSON.stringify(payload),
-                signal: controller.signal
+
             });
 
             clearTimeout(timeoutId);
