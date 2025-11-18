@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const idField = document.getElementById('deleteMethodPaymentCategoryId');
     const userIdField = document.getElementById('deleteMethodPaymentUserId');
     const confirmButton = document.getElementById('confirmDeleteMethodPaymentCategoryButton');
-
+    const safeToast = (msg, type = "info") => {
+        if (typeof showToast === "function") showToast(msg, type);
+        else console.log(msg);
+    };
     // 🔹 Otwieranie modala po kliknięciu kosza
     document.querySelectorAll('.open-delete-payment-method-category-modal[data-type="payment"]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -36,11 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("❌ Brak ID kategorii do usunięcia.");
             return;
         }
-
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        let res;
         try {
             const csrfToken = document.getElementById('deletePaymentCsrf').value;
 
-            const res = await fetch('/method-payment/delete', {
+            res = await fetch('/method-payment/delete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -51,16 +56,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     id,
                     user_id,
                     csrf_token: csrfToken
-                })
+                }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeout);
+            if (res.status === 403) {
+                showToast("Access denied. Please log in again.", "error");
+                setTimeout(() => (window.location.href = "/login"), 1500);
+                return;
+            }
 
+            if (res.status >= 500) {
+                showToast("Server error. Try again later.", "error");
+                return;
+            }
+
+            let data = await res.json();
             if (!res.ok) {
                 throw new Error(`HTTP error! Status: ${res.status}`);
             }
 
-            const data = await res.json();
-
+            if (!data.success) {
+                showToast(data.message || "Failed to delete category.", "error");
+                return;
+            }
             if (data.success) {
                 // 🔹 Usuń element z listy bez odświeżania
                 const liToRemove = document.querySelector(

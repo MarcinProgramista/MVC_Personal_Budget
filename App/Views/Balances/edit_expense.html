@@ -8,6 +8,7 @@
             <div class="modal-body">
                 <form id="editExpenseForm">
                     <!-- Hidden fields -->
+                    <input type="hidden" id="editExpenseCsrf" value="{{ csrf_token }}">
                     <input type="hidden" id="editExpeneId" name="id">
                     <input type="hidden" id="editExpeneDateFirst" name="dateFirst">
                     <input type="hidden" id="editExpeneDateSecond" name="dateSecond">

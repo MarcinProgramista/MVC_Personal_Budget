@@ -1,4 +1,4 @@
-// delete_income.js — PART 1/4
+// delete_income.js – FIXED VERSION
 document.addEventListener("DOMContentLoaded", function () {
 
     const deleteButtonsIncome = document.querySelectorAll(".open-delete-income-details-balance-modal");
@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const modal = new bootstrap.Modal(modalElementDelete);
 
+    // ================================
+    // OPEN MODAL
+    // ================================
     deleteButtonsIncome.forEach(btn => {
         btn.addEventListener("click", () => {
             selected.id = btn.dataset.id;
@@ -40,8 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             deleteIdInput.value = selected.id;
 
-            const details = document.getElementById("deleteIncomeDetails");
-            details.innerHTML = `
+            document.getElementById("deleteIncomeDetails").innerHTML = `
                 <div>📅 <strong>Date:</strong> ${selected.date}</div>
                 <div>📂 <strong>Category:</strong> ${selected.name}</div>
                 <div>💰 <strong>Amount:</strong> ${parseFloat(selected.amount).toFixed(2)} PLN</div>
@@ -50,8 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.show();
         });
     });
-    // delete_income.js — PART 2/4
 
+
+    // ================================
+    // DELETE REQUEST
+    // ================================
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -92,31 +97,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
         clearTimeout(timeout);
 
+        // HTTP ERRORS
+        if (res.status === 403) {
+            showToast("Access denied. Please log in again.", "error");
+            setTimeout(() => (window.location.href = "/login"), 1500);
+            return;
+        }
+
+        if (res.status >= 500) {
+            safeToast("Server error. Try again later.", "error");
+            return;
+        }
+
         if (!res.ok) {
-            safeToast("Server error", "error");
-            confirmButton.disabled = false;
-            confirmButton.textContent = "Delete";
+            safeToast("Unexpected server error", "error");
             return;
         }
 
+        // JSON PARSE
         const data = await res.json();
+
         if (data.status !== "success") {
-            safeToast("Failed to delete income", "error");
+            safeToast(data.message || "Failed to delete income", "error");
             confirmButton.disabled = false;
             confirmButton.textContent = "Delete";
             return;
         }
 
-        // remove li
+        // ================================
+        // REMOVE LIST ITEM
+        // ================================
         const li = document.querySelector(
             `#incomeBalanceCategoriesList li[data-id="${selected.id}"]`
         );
         if (li) li.remove();
 
         safeToast(`Deleted: ${selected.name}`, "success");
-        // delete_income.js — PART 3/4
 
-        // update sums
+        // ================================
+        // UPDATE SUMS
+        // ================================
         if (document.getElementById("sumIncomes"))
             document.getElementById("sumIncomes").textContent =
                 `${data.sumAllIncomes} PLN`;
@@ -129,11 +149,12 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("balanceSum").textContent =
                 `${data.sum} PLN`;
 
-        // refresh incomes
+        // ================================
+        // REFRESH LIST + CHART
+        // ================================
         if (Array.isArray(data.incomes)) {
             refreshIncomeList(data.incomes);
 
-            // refresh chart
             if (typeof drawChart === "function") {
                 incomesData = data.incomes.map(i => ({
                     id: i.id,
@@ -155,8 +176,11 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmButton.textContent = "Delete";
         modal.hide();
     });
-    // delete_income.js — PART 4/4
 
+
+    // ================================
+    // REBUILD LIST
+    // ================================
     function refreshIncomeList(incomes) {
         const list = document.getElementById("incomeBalanceCategoriesList");
         if (!list) return;
@@ -165,7 +189,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         incomes.forEach(income => {
             const li = document.createElement("li");
-            li.className = "list-group-item d-flex justify-content-between border border-warning align-items-center text-light";
+            li.className =
+                "list-group-item d-flex justify-content-between border border-warning align-items-center text-light";
             li.dataset.id = income.id;
 
             li.innerHTML = `
@@ -184,4 +209,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-}); // END DOMContentLoaded
+});

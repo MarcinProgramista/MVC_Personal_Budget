@@ -1,4 +1,4 @@
-// delete_expense.js — PART 1/4
+// delete_expense.js — FIXED VERSION
 document.addEventListener("DOMContentLoaded", function () {
 
     const deleteButtonsExpense = document.querySelectorAll(".open-delete-expense-details-balance-modal");
@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const deleteIdInput = document.getElementById("deleteExpenseId");
     const deleteCsrfInput = document.getElementById("deleteExpenseCsrf");
     const confirmButton = document.getElementById("confirmDeleteExpenseButton");
+
     let selected = {
         id: "",
         date: "",
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         payment: "",
         amount: 0
     };
+
     const safeToast = (msg, type = "info") => {
         if (typeof showToast === "function") showToast(msg, type);
         else console.log(msg);
@@ -28,8 +30,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const modal = new bootstrap.Modal(modalElementDelete);
 
+    // =====================================================
+    //  OPEN MODAL
+    // =====================================================
     deleteButtonsExpense.forEach(btn => {
         btn.addEventListener("click", () => {
+
             selected.id = btn.dataset.id;
             selected.date = btn.dataset.date || "";
             selected.name = btn.dataset.namecategoryexpense || "";
@@ -40,16 +46,21 @@ document.addEventListener("DOMContentLoaded", function () {
             selected.dateSecond = btn.dataset.datesecond || "";
 
             deleteIdInput.value = selected.id;
-            const details = document.getElementById("deleteExpenseDetails");
-            details.innerHTML = `
+
+            document.getElementById("deleteExpenseDetails").innerHTML = `
                 <div>📅 <strong>Date:</strong> ${selected.date}</div>
                 <div>📂 <strong>Category:</strong> ${selected.name}</div>
                 <div>💳 <strong>Payment:</strong> ${selected.payment}</div>
                 <div>💰 <strong>Amount:</strong> ${parseFloat(selected.amount).toFixed(2)} PLN</div>
             `;
+
             modal.show();
         });
     });
+
+    // =====================================================
+    //  SEND DELETE REQUEST
+    // =====================================================
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -62,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
             dateSecond: selected.dateSecond,
             csrf_token: csrf
         };
+
         confirmButton.disabled = true;
         confirmButton.textContent = "Deleting...";
 
@@ -69,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const timeout = setTimeout(() => controller.abort(), 8000);
 
         let res;
+
         try {
             res = await fetch("/balances/delete-expense", {
                 method: "POST",
@@ -80,31 +93,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 signal: controller.signal
             });
         } catch (err) {
-            safeToast("Connection timeout", "error");
+            safeToast("Connection timeout.", "error");
             confirmButton.disabled = false;
             confirmButton.textContent = "Delete";
             return;
         }
 
         clearTimeout(timeout);
-        if (!res.ok) {
-            safeToast("Server error", "error");
-            confirmButton.disabled = false;
-            confirmButton.textContent = "Delete";
+
+        // HTTP ERRORS
+        if (res.status === 403) {
+            safeToast("Access denied. Please log in again.", "error");
+            setTimeout(() => (window.location.href = "/login"), 1500);
             return;
         }
 
+        if (res.status >= 500) {
+            safeToast("Server error. Try again later.", "error");
+            return;
+        }
+
+        if (!res.ok) {
+            safeToast("Unexpected server error.", "error");
+            return;
+        }
+
+        // PARSE DATA
         const data = await res.json();
 
         if (data.status !== "success") {
-            safeToast("Failed to delete expense", "error");
+            safeToast(data.message || "Failed to delete expense.", "error");
             confirmButton.disabled = false;
             confirmButton.textContent = "Delete";
             return;
         }
-        // ==========================
-        //  🗑️ Usuń element z listy
-        // ==========================
+
+        // =====================================================
+        //  REMOVE LI FROM LIST
+        // =====================================================
         const li = document.querySelector(
             `#expenseDetailsBalanceCategoriesList li[data-id="${selected.id}"]`
         );
@@ -113,10 +139,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         safeToast(`Deleted: ${selected.name}`, "success");
 
-
-        // ==========================
-        //  🔄 Aktualizacja sum
-        // ==========================
+        // =====================================================
+        //  UPDATE SUMS
+        // =====================================================
         if (document.getElementById("sumALlExpensesTop"))
             document.getElementById("sumALlExpensesTop").textContent =
                 `${data.sumAllExpenses} PLN`;
@@ -129,21 +154,20 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("balanceSum").textContent =
                 `${data.sum} PLN`;
 
-
-        // ==========================
-        //  🔄 Aktualizacja listy
-        // ==========================
+        // =====================================================
+        //  REFRESH LIST & CHART
+        // =====================================================
         if (Array.isArray(data.expenses)) {
+
             refreshExpenseList(data.expenses);
 
-            // 🔄 Aktualizacja wykresu
             if (typeof drawExpenseChart === "function") {
-                expensesData = data.expenses.map(e => ({
-                    id: e.id,
-                    Category: e.Category,
-                    Amount: parseFloat(e.Amount),
-                    date: e.date,
-                    info: e.info || ""
+                expensesData = data.expenses.map(exp => ({
+                    id: exp.id,
+                    Category: exp.Category,
+                    Amount: parseFloat(exp.Amount),
+                    date: exp.date,
+                    info: exp.info || ""
                 }));
 
                 if (expensesData.length > 0) drawExpenseChart();
@@ -159,10 +183,9 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.hide();
     });
 
-
-    // =====================================================================
-    //  🔁 Funkcja przebudowująca listę wydatków (jak w income)
-    // =====================================================================
+    // =====================================================
+    //  LIST REFRESH FUNCTION
+    // =====================================================
     function refreshExpenseList(expenses) {
         const list = document.getElementById("expenseDetailsBalanceCategoriesList");
         if (!list) return;
