@@ -49,19 +49,22 @@ Expected income information — monthly expectations or limits (if set by the us
 
 These insights help users understand their current financial situation and ensure more mindful income tracking.
 The clean, dark interface makes the form easy to use while the additional data supports better decision-making.
-✅ <h1>Balance Overview — Monthly Financial Summary</h1>
+<h3>Balance Overview — Monthly Financial Summary</h3>
 <img width="1832" height="793" alt="image" src="https://github.com/user-attachments/assets/01722040-9cdc-475f-9d16-4fe929f92fc5" />
 This view presents a clear summary of incomes and expenses for the selected period.
 Users can switch between the current month, last month, or a custom date range.
 Interactive pie charts visualize the distribution of income sources and spending categories, making it easy to identify financial habits.
 A total balance indicator helps users understand their financial standing at a glance.
-Smart Financial Advice (AI Panel)
+
+<h3>Smart Financial Advice (AI Panel)</h3>
+
+<img width="1832" height="558" alt="image" src="https://github.com/user-attachments/assets/1842397e-d321-4928-9230-4d1b46752ced" />
 
 At the top of the balance overview, users can access the AI-powered Smart Financial Advice feature.
 This module analyzes the user’s financial data and provides personalized suggestions for improving savings, spending habits, and budget efficiency.
 When the AI service is unavailable, the system displays an informative message and encourages the user to try again later.
 
-✅ <h1>Period Selection Menu</h1>
+<h1>Period Selection Menu</h1>
 <img width="1832" height="187" alt="image" src="https://github.com/user-attachments/assets/431f1509-daa3-49db-92a6-4c6073b3d3b5" />
 
 A dropdown menu allows users to effortlessly choose the balance period:
