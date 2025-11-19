@@ -11,6 +11,10 @@ use \App\Flash;
 use \App\Controllers\Authenticated;
 use App\Models\Expense;
 
+use GeminiAPI\Client;
+use GeminiAPI\Resources\Parts\TextPart;
+
+
 /**
  * Balances
  */
@@ -43,8 +47,16 @@ class Balances extends Authenticated
      */
     public function indexAction()
     {
+
+
         $month = (int)date('m');
         $balanceService = new \App\Services\BalanceService();
+        $balanceData = $balanceService->getBalanceData($this->user->id, $month);
+
+
+        $month = (int)date('m');
+        $balanceService = new \App\Services\BalanceService();
+
         $balance = true;
         try {
             $balanceData = $balanceService->getBalanceData($this->user->id, $month);
@@ -60,6 +72,7 @@ class Balances extends Authenticated
                 'sum' => $balanceData['sum'],
                 'sumAllIncomes' => $balanceData['sumAllIncomes'],
                 'sumAllExpenses' => $balanceData['sumAllExpenses'],
+                'advice' => static::getFinancialAdvice($balanceData)  // 👈 NOWE
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
@@ -98,6 +111,7 @@ class Balances extends Authenticated
                 'sum' => $balanceData['sum'],
                 'sumAllIncomes' => $balanceData['sumAllIncomes'],
                 'sumAllExpenses' => $balanceData['sumAllExpenses'],
+                'advice' => static::getFinancialAdvice($balanceData)  // 👈 NOWE
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
@@ -125,6 +139,89 @@ class Balances extends Authenticated
 
         return $months[$month] ?? 'Unknown';
     }
+
+    private static array $adviceCache = [];
+
+    private function getFinancialAdvice(array $balanceData): string
+    {
+        if (empty($balanceData['incomes']) && empty($balanceData['expenses'])) {
+            return "No financial data available — please add incomes or expenses to receive AI guidance.";
+        }
+
+        try {
+            $client = new \GeminiAPI\Client($_ENV['GEMINI_API_KEY']);
+
+            $model = "gemini-2.5-flash";
+
+            $prompt = "You are a financial advisor. Analyze the user's financial data.\n\n" .
+                "IMPORTANT: All amounts are in PLN. Do NOT convert them to USD or any other currency.\n" .
+                "Always refer to amounts as PLN.\n\n" .
+                "Incomes: " . json_encode($balanceData['incomes']) . "\n" .
+                "Expenses: " . json_encode($balanceData['expenses']) . "\n\n" .
+                "Provide a short, practical financial advice in English.\n" .
+                "Friendly tone, maximum 5–6 sentences.\n" .
+                "Never mention USD, only PLN.";
+
+            $response = $client
+                ->generativeModel($model)
+                ->generateContent(
+                    new \GeminiAPI\Resources\Parts\TextPart($prompt)
+                );
+
+            return $response->text() ?? "AI did not return any information.";
+        } catch (\Exception $e) {
+            error_log("AI ERROR: " . $e->getMessage());
+            return "⚠️ The AI service is temporarily unavailable. Please try again later.";
+        }
+    }
+
+
+
+
+    // public static function getFinancialAdvice(array $balanceData): string
+    // {
+    //     $hash = md5(json_encode($balanceData));
+
+    //     // Cache
+    //     if (isset(self::$adviceCache[$hash])) {
+    //         return self::$adviceCache[$hash];
+    //     }
+
+    //     try {
+    //         $client = new \GeminiAPI\Client($_ENV['GEMINI_API_KEY']);
+
+    //         $model = $client
+    //             ->withV1BetaVersion()
+    //             ->generativeModel('models/gemini-2.5-flash');
+
+    //         $prompt = "You are a financial advisor. Based on the data:
+    //     Total income: {$balanceData['sumAllIncomes']}
+    //     Total expenses: {$balanceData['sumAllExpenses']}
+    //     Balance: {$balanceData['sum']}
+    //     Give clear, short and helpful advice for the user.";
+
+    //         $response = $model->generateContent(
+    //             new \GeminiAPI\Resources\Parts\TextPart($prompt)
+    //         );
+
+    //         $text = trim($response->text());
+    //         self::$adviceCache[$hash] = $text;
+
+    //         return $text;
+    //     } catch (\RuntimeException $e) {
+
+    //         // 🔥 SPECJALNA OBSŁUGA 503 — model przeciążony
+    //         if (str_contains($e->getMessage(), '"code": 503')) {
+    //             return "🌐 Usługa AI jest chwilowo przeciążona.  
+    //         Proszę spróbować ponownie za kilka minut.";
+    //         }
+
+    //         // 🔥 Obsługa błędnych kluczy, problemów z SSL itd.
+    //         return "⚠️ Usługa AI jest chwilowo niedostępna.  
+    //     Spróbuj ponownie później.";
+    //     }
+    // }
+
 
     public function sendChosenDatesAction()
     {
@@ -182,6 +279,7 @@ class Balances extends Authenticated
                 'sum' => $balanceData['sum'],
                 'sumAllIncomes' => $balanceData['sumAllIncomes'],
                 'sumAllExpenses' => $balanceData['sumAllExpenses'],
+                'advice' => static::getFinancialAdvice($balanceData)  // 👈 NOWE
             ]));
         } catch (\Exception $e) {
             error_log('Balance error: ' . $e->getMessage());
