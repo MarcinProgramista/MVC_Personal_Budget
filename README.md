@@ -64,7 +64,7 @@ At the top of the balance overview, users can access the AI-powered Smart Financ
 This module analyzes the user’s financial data and provides personalized suggestions for improving savings, spending habits, and budget efficiency.
 When the AI service is unavailable, the system displays an informative message and encourages the user to try again later.
 
-<h1>Period Selection Menu</h1>
+<h3>Period Selection Menu</h3>
 <img width="1832" height="187" alt="image" src="https://github.com/user-attachments/assets/431f1509-daa3-49db-92a6-4c6073b3d3b5" />
 
 A dropdown menu allows users to effortlessly choose the balance period:
