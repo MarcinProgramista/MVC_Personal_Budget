@@ -7,7 +7,7 @@ $apiKey = $_ENV['GEMINI_API_KEY'] ?? null;
 
 // Jeśli .env nie działa – wpisz ręcznie:
 if (!$apiKey) {
-    $apiKey = "AIzaSyA7uozfJCN4yh_eymZVsVZGixcuf6vNpnM";
+    $apiKey = "";
 }
 
 try {
