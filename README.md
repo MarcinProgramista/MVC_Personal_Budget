@@ -6,9 +6,9 @@ It also includes modern features such as email notifications and an AI assistant
 More details, screenshots, and feature highlights below.
 <h3>Sign Up — Clean and Modern Registration Page</h3>
 <img width="1832" height="793" alt="image" src="https://github.com/user-attachments/assets/a9728077-30c8-43f6-b4e3-783578ede990" />
-This screenshot presents the Sign Up page of the Personal Budget application.
-The interface is designed for simplicity and clarity, featuring a clean dark theme with bright accent colors for improved visibility.
-Users can quickly create an account by entering their name, email, and password, with built-in validation ensuring correct input.
+This screenshot presents the Sign Up page of the Personal Budget application. The interface is designed for simplicity and clarity, featuring a clean dark theme with bright accent colors for improved visibility. Users can quickly create an account by entering their name, email, and password, with built-in validation ensuring correct input.
+
+After registering, the user receives an activation link sent to the provided email address. The account must be confirmed via this link before logging in — ensuring safe and verified access.
 A motivational quote and illustration on the right create a friendly and engaging onboarding experience.
 
 
