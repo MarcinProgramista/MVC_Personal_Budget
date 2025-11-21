@@ -57,7 +57,6 @@ Interactive pie charts visualize the distribution of income sources and spending
 A total balance indicator helps users understand their financial standing at a glance.
 
 <h3>Smart Financial Advice (AI Panel)</h3>
-
 <img width="1852" height="781" alt="image" src="https://github.com/user-attachments/assets/88d315d8-0796-4b65-9eba-1f1ef5b8daa4" />
 <img width="614" height="803" alt="image" src="https://github.com/user-attachments/assets/0e394122-57f1-4116-958d-28304d2e8dc7" />
 
