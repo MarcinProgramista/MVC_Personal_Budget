@@ -22,5 +22,6 @@ class Account extends \Core\Controller
 
         header('Content-Type: application/json');
         echo json_encode($is_valid);
+        exit; // <-- DODAJ TO
     }
 }

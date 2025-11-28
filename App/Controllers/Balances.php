@@ -14,6 +14,8 @@ use App\Models\Expense;
 use GeminiAPI\Client;
 use GeminiAPI\Resources\Parts\TextPart;
 
+use Google\GenerativeAI\GoogleAI;
+
 
 /**
  * Balances
@@ -153,14 +155,49 @@ class Balances extends Authenticated
 
             $model = "gemini-2.5-flash";
 
-            $prompt = "You are a financial advisor. Analyze the user's financial data.\n\n" .
-                "IMPORTANT: All amounts are in PLN. Do NOT convert them to USD or any other currency.\n" .
-                "Always refer to amounts as PLN.\n\n" .
-                "Incomes: " . json_encode($balanceData['incomes']) . "\n" .
-                "Expenses: " . json_encode($balanceData['expenses']) . "\n\n" .
-                "Provide a short, practical financial advice in English.\n" .
-                "Friendly tone, maximum 5–6 sentences.\n" .
-                "Never mention USD, only PLN.";
+            $prompt = "
+    You are a professional financial advisor. Analyze the user's financial data and return the results in a clear, structured format.
+
+    IMPORTANT RULES:
+    - All amounts must stay in PLN (do NOT convert them).
+    - Be precise and analytical.
+    - Write in English.
+    - Keep formatting exactly as instructed below.
+
+    Use this exact response structure:
+
+    ---
+    Hello,
+
+    Based on the financial data provided, here is your monthly financial analysis:
+
+    **Incomes:**
+    - List each income category with amount in PLN.
+    - Provide a total: **Total incomes: X PLN**
+
+    **Expenses:**
+    - List each expense category with amount in PLN.
+    - Provide a total: **Total expenses: X PLN**
+
+    **Net Balance:**
+    Calculate: incomes - expenses  
+    Format the result as:  
+    **Net Balance: X PLN**
+
+    **Summary & Analysis:**
+    Write 3–5 sentences explaining the financial condition, biggest categories, savings potential, and overall balance.
+
+    **Three practical recommendations to improve financial management:**
+    1. Recommendation 1.
+    2. Recommendation 2.
+    3. Recommendation 3.
+
+    ---
+    Here is the data to analyze:
+
+    Incomes (JSON): " . json_encode($balanceData['incomes'], JSON_PRETTY_PRINT) . "
+    Expenses (JSON): " . json_encode($balanceData['expenses'], JSON_PRETTY_PRINT) . "
+    ";
 
             $response = $client
                 ->generativeModel($model)
@@ -178,49 +215,7 @@ class Balances extends Authenticated
 
 
 
-    // public static function getFinancialAdvice(array $balanceData): string
-    // {
-    //     $hash = md5(json_encode($balanceData));
 
-    //     // Cache
-    //     if (isset(self::$adviceCache[$hash])) {
-    //         return self::$adviceCache[$hash];
-    //     }
-
-    //     try {
-    //         $client = new \GeminiAPI\Client($_ENV['GEMINI_API_KEY']);
-
-    //         $model = $client
-    //             ->withV1BetaVersion()
-    //             ->generativeModel('models/gemini-2.5-flash');
-
-    //         $prompt = "You are a financial advisor. Based on the data:
-    //     Total income: {$balanceData['sumAllIncomes']}
-    //     Total expenses: {$balanceData['sumAllExpenses']}
-    //     Balance: {$balanceData['sum']}
-    //     Give clear, short and helpful advice for the user.";
-
-    //         $response = $model->generateContent(
-    //             new \GeminiAPI\Resources\Parts\TextPart($prompt)
-    //         );
-
-    //         $text = trim($response->text());
-    //         self::$adviceCache[$hash] = $text;
-
-    //         return $text;
-    //     } catch (\RuntimeException $e) {
-
-    //         // 🔥 SPECJALNA OBSŁUGA 503 — model przeciążony
-    //         if (str_contains($e->getMessage(), '"code": 503')) {
-    //             return "🌐 Usługa AI jest chwilowo przeciążona.  
-    //         Proszę spróbować ponownie za kilka minut.";
-    //         }
-
-    //         // 🔥 Obsługa błędnych kluczy, problemów z SSL itd.
-    //         return "⚠️ Usługa AI jest chwilowo niedostępna.  
-    //     Spróbuj ponownie później.";
-    //     }
-    // }
 
 
     public function sendChosenDatesAction()
@@ -352,7 +347,9 @@ class Balances extends Authenticated
             'sumAllExpenses' => $financialData['sumAllExpenses'],
             'incomes' => $financialData['incomes'],
             'expenses' => $financialData['expenses'],
-            'sum' => $sum
+            'sum' => $sum,
+            'advice' => $this->getFinancialAdvice($financialData) ?: "AI temporarily unavailable"
+
         ]);
     }
 
@@ -443,7 +440,8 @@ class Balances extends Authenticated
                 'sumAllExpenses' => $financialData['sumAllExpenses'],
                 'sum' => $sum
             ],
-            'expenses' => $financialData['expenses'] ?? [] // jeśli chcesz odświeżyć listę
+            'expenses' => $financialData['expenses'] ?? [], // jeśli chcesz odświeżyć listę
+            'advice' => $this->getFinancialAdvice($financialData) ?: "AI temporarily unavailable"
         ]);
         exit;
     }
@@ -494,7 +492,8 @@ class Balances extends Authenticated
                 'info' => $data['info'],
                 'date' => $data['date'],
                 'incomes' => $financialData['incomes'],
-            ]
+            ],
+            'advice' => $this->getFinancialAdvice($financialData) ?: "AI temporarily unavailable"
         ]);
 
         exit;

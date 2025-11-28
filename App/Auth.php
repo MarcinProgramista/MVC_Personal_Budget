@@ -114,7 +114,8 @@ class Auth
 
             $remembered_login = RememberedLogin::findByToken($cookie);
 
-            if ($remembered_login && ! $remembered_login->hasExpirerd()) {
+            if ($remembered_login && ! $remembered_login->hasExpired()) {
+
 
                 $user = $remembered_login->getUser();
 

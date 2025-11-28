@@ -66,4 +66,8 @@ class Config
     {
         return $_ENV['GEMINI_API_KEY'];
     }
+    public static function getSmtpSecure(): string
+    {
+        return $_ENV['SMTP_SECURE'] ?? 'tls';
+    }
 }

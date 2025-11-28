@@ -64,15 +64,15 @@ class Mail
         try {
             // SERVER SETTINGS
             $mail->isSMTP();
-            $mail->Host       = Config::SMTP_HOST;
+            $mail->Host       = Config::getSmtpHost();
             $mail->SMTPAuth   = true;
-            $mail->Username   = Config::SMTP_USER;
-            $mail->Password   = Config::SMTP_PASS;
-            $mail->SMTPSecure = Config::SMTP_SECURE;   // 'tls' or 'ssl'
-            $mail->Port       = Config::SMTP_PORT;
+            $mail->Username   = Config::getSmtpUser();
+            $mail->Password   = Config::getSmtpPass();
+            $mail->SMTPSecure = Config::getSmtpSecure();  // <-- poprawione
+            $mail->Port       = Config::getSmtpPort();
 
             // SENDER & RECEIVER
-            $mail->setFrom(Config::SMTP_FROM, Config::SMTP_FROM_NAME);
+            $mail->setFrom(Config::getSmtpFrom(), Config::getSmtpFromName());
             $mail->addAddress($to);
 
             // CONTENT

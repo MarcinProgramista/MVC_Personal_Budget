@@ -26,9 +26,17 @@
                 email: {
                     required: true,
                     email: true,
-                    remote: '/account/validate-email'
-
+                    remote: {
+                        url: '/account/validate-email',
+                        type: 'get',
+                        data: {
+                            email: function () {
+                                return $('#inputEmail').val();
+                            }
+                        }
+                    }
                 },
+
                 password: {
                     required: true,
                     minlength: 6,
@@ -96,17 +104,10 @@
     <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
 
         <!-- LEWA KOLUMNA Z OBRAZEM -->
-        <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
-            <p class="fst-italic text-light mb-4">
-                “Don’t tell me where your priorities are. Show me where you spend your money
-                and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
-            </p>
-            <img src="/images/achievement-3404945_1920.jpg" alt="Motywacyjny obraz"
-                class="img-fluid border border-warning rounded shadow-lg form-image">
-        </div>
 
-        <!-- PRAWA KOLUMNA Z FORMULARZEM -->
-        <div class="col-md-5">
+
+
+        <div class="col-md-4">
             <div class="container pb-3 text-danger">
                 {% if user.errors is not empty %}
                 <p>Errors:</p>
@@ -147,6 +148,15 @@
                 </div>
 
             </form>
+        </div>
+        <!-- PRAWA KOLUMNA Z FORMULARZEM -->
+        <div class="col-md-4 text-center border border-warning rounded shadow-lg p-4">
+            <p class="fst-italic text-light mb-4">
+                “Don’t tell me where your priorities are. Show me where you spend your money
+                and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
+            </p>
+            <img src="/images/achievement-3404945_1920.jpg" alt="Motywacyjny obraz"
+                class="img-fluid border border-warning rounded shadow-lg form-image">
         </div>
     </div>
 </div>
