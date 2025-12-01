@@ -1,0 +1,59 @@
+<div class="modal fade" id="editExpenseModal" tabindex="-1" aria-labelledby="editExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-warning">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning" id="editExpenseModalLabel">Edit Expense</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editExpenseForm">
+                    <!-- Hidden fields -->
+                    <input type="hidden" id="editExpenseCsrf" value="{{ csrf_token }}">
+                    <input type="hidden" id="editExpeneId" name="id">
+                    <input type="hidden" id="editExpeneDateFirst" name="dateFirst">
+                    <input type="hidden" id="editExpeneDateSecond" name="dateSecond">
+                    <div class="mb-3">
+                        <label for="editExpenseAmount" class="form-label text-warning">Amount</label>
+                        <input type="number" class="form-control bg-warning text-dark" id="editExpenseAmount"
+                            name="amount" step="0.01" required>
+                    </div>
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label for="editExpenseDate" class="form-label text-warning">Date</label>
+                        <input type="date" class="form-control bg-warning text-dark" id="editExpenseDate" name="date"
+                            required>
+                    </div>
+                    <!-- Category -->
+                    <div class="mb-3">
+                        <label for="editExpenseCategory" class="form-label text-warning">Category</label>
+                        <select class="form-select bg-warning text-dark" id="editExpenseCategory" name="category_id"
+                            required>
+                            {% for category in expenseCategories %}
+                            <option value="{{ category.id }}">{{ category.name|e }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Payment -->
+                    <div class="mb-3">
+                        <label for="editExpensePayment" class="form-label text-warning">Payment</label>
+                        <select class="form-select bg-warning text-dark" id="editExpensePayment" name="paymenr_id"
+                            required>
+                            {% for expensePayment in expensePayments %}
+                            <option value="{{ expensePayment.id }}">{{ expensePayment.name|e }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Info -->
+                    <div class="mb-3">
+                        <label for="editExpenseInfo" class="form-label text-warning">Additional Info</label>
+                        <textarea class="form-control bg-warning text-dark" id="editExpenseInfo" name="info"
+                            rows="2"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-warning text-dark">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

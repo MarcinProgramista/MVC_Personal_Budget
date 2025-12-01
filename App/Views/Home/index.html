@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block body %}
+{% if current_user %}
+<div class="container py-5">
+    <h1 class="text-center">Welcome, {{ current_user.name|capitalize }}!</h1>
+</div>
+{% else %}
+<div class="vh-100 text-white" style="background: url('/images/01.jpg') no-repeat center center/cover;">
+
+    <div class="container pt-5 ps-4 ps-md-5">
+        <div class="col-12 col-md-6">
+            <h1 class="display-4 fw-bold mb-3">
+                Welcome to <span class="text-warning">Personal&nbsp;Budget</span>
+            </h1>
+
+            <p class="fs-5 fst-italic mb-4 bg-dark rounded p-1">
+                “Manage your budget wisely — every penny counts.
+                Personal&nbsp;Budget helps you take control of your finances.”
+            </p>
+
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

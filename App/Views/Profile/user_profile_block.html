@@ -1,0 +1,24 @@
+<div class="border  border-warning  rounded shadow-lg mb-3">
+    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
+        <button id="toggleProfileBtn"
+            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1"
+            style="width: 100%;">
+            <span><i class="fas fa-user me-1"></i> User</span>
+            <span id="toggleProfileArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+        </button>
+    </div>
+    <div id="profileData" class="fade-section hidden pl-2" style="width: 100%;">
+        <dl class="text-light p-3">
+            <dt>Name</dt>
+            <dd id=" userName">{{ user.name|capitalize|e }}</dd>
+            <dt>Email</dt>
+            <dd id="userEmail">{{ user.email|e }}</dd>
+            <dt><a href="/profile/edit">
+                    <button class="btn btn-warning icon-btn">
+                        <i class="fas fa-pencil-alt pl-1"></i>
+                    </button>
+                </a></dt>
+        </dl>
+
+    </div>
+</div>

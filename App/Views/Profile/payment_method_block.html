@@ -1,0 +1,55 @@
+<div class="border border-warning rounded shadow-lg  bg-dark">
+    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
+        <button id="toggleListPaymentMethodBtn"
+            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
+            <span><i class="fas fa-credit-card"></i> Payment method</span>
+            <span id="togglePaymentArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+        </button>
+    </div>
+
+    <div id="paymentMethodListContainer" class="fade-section hidden d-flex align-items-center flex-column"
+        style="width: 100%;">
+
+        <ul id="paymentMethodList" class="list-group custom-list" style="width: 95%; margin: 1 auto;">
+            {% for paymentMethod in paymentMethods %}
+            <li
+                class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ paymentMethod.name }}</span>
+                    {% if paymentMethod.cash_limit is not none %}
+                    <small class="text-info">Limited: {{ paymentMethod.cash_limit }} PLN</small>
+                    {% endif %}
+                </div>
+                <span class="d-flex flex-row">
+                    <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+
+                        <i class="fas fa-pencil-alt text-success  edit-payment-method-category-modal" role="button"
+                            data-id="{{ paymentMethod.id }}" data-name="{{ paymentMethod.name }}"
+                            data-cash_limit="{{ paymentMethod.cash_limit | default('') }}"
+                            data-is_limit_active="{{ paymentMethod.is_limit_active }}"
+                            data-user_id="{{ paymentMethod.user_id }}" data-type="payment"></i></button>
+                    </button>
+                    <button
+                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+
+                        <i class="fas fa-trash-alt text-danger open-delete-payment-method-category-modal" role="button"
+                            data-type="payment" data-id="{{ paymentMethod.id }}" data-name="{{ paymentMethod.name }}"
+                            data-user_id="{{ paymentMethod.user_id }}"></i></button>
+
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="d-flex align-items-center" style="width: 95%;">
+            <button
+                class="btn  btn-outline-secondary  border border-warning text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1 open-add-category-modal"
+                data-type="payment"><span class="position-absolute start-0 ms-3">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span>Add Payment Method</span>
+            </button>
+        </div>
+    </div>
+</div>

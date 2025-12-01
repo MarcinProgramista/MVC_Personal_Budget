@@ -1,0 +1,105 @@
+<div class="border border-warning bg-dark rounded shadow-lg ">
+    {% if incomes %}
+    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
+        <button id="toggleListIncomesBalanceBtn"
+            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
+            <span><i class="fas fa-money-bill-wave me-1"></i> Incomes</span>
+            <span id="toggleIncomesBalanceArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+        </button>
+    </div>
+
+    <!-- 🔽 Sekcja z listą -->
+    <div id="incomeBalanceListContainer" class="fade-section hidden d-flex align-items-center flex-column"
+        style="width: 100%;">
+
+        <!-- 🔹 Lista przychodów -->
+        <ul id="incomeBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
+            {% for income in incomes %}
+            <li data-id="{{ income.id }}"
+                class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
+
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-row align-items-center ">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">{{ income.Category }}</span>
+                    </div>
+                </div>
+                <span class="d-flex flex-row">
+                    <span class="d-flex align-items-center">
+                        <strong class="text-light text-center mx-2">{{ income.Amount }} PLN</strong>
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- 🔹 Suma przychodów -->
+        <div class="d-flex align-items-center" style="width: 95%;">
+            <div
+                class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
+                SUM :<strong id="sumIncomes" class="text-light m-0">{{ sumAllIncomes }} PLN</strong>
+            </div>
+        </div>
+
+        <!-- 🔹 Wykres -->
+        <!-- <div id="piechart1" class="row justify-content-center bg-dark w-100" style="height: 400px;"></div> -->
+    </div>
+    {% else %}
+    <div class="d-flex flex-column align-items-center justify-content-center text-center p-4 my-3 fade-in">
+        <div class="border border-warning rounded-3 bg-dark shadow-lg p-4" style="max-width: 500px;">
+            <i class="fas fa-wallet fa-3x text-warning mb-3 pulse"></i>
+            <h3 class="text-light mb-2">No incomes found</h3>
+            <p class="text-secondary mb-3">There are no recorded incomes for this selected period.</p>
+            <a href="/incomes/index" class="btn btn-outline-warning">
+                <i class="fas fa-plus-circle me-1"></i> Add new income
+            </a>
+        </div>
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+<style>
+    /* 🔹 Efekt łagodnego pojawienia się */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 🔹 Subtelne pulsowanie ikony */
+    .pulse {
+        animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Reset password{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
+
+        <!-- LEWA KOLUMNA Z OBRAZEM -->
+        <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
+            <p class="fst-italic text-dark mb-4">
+                “Don’t tell me where your priorities are. Show me where you spend your money
+                and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
+            </p>
+            <img src="/images/large.jpg" alt="Motywacyjny obraz"
+                class="img-fluid border border-warning rounded shadow-lg form-image">
+        </div>
+
+        <!-- PRAWA KOLUMNA Z FORMULARZEM -->
+        <div class="col-md-5">
+            <div class="container pb-3 text-danger">
+                {% if user.errors is not empty %}
+                <p>Errors:</p>
+                <ul>
+                    {% for error in user.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="registration-form text-warning bg-dark">
+
+                <h1 class="mb-4 text-center p-4">Request password reset</h1>
+
+                <p class="mb-4 text-center p-4">Please check your email.</p>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

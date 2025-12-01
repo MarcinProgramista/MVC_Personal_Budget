@@ -1,0 +1,40 @@
+##############################
+# PHP MVC PROJECT (SAFE TEMPLATE)
+##############################
+
+# Composer vendor
+/vendor/
+
+# Environment variables (NEVER commit API keys)
+.env
+.env.local
+.env.dev
+.env.test
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.idea/
+.vscode/
+nbproject/
+
+# Logs
+*.log
+/logs/
+error_log
+
+# Cache & temp
+/tmp/
+.cache/
+*.cache
+*.temp
+*.tmp
+
+# OS artifacts
+*.swp
+*.swo
+
+# PHPUnit cache
+.phpunit.result.cache

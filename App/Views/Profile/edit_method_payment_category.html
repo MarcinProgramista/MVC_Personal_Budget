@@ -1,0 +1,53 @@
+<div class="modal fade" id="editCategoryMethodPyamentModal" tabindex="-1"
+    aria-labelledby="editCategoryMethodPyamentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <form id="editCategoryMethodPyamentForm">
+                <div class="modal-header bg-dark text-warning">
+                    <h5 class="modal-title" id="editCategoryMethodPyamentModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label for="categoryMethodPyamentName" class="form-label fw-bold text-warning">Name</label>
+                        <input type="text" class="form-control form-control-sm bg-warning"
+                            id="categoryEditMethodPyamentName" name="name" required>
+                        <div class="invalid-feedback" id="categoryEditMethodPyamentError">Please enter a name.</div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input bg-warning" type="checkbox"
+                            id="categoryEditMethodPyamentLimitActive" name="is_limit_active">
+                        <label class="form-check-label fw-bold text-warning"
+                            for="categoryEditMethodPyamentLimitActive">Activate cash
+                            limit</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoryEditMethodPyamentCashLimit" class="form-label text-warning">Cash Limit
+                            (optional)</label>
+                        <input type="number" step="1" class="form-control form-control-sm bg-warning"
+                            id="categoryEditMethodPyamentCashLimit" name="cash_limit" placeholder="Limit is blocked now"
+                            disabled>
+                    </div>
+
+                    <!-- 🔹 DODAJ TEN UKRYTY INPUT -->
+                    <input type="hidden" id="categoryEditMethodPyamentUserId" name="user_id">
+                    <input type="hidden" name="csrf_token" id="editPaymentCsrf" value="{{ csrf_token }}">
+
+
+                </div>
+
+
+
+                <div class="modal-footer bg-dark">
+                    <button type="submit" class="btn btn-warning">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

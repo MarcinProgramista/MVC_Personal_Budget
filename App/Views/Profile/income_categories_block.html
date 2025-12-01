@@ -1,0 +1,90 @@
+<div class="border border-warning bg-dark rounded shadow-lg mb-2">
+  <div
+    class="d-flex align-items-center p-1"
+    style="width: 100%; column-gap: 10px"
+  >
+    <button
+      id="toggleListIncomesBtn"
+      class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1"
+    >
+      <span><i class="fas fa-money-bill-wave me-1"></i> Income categories</span>
+      <span id="toggleIncomesArrow"
+        ><i class="fas fa-arrow-down text-warning"></i
+      ></span>
+    </button>
+  </div>
+  <!-- 🔽 Sekcja z listą -->
+  <div
+    id="incomeListContainer"
+    class="fade-section hidden d-flex align-items-center d-flex flex-column"
+    style="width: 100%"
+  >
+    <ul
+      id="incomeCategoriesList"
+      class="list-group custom-list"
+      style="width: 95%; margin: 0 auto"
+    >
+      {% for incomeCategory in incomeCategories %}
+      <li
+        data-category-id="{{ incomeCategory.id }}"
+        class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light"
+      >
+        <div class="d-flex flex-column">
+          <div class="d-flex flex-row align-items-center">
+            <i class="fas fa-circle me-2 text-success"></i>
+            <span class="fw-bold">{{ incomeCategory.name }}</span>
+          </div>
+
+          {% if incomeCategory.cash_limit is not none %}
+          <small class="text-info"
+            >Limited: {{ incomeCategory.cash_limit }} PLN</small
+          >
+          {% endif %}
+        </div>
+
+        <span class="d-flex flex-row">
+          <button
+            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1"
+          >
+            <i
+              class="fas fa-pencil-alt text-success open-edit-income-category-modal"
+              data-id="{{ incomeCategory.id }}"
+              data-name="{{ incomeCategory.name|escape }}"
+              data-cash_limit="{{ incomeCategory.cash_limit | default('') }}"
+              data-is_limit_active="{{ incomeCategory.is_limit_active }}"
+              data-user_id="{{ incomeCategory.user_id }}"
+              data-type="income"
+            ></i>
+          </button>
+
+          <button
+            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1"
+          >
+            <i
+              class="fas fa-trash-alt text-danger open-delete-income-category-modal"
+              data-id="{{ incomeCategory.id }}"
+              data-name="{{ incomeCategory.name|escape }}"
+              data-user_id="{{ incomeCategory.user_id }}"
+              data-type="income"
+            ></i>
+          </button>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="d-flex align-items-center" style="width: 95%">
+      <button
+        class="btn btn-outline-secondary border border-warning text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1 open-add-category-income-modal"
+        data-type="income"
+      >
+        <!-- Ikona po lewej -->
+        <span class="position-absolute start-0 ms-3">
+          <i class="fas fa-plus"></i>
+        </span>
+        <!-- Tekst na środku -->
+        <span>Add category</span>
+      </button>
+    </div>
+  </div>
+</div>

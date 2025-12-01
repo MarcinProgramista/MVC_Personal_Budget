@@ -1,0 +1,434 @@
+{% extends "base.html" %} {% block title %}Balances{% endblock %} {% block body
+%} {% if current_user %}
+<div
+  class="border-bottom-1 border-success m-4 text-success"
+  style="border-bottom: 2px solid"
+>
+  {% if nameMonth %}
+  <h1 class="text-start">Balances for {{ nameMonth }}</h1>
+  {% else %}
+  <h1 class="text-start">
+    Balances from {{ dateFirst }} till {{ dateSecond }}
+  </h1>
+  {% endif %}
+</div>
+
+<div class="expense-bg"></div>
+{% if sum < 0 %}
+<div
+  class="justify-content-center align-items-center g-1 text-center text-danger"
+>
+  <h1 id="balanceSum">{{ sum }} PLN</h1>
+</div>
+{% elseif sum > 0 %}
+<div
+  class="justify-content-center align-items-center g-1 text-center text-success"
+>
+  <h1 id="balanceSum">{{ sum }} PLN</h1>
+</div>
+{% else %}
+<div
+  class="justify-content-center align-items-center g-1 text-center text-success"
+>
+  <h1 id="balanceSum">{{ sum }} PLN</h1>
+</div>
+{% endif %}
+<div class="d-flex justify-content-center">
+  <div
+    class="border border-info bg-dark rounded shadow-lg d-flex align-items-center p-1 mp-1 col-6"
+  >
+    <button
+      class="btn btn-outline-info text-dark d-flex justify-content-center align-items-center flex-grow-1 ai-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#adviceModal"
+    >
+      <i class="bi bi-robot"></i> AI Advice
+    </button>
+  </div>
+</div>
+
+{% if (incomes is not defined or incomes|length == 0) and (expenses is not
+defined or expenses|length == 0) and (sum == 0) %}
+<div
+  id="budgetAlert"
+  class="alert alert-info custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+  role="alert"
+>
+  <i class="bi bi-credit-card mb-2 fs-3"></i>
+  <div class="fst-italic">
+    It looks like you haven’t added any incomes or expenses yet. Start by
+    entering your first transaction to see your budget in action!
+  </div>
+</div>
+{% elseif sum < 0 %}
+<div
+  id="budgetAlert"
+  class="alert alert-danger custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+  role="alert"
+>
+  <i class="bi bi-emoji-frown mb-2 fs-3"></i>
+  <div class="fst-italic">
+    You’re spending more than you earn right now. Don’t worry — every step
+    toward balance counts! Review your budget and see where small changes can
+    make a big difference.
+  </div>
+</div>
+{% elseif sum > 0 %}
+<div
+  id="budgetAlert"
+  class="alert alert-success custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+  role="alert"
+>
+  <i class="bi bi-emoji-smile mb-2 fs-3"></i>
+  <div class="fst-italic">
+    Great job! You’re earning more than you spend. Keep up the good habits and
+    consider setting some of that extra income aside for your goals.
+  </div>
+</div>
+{% else %}
+<div
+  id="budgetAlert"
+  class="alert alert-warning custom-alert d-flex flex-column justify-content-center align-items-center text-center"
+  role="alert"
+>
+  <i class="bi bi-emoji-neutral mb-2 fs-3"></i>
+  <div class="fst-italic">Your budget is perfectly balanced.</div>
+</div>
+{% endif %}
+
+<div class="row justify-content-center align-items-center g-1">
+  {% if incomes %}
+  <div
+    id="piechart1"
+    class="justify-content-center bg-dark col-5 left-column"
+    style="height: 400px; margin-bottom: 50px"
+  ></div>
+  {% endif %} {% if expenses %}
+  <div
+    id="piechartExpenses"
+    class="row justify-content-center bg-dark col-5 right-column"
+    style="height: 400px; margin-bottom: 50px"
+  ></div>
+  {% endif %}
+  <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+    <!-- 🔘 Przycisk pokazujący listę incomes-->
+    {% include "Balances/income_balance_block.html" %}
+  </div>
+  <!-- 🔘 Przycisk pokazujący listę expenses-->
+  <div class="col-md-11 text-center border border-warning m-1 p-1 right-column">
+    {% include "Balances/expense_balance_block.html" %}
+  </div>
+  <!-- 🔘 Przycisk pokazujący listę incomes details-->
+  <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+    <!-- 🔘 Przycisk pokazujący listę incomes-->
+    {% include "Balances/income_details_balance_block.html" %}
+  </div>
+  <div class="col-md-11 text-center border border-warning m-1 p-1 left-column">
+    <!-- 🔘 Przycisk pokazujący listę expenses-->
+    {% include "Balances/expense_details_balance_block.html" %}
+  </div>
+</div>
+
+{% endif %}
+<script>
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart);
+  window.addEventListener("resize", drawChart);
+
+  function drawChart() {
+    const chartDiv = document.getElementById("piechart1");
+
+    // Jeśli globalna tablica nie istnieje — zakończ
+    if (!chartDiv || !window.incomesData || window.incomesData.length === 0)
+      return;
+
+    const dataArray = [["Category", "Amount"]];
+
+    window.incomesData.forEach((income) => {
+      dataArray.push([income.Category, parseFloat(income.Amount)]);
+    });
+
+    const data = google.visualization.arrayToDataTable(dataArray);
+
+    const options = {
+      title: "Incomes",
+      backgroundColor: "#212529",
+      titleTextStyle: { color: "#f8f9fa" },
+      legend: { textStyle: { color: "#f8f9fa" } },
+      pieSliceTextStyle: { color: "#212529" },
+      chartArea: { width: "90%", height: "80%" },
+      animation: { startup: true, duration: 300, easing: "out" },
+    };
+
+    const chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+</script>
+
+<script src="/js/balances.js?v={{ random() }}"></script>
+<script>
+  // automatyczne ukrycie po 3 sekundach
+  setTimeout(() => {
+    const alert = document.getElementById("budgetAlert");
+    if (alert) {
+      alert.classList.add("fade-out");
+      setTimeout(() => alert.remove(), 1000); // usuń element po zakończeniu animacji
+    }
+  }, 3000);
+</script>
+<!-- Modal AI Advice -->
+<div
+  class="modal fade"
+  id="adviceModal"
+  tabindex="-1"
+  aria-labelledby="adviceModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content ai-modal-bg">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-info fw-bold" id="adviceModalLabel">
+          <i class="bi bi-robot"></i> Smart Financial Analysis
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- AI ANALYSIS -->
+        <div class="ai-advice-box p-3 mb-4">
+          <div class="advice-text text-light" id="aiAdviceBox">
+            Click AI Advice to load analysis...
+          </div>
+        </div>
+
+        <!-- BAR CHART -->
+        <div id="paiBarChart" style="height: 350px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelector(".ai-btn").addEventListener("click", async () => {
+    const box = document.getElementById("aiAdviceBox");
+    box.innerHTML = "<div class='text-info'>Loading AI advice...</div>";
+
+    const res = await fetch("/balances/get-advice");
+    const data = await res.json();
+
+    if (data.status === "success") {
+      box.innerHTML = data.advice.replace(/\n/g, "<br>");
+    } else {
+      box.innerHTML = "<div class='text-danger'>AI service unavailable.</div>";
+    }
+  });
+</script>
+
+{% endblock %} {% block footer %}
+<style>
+  .ai-btn {
+    font-size: 1.1rem;
+    padding: 10px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .ai-advice {
+    background: #1b1b1b;
+    border-radius: 14px;
+    max-width: 700px;
+    width: 100%;
+    color: #e9ecef;
+    border: 1px solid rgba(0, 168, 255, 0.25);
+    position: relative;
+  }
+
+  /* Elegancki neon AI glow */
+  .shadow-ai {
+    box-shadow: 0 0 10px rgba(0, 190, 255, 0.35),
+      0 0 25px rgba(0, 190, 255, 0.25), 0 0 45px rgba(0, 190, 255, 0.2);
+  }
+
+  /* Tekst z ładnym line-height */
+  .advice-text {
+    font-size: 1.05rem;
+    line-height: 1.55rem;
+  }
+
+  .ai-btn {
+    font-size: 1.1rem;
+    padding: 10px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #00befe, #00e5ff);
+    border: none;
+    color: #0a0a0a;
+    box-shadow: 0 0 12px rgba(0, 190, 255, 0.55);
+    transition: 0.3s ease;
+  }
+
+  .ai-btn:hover {
+    background: linear-gradient(135deg, #00e5ff, #00befe);
+    box-shadow: 0 0 20px rgba(0, 225, 255, 0.7);
+  }
+
+  /* Modal dark theme */
+  .ai-modal-bg {
+    background: #1b1b1b;
+    color: #e9ecef;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 168, 255, 0.25);
+    box-shadow: 0 0 20px rgba(0, 190, 255, 0.25);
+  }
+
+  .ai-advice-box {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(0, 168, 255, 0.25);
+    border-radius: 14px;
+    backdrop-filter: blur(4px);
+  }
+
+  .left-column,
+  .right-column {
+    background: linear-gradient(145deg, #1c1c1c, #222);
+    border: 1px solid #ffc107;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+    transition: all 0.4s ease;
+    animation: fadeIn 0.5s ease;
+    position: relative;
+    z-index: 1;
+    margin: 10px;
+    opacity: 0.6;
+  }
+
+  .custom-alert {
+    opacity: 0.9;
+    background-color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-style: italic;
+    border-radius: 0.75rem;
+    transition: opacity 1s ease-in-out;
+  }
+
+  .custom-alert.fade-out {
+    opacity: 0;
+  }
+</style>
+
+{% include 'Balances/edit_income.html' %} {% include'Balances/edit_expense.html'
+%} {% include 'Balances/delete_expense.html' %} {% include
+'Balances/delete_income.html' %}
+<script src="/js/toast.js?v={{ random() }}"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="/js/edit_income.js?v={{ random() }}"></script>
+<script src="/js/edit_expense.js?v={{ random() }}"></script>
+<script src="/js/delete_expense.js?v={{ random() }}"></script>
+<!-- <script src="/js/delete_income.js?v={{ random() }}"></script> -->
+<script>
+  // Inicjalizacja GLOBALNEJ tablicy (jedno źródło prawdy)
+  window.incomesData = {{ incomes ? incomes|json_encode|raw : '[]' }};
+
+  // Jeżeli backend zwraca szczegóły (wiele wpisów tej samej kategorii),
+  // możemy pogrupować je funkcją groupByCategory przed rysowaniem wykresu.
+  function groupByCategory(items) {
+    const map = new Map();
+    items.forEach(i => {
+      const cat = i.Category ?? i.category ?? 'Unknown';
+      const amount = Number(i.Amount ?? i.amount ?? 0);
+      map.set(cat, (map.get(cat) || 0) + amount);
+    });
+    // zwróć w formacie oczekiwanym przez wykres: [{Category, Amount}, ...]
+    return Array.from(map.entries()).map(([Category, Amount]) => ({ Category, Amount }));
+  }
+
+  google.charts.load('current', { packages: ['corechart'] });
+  google.charts.setOnLoadCallback(drawChart);
+  window.addEventListener('resize', drawChart);
+
+  function drawChart() {
+    const chartDiv = document.getElementById('piechart1');
+    if (!chartDiv) return;
+
+    // jeżeli brak danych - wyczyść miejsce i wyjdź
+    if (!Array.isArray(window.incomesData) || window.incomesData.length === 0) {
+      chartDiv.innerHTML = '<div class="text-center text-secondary p-3">No data</div>';
+      return;
+    }
+
+    // jeśli elementy mają już sumę po Category (Amount number), używamy bez zmian.
+    // ale bezpiecznie pogrupujemy - groupByCategory zapewni poprawną postać.
+    const prepared = groupByCategory(window.incomesData);
+
+    const dataArray = [['Category', 'Amount']];
+    prepared.forEach(item => {
+      dataArray.push([item.Category, Number(item.Amount)]);
+    });
+
+    const data = google.visualization.arrayToDataTable(dataArray);
+
+    const options = {
+      title: 'Incomes',
+      backgroundColor: '#212529',
+      titleTextStyle: { color: '#f8f9fa' },
+      legend: { textStyle: { color: '#f8f9fa' } },
+      pieSliceTextStyle: { color: '#212529' },
+      chartArea: { width: '90%', height: '80%' },
+      animation: { startup: true, duration: 300, easing: 'out' }
+    };
+
+    const chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+</script>
+
+<script
+  type="text/javascript"
+  src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="text/javascript">
+  // 🔹 Globalna tablica danych dla wydatków
+  window.expensesData = {{ expenses ? expenses|json_encode|raw : '[]' }};
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawExpenseChart);
+  window.addEventListener("resize", drawExpenseChart); // responsywny wykres
+
+  function drawExpenseChart() {
+    const chartDiv = document.getElementById("piechartExpenses");
+    if (!chartDiv) return; // ❗ div nie istnieje → wyjście
+
+    // ❗ brak danych → pokazujemy info zamiast błędu JS
+    if (!Array.isArray(window.expensesData) || window.expensesData.length === 0) {
+      chartDiv.innerHTML =
+        '<div class="text-center text-secondary p-3">No data</div>';
+      return;
+    }
+
+    const dataArray = [["Category", "Amount"]];
+
+    window.expensesData.forEach((expense) => {
+      dataArray.push([expense.Category, Number(expense.Amount)]);
+    });
+
+    const data = google.visualization.arrayToDataTable(dataArray);
+
+    const options = {
+      title: "Expenses",
+      backgroundColor: "#212529",
+      titleTextStyle: { color: "#f8f9fa" },
+      legend: { textStyle: { color: "#f8f9fa" } },
+      pieSliceTextStyle: { color: "#212529" },
+      chartArea: { width: "90%", height: "80%" },
+      animation: { startup: true, duration: 300, easing: "out" }
+    };
+
+    const chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+</script>
+
+{% endblock %}

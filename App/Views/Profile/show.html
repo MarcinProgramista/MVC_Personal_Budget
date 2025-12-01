@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="/style/custom.css">
+{% endblock %}
+{% block body %}
+<div class="container my-5">
+    {% if user.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for error in user.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="row justify-content-center align-items-center" style="column-gap:50px;">
+        <div class="col-md-12">
+            <div class="border-bottom-1 border-light m-4" style="border-bottom: 2px solid; ">
+                <h1 class="text-start ">Settings</h1>
+            </div>
+            <!-- 🔘 Przycisk pokazujący dane użytkownika -->
+            {% include "Profile/user_profile_block.html" %}
+            <!-- 🔘 Przycisk pokazujący listę expenses-->
+            {% include "Profile/expense_categories_block.html" %}
+            <!-- 🔘 Przycisk pokazujący listę incomes-->
+            {% include "Profile/income_categories_block.html" %}
+            <!-- 🔘 Przycisk pokazujący listę payment methods-->
+            {% include "Profile/payment_method_block.html" %}
+            <!-- 🔘 Przycisk pokazujący listę incomes-->
+
+        </div>
+    </div>
+</div>
+
+{% include 'Profile/add_method_payment_category.html' %}
+{% include 'Profile/add_income_category.html' %}
+{% include 'Profile/add_expense_category.html' %}
+{% include 'Profile/edit_expense_category.html' %}
+{% include 'Profile/edit_income_category.html' %}
+{% include 'Profile/edit_method_payment_category.html' %}
+{% include 'Profile/delete_method_payment_category.html' %}
+{% include 'Profile/delete_expense_category.html' %}
+{% include 'Profile/delete_income_category.html' %}
+<!-- ✅ Najpierw toast.js -->
+<script src="/js/toast.js?v={{ random() }}"></script>
+<script src="/js/add_method_payment_category.js?v={{ random() }}"></script>
+<script src="/js/add_income_category.js?v={{ random() }}"></script>
+<script src="/js/add_expense_category.js?v={{ random() }}"></script>
+<script src="/js/edit_expense_category.js?v={{ random() }}"></script>
+<script src="/js/edit_income_category.js?v={{ random() }}"></script>
+<script src="/js/edit_payment_method_category.js?v={{ random() }}"></script>
+<script src="/js/delete_payment_method_category.js?v={{ random() }}"></script>
+<script src="/js/delete_expense_category.js?v={{ random() }}"></script>
+<script src="/js/delete_income_category.js?v={{ random() }}"></script>
+<script src="/js/profile.js?v={{ random() }}"></script>
+{% endblock %}

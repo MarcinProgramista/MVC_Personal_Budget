@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block footer %}
+<script src="/js/hideShowPassword.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Show/hide password plugin
+        $('#inputPassword').hideShowPassword({
+            show: false,
+            innerToggle: true,
+            toggle: {
+                className: 'btn btn-sm btn-dark hide-password-btn hideShowPassword-toggle',
+                content: '<i class="fa fa-eye"></i>',
+                attr: {
+                    'aria-label': 'Show password',
+                    title: 'Show password'
+                }
+            },
+            states: {
+                shown: { toggle: { content: '<i class="fa fa-eye-slash"></i>', attr: { title: 'Hide password' } } },
+                hidden: { toggle: { content: '<i class="fa fa-eye"></i>', attr: { title: 'Show password' } } }
+            }
+        });
+    });
+</script>
+
+<style>
+    .hideShowPassword-wrapper {
+        position: relative !important;
+        display: inline-block !important;
+        width: 100% !important;
+        height: 70px;
+    }
+
+
+    .hideShowPassword-toggle {
+        position: absolute !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        right: 12px;
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+{% block body %}
+
+<div class="container my-5">
+    <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
+
+        <!-- LEWA KOLUMNA Z OBRAZEM -->
+        <div class="col-md-5">
+            <div class="container pb-3 text-danger">
+                {% if user.errors is not empty %}
+                <p>Errors:</p>
+                <ul>
+                    {% for error in user.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <form method="post" action="/login/create" class="registration-form text-warning bg-dark" id="fromLogin">
+
+                <h1 class="mb-4 text-center p-4">Log in</h1>
+
+                <div class="form-group" style="padding: 10px;">
+                    <label for="inputEmail"><i class="far fa-envelope"></i></label>
+                    <input type="email" class="form-control p-2 w-100" id="inputEmail" name="email" value="{{email }}"
+                        placeholder="E-mail address" required>
+                </div>
+
+                <!-- Pole hasła -->
+                <div class="form-group" style="padding: 10px;">
+                    <label for="inputPassword"><i class="fas fa-key"></i></label>
+                    <input type="password" class="form-control p-2 w-100" id="inputPassword" name="password"
+                        placeholder="Password" required>
+
+                </div>
+                <div class="form-group" style="padding: 10px;">
+                    <label> <input type="checkbox" name="remember_me" {% if remember_me %} checked="checked" {% endif
+                            %} />
+                        Remember me</label>
+
+                </div>
+                <div class="text-center">
+
+                    <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">Log in</button>
+                </div>
+                <div class="text-center">
+                    <a class="text-center p-2 text-light" href="/password/forgot">Fogot password?</a>
+                </div>
+
+            </form>
+        </div>
+
+
+        <!-- PRAWA KOLUMNA Z FORMULARZEM -->
+        <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
+            <p class="fst-italic text-light mb-4">
+                “Don’t tell me where your priorities are. Show me where you spend your money
+                and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
+            </p>
+            <img src="/images/02.jpg" alt="Motywacyjny obraz"
+                class="img-fluid border border-warning rounded shadow-lg form-image">
+        </div>
+    </div>
+</div>
+
+{% endblock %}

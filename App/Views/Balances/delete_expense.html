@@ -1,0 +1,26 @@
+<div class="modal fade" id="deleteExpenseModal" tabindex="-1" aria-labelledby="deleteExpenseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-warning">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning" id="deleteExpenseModalLabel">Delete Expense</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="deleteExpenseInfo" class="fw-bold mb-2 text-warning">Do you want to delete bellow
+                    expense?:
+                </p>
+                <div id="deleteExpenseDetails" class="text-danger text-start fw-bold mb-2"></div>
+                <form id="deleteExpenseForm">
+                    <input type="hidden" id="deleteExpenseId">
+                    <input type="hidden" id="deleteExpenseCsrf" value="{{ csrf_token }}">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="confirmDeleteExpenseButton" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Moja aplikacja{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Własne style -->
+    <link rel="stylesheet" href="/css/all.css" />
+    <link rel="stylesheet" href="/style/custom.css" />
+
+    <!-- Google Charts (MUSI BYĆ!) -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+
+  <body class="bg-dark text-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <!-- Lewa strona: logo -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+          <span class="text-warning me-2"><i class="fas fa-wallet"></i></span>
+          <span class="d-none d-lg-inline text-uppercase">
+            <span class="text-warning">Personal</span>
+            <span class="text-white">Budget</span>
+          </span>
+          <span class="d-lg-none text-white">Personal Budget</span>
+        </a>
+
+        <!-- Toggler (hamburger) -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Zawartość nawigacji (środek + prawa strona) -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          {# ŚRODKOWA SEKCJA: wyświetlana tylko dla zalogowanych #} {% if
+          current_user %}
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link text-warning" href="/incomes/index">
+                <i class="fas fa-money-bill-wave me-1"></i> Add income
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link text-warning" href="/expenses/index">
+                <i class="fas fa-shopping-basket me-1"></i> Add expense
+              </a>
+            </li>
+
+            {% if balance %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-warning"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-calendar-alt me-1"></i> Choose balance period
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-dark"
+                aria-labelledby="navbarDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="/balances/index"
+                    >Current month</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/balances/show-last-month"
+                    >Last month</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    >Choose period</a
+                  >
+                </li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link text-warning" href="/balances/index">
+                <i class="fas fa-chart-pie me-1"></i> Balance overview
+              </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-item">
+              <a class="nav-link text-warning" href="/profile/show">
+                <i class="fas fa-cog me-1"></i> Settings
+              </a>
+            </li>
+          </ul>
+          {% endif %} {# PRAWA STRONA: logowanie / wylogowanie (zawsze po
+          prawej) #}
+          <div class="d-flex ms-lg-auto align-items-center">
+            {% if current_user %}
+            <span class="text-white me-3"
+              >Welcome, {{ session.user_name|capitalize|e }}</span
+            >
+            <a href="/logout" class="btn btn-outline-light">Log out</a>
+            {% else %}
+            <a href="/login" class="btn btn-outline-warning me-2">Log in</a>
+            <a href="/signup/new" class="btn btn-warning">Sign up</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {% for message in flash_messages %}
+    <div class="container">
+      <div class="row pt-3">
+        <div class="col-12 text-center mx-auto  alert alert-{{ message.type }}">
+          {{ message.body}}
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% block body %} {% endblock %}
+
+    <!-- base.html -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block footer %}{% endblock %}
+
+    <!-- 🟡 Modal: Choose Period -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="choosePeriodLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border border-warning">
+          <div class="modal-header border-warning">
+            <h5 class="modal-title text-warning" id="choosePeriodLabel">
+              <i class="fas fa-calendar-alt me-2"></i>Choose Custom Period
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <form
+            method="POST"
+            action="/balances/sendChosenDates"
+            id="choosePeriodForm"
+          >
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="dateFirst" class="form-label text-warning"
+                  >Start date:</label
+                >
+                <input
+                  type="date"
+                  class="form-control bg-warning border border-warning text-dark"
+                  id="dateFirst"
+                  name="dateFirst"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="dateSecond" class="form-label text-warning"
+                  >End date:</label
+                >
+                <input
+                  type="date"
+                  class="form-control bg-warning border border-warning text-dark"
+                  id="dateSecond"
+                  name="dateSecond"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="modal-footer border-warning">
+              <button
+                type="button"
+                class="btn btn-outline-light"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-warning fw-bold">
+                <i class="fas fa-check me-1"></i>Confirm
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

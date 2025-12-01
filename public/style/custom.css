@@ -1,0 +1,314 @@
+body {
+    background-color: #333;
+    /* jasne, czyste tło */
+    color: wheat;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.logo {
+    background-color: #000
+}
+
+.modal-content {
+    border-radius: 1rem;
+}
+
+.btn-primary {
+    border-radius: 8px;
+}
+
+/* Formularz rejestracji */
+.registration-form {
+    max-width: 500px;
+    /* maksymalna szerokość formularza */
+    margin: 40px auto;
+    /* wyśrodkowanie i odstęp od góry */
+    border-radius: 10px;
+    /* lekko zaokrąglone rogi */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    /* cień dla desktopu */
+    transition: all 0.3s ease-in-out;
+
+
+}
+
+/* Hover - delikatne powiększenie formularza przy najechaniu */
+.registration-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Responsywność dla urządzeń mobilnych */
+@media (max-width: 576px) {
+    .registration-form {
+        margin: 20px 15px;
+        /* mniejsze marginesy na telefonach */
+        padding: 20px;
+        /* zmniejszone paddingi */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        /* mocniejszy cień na małym ekranie */
+    }
+}
+
+.form-control:focus {
+    color: #212529;
+    background-color: #ffc107;
+    border-color: black;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem #ffc107;
+    width: 150px;
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
+}
+
+#editCategoryName {
+    background-color: #ffc107;
+
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
+}
+
+#editCategoryLimit {
+    background-color: #ffc107;
+
+    width: 95%;
+    /* szerokość */
+    height: 30px;
+    /* wysokość */
+    font-size: 0.9rem;
+    /* mniejszy tekst */
+    padding: 0.25rem 0.5rem;
+    /* mniejsze paddingi */
+}
+
+.form-control.input {
+    background-color: #ffc107;
+}
+
+.input:focus {
+
+    box-shadow: 0 0 10px #ffc107;
+    background-color: #ffc107;
+}
+
+.select {
+    background-color: #ffc107;
+}
+
+.guest-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/images/01.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: 0;
+}
+
+/* Komunikaty walidacji */
+form#formSignup label.error {
+    color: red !important;
+    font-size: 0.9rem;
+    padding-top: 6px;
+    display: block;
+}
+
+form#formSignup #inputPassword.form-control {
+    height: 40px !important;
+    line-height: 1.5 !important;
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+
+.hideShowPassword-toggle {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 12px;
+    z-index: 10;
+}
+
+form#formSignup .hideShowPassword-wrapper {
+    position: relative !important;
+    display: inline-block !important;
+    width: 100% !important;
+    height: 70px;
+}
+
+.fixed-btn-width {
+    width: 450px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+}
+
+/* Płynne rozwijanie sekcji */
+.fade-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.fade-section.show {
+    opacity: 1;
+    max-height: 1000px;
+    /* wystarczająco dużo */
+    transform: scaleY(1);
+}
+
+.fade-section-list {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Styl listy */
+.custom-list {
+    margin-top: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.custom-list .list-group-item {
+    background-color: transparent;
+    color: grey;
+    border: 1px solid #212529;
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-list .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.custom-list .list-group-item i {
+    color: grey;
+}
+
+/* Płynne rozwijanie sekcji */
+.fade-section {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
+}
+
+.fade-section.show {
+    opacity: 1;
+    max-height: 2000px;
+    /* duża wartość wystarczająca dla całej listy */
+    transform: scaleY(1);
+}
+
+
+.fade-section-list {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: scaleY(0.95);
+    transform-origin: top;
+    transition: opacity 0.6s ease, max-height 0.6s ease, transform 0.4s ease;
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Styl listy */
+.custom-list {
+    margin-top: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.custom-list .list-group-item {
+    background-color: transparent;
+    color: grey;
+    border: 1px solid #212529;
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-list .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.custom-list .list-group-item i {
+    color: grey;
+}
+
+.hidden {
+    display: none;
+}
+
+.fade-section.show {
+    display: flex !important;
+}
+
+/* 🔥 Animacja usuwania kategorii income*/
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(-10px);
+}
+
+#deleteCategoryName {
+    color: red !important;
+    font-weight: bold;
+    display: block !important;
+}
+
+#message:focus {
+    border-color: #ffc107;
+    /* border-warning */
+    outline: none;
+}
+
+#message::placeholder {
+    color: #f8f9fa;
+    /* text-light */
+    opacity: 1;
+}

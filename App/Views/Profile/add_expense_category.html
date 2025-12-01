@@ -1,0 +1,45 @@
+<div class="modal fade" id="addCategoryExpenseModal" tabindex="-1" aria-labelledby="addCategoryExpenseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <form id="addCategoryExpenseForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="modal-header bg-dark text-warning">
+                    <h5 class="modal-title" id="addCategoryExpenseModalLabel">Add Category</h5>
+                    <button type="button" class="btn-close bg-warning" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label for="categoryExpenseName" class="form-label text-warning fw-bold">Name</label>
+                        <input type="text" class="form-control bg-warning form-control-sm" id="categoryExpenseName"
+                            name="name" required>
+                        <div class="invalid-feedback" id="categoryExpenseError">Please enter a name.</div>
+                    </div>
+
+                    <div class="form-check  mb-3">
+                        <input class="form-check-input bg-warning" type="checkbox" id="categoryExpenseLimitActive"
+                            name="is_limit_active">
+                        <label class="form-check-label text-warning" for="categoryExpenseLimitActive">Activate cash
+                            limit</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoryExpenseCashLimit" class="form-label text-warning">Cash Limit
+                            (optional)</label>
+                        <input type="number" step="0.01" class="form-control bg-warning form-control-sm"
+                            id="categoryExpenseCashLimit" name="cash_limit" placeholder="Limit is blocked now" disabled>
+
+
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-dark">
+                    <button type="submit" class="btn btn-warning">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

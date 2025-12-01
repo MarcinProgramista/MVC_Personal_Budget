@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Add Income{% endblock %}
+{% block body %}
+<div class="container-fluid ">
+    <div class="row justify-content-center align-items-center g-1">
+        <!-- LEWA KOLUMNA blisko lewej krawędzi -->
+        <div class="col-md-5 text-center border border-warning  p-4 left-column" id="leftColumn">
+            <h1 class="mb-4 text-center"><i class="fas fa-coins me-2"></i>Add Expense</h1>
+            <form method="post" action="/expenses/new" class="registration-form text-warning bg-dark"
+                id="fromAddExpense" novalidate>
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <input type="number" id="amount" name="amount" value="{{ expense.amount }}"
+                        class="form-control bg-dark text-light border-warning" placeholder="Enter amount">
+                </div>
+                <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
+                    <span class="input-group-text bg-dark text-warning border-warning">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                    <input type="date" name="dateExpense" class="form-control bg-dark text-light border-warning"
+                        value="{{ dateExpense }}">
+                </div>
+                <!-- SELECT Category-->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning mb-3"
+                    id="expenseCategorySelect" name="expenseCategoryName">
+                    {% if expense.nameCategory %}
+                    {% for expenseCategory in expenseCategories %}
+                    <option value="{{ expenseCategory.name | escape }}" data-id="{{ expenseCategory.id }}" {% if
+                        expense.expenseCategory==expenseCategory.name %}selected{% endif %}>
+                        {{ expenseCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option selected disabled>-- Select expense category --</option>
+                    {% for expenseCategory in expenseCategories %}
+                    <option value="{{ expenseCategory.name | escape }}" data-id="{{ expenseCategory.id }}">
+                        {{ expenseCategory.name }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+                <!-- SELECT Payment Method-->
+                <select class="form-select form-select-sm bg-dark text-light border border-warning mb-3"
+                    id="namePayment" name="namePayment">
+                    {% if expense.namePayment %}
+                    {% for expensePayment in expensePayments %}
+                    <option value="{{ expensePayment.name | escape }}" data-id="{{ expensePayment.id }}" {% if
+                        expense.namePayment==expensePayment.name %}selected{% endif %}>
+                        {{ expensePayment.name }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option selected disabled>-- Select payment method-</option>
+                    {% for expensePayment in expensePayments %}
+                    <option value="{{ expensePayment.name | escape }}" data-id="{{ expensePayment.id }}">
+                        {{ expensePayment.name }}
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+                <textarea id="message" name="messageExpense" rows="4"
+                    class="col-10 input-group mt-3 bg-dark text-light border border-warning mb-5"
+                    placeholder="Enter your comment here">{{ expense.messageExpense }}</textarea>
+
+                <div class="col-9 input-group col-md-9 pb-1 text-center">
+                    <button type="submit" class="btn btn-outline-success text-white col-12">Add Expense</button>
+                </div>
+            </form>
+        </div>
+        <!-- PRAWA KOLUMNA Z WYNIKIEM -->
+        <div class="col-md-4 position-relative right-column">
+            <!-- 🔹 TŁO Z OBRAZKIEM – ZAWSZE WIDOCZNE -->
+            <div class="expense-bg"></div>
+
+            <!-- 🔹 ZAWARTOŚĆ KATEGORII (pojawia się po wybraniu kategorii) -->
+            <div id="selectedCategoryDiv" class="hidden1">
+                <div class="info-card text-center p-1 position-relative">
+                    <h6 class="text-warning" id="selectedCategoryH3">Cash info</h3>
+                        <p class="text-light" id="selectedCategoryH1" style="font-size: 12px;"></p>
+                </div>
+
+                <div class="info-card text-center p-1  position-relative" id="secondInfoDiv">
+                    <h6 id="limitExpense" class="text-warning ">Limit value</h4>
+                        <p class="text-light" id="secondInfoP" style="font-size: 12px;"></p>
+                </div>
+
+                <div class="info-card text-center p-1 position-relative">
+                    <h6 class="text-warning">Cash left</h3>
+                        <p class="text-light" id="selectedPaymentH1" style="font-size: 12px;"></p>
+                </div>
+            </div>
+
+            <!-- 🔹 Payment Method (niezależne, zawsze aktywne) -->
+            <div class=" info-card text-center p-1 position-relative hidden1" id="paymentInfoDiv">
+                <h6 class="text-warning ">Payment Method limit</h3>
+                    <p style="font-size: 12px;" class=" text-light" id="selectedPaymentLimit"></p>
+            </div>
+            <div class="info-card text-center p-1 position-relative hidden1" id="paymentCashLeftDiv">
+                <h6 class="text-warning ">Cash left in this method payment</h3>
+                    <p class="text-light" style="font-size: 12px;" id="selectedPaymentCashLeft"></p>
+            </div>
+            <div class="info-card text-center p-1 position-relative hidden1" id="paymentMethodInfoDiv">
+                <h6 class="text-warning">Payment Method info</h3>
+                    <p class="text-light" style="font-size: 12px;" id="selectedPaymentMethodInfo"></p>
+            </div>
+
+
+        </div>
+
+    </div>
+    <script src="/js/new_expense.js?v={{ random() }}" defer></script>
+
+    {% endblock %}
+    {% block footer %}
+    <style>
+        /* 🔹 Ukrywanie tylko treści, nie tła */
+        .hidden1 {
+            display: none;
+        }
+
+        .right-column {
+            min-height: 600px;
+            border-radius: 20px;
+            margin-left: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 🔹 Obrazek jako tło — zawsze widoczny */
+        .expense-bg {
+            position: absolute;
+            inset: 0;
+            background: url('/images/expense_down.png') center center no-repeat;
+            background-size: contain;
+            opacity: 0.45;
+            filter: brightness(0.8);
+            z-index: 0;
+
+        }
+
+        #expenseCategorySelect:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+            border-color: #ffc107 !important;
+        }
+
+        #leftColumn {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 10px;
+            opacity: 0.6;
+        }
+
+        /* 🔹 Karty z tekstem */
+        .info-card {
+            background: linear-gradient(145deg, #1c1c1c, #222);
+            border: 1px solid #ffc107;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin: 5px;
+            opacity: 0.6;
+        }
+
+        .info-card:hover {
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+
+        #leftColumn:hover {
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        .input-group-text {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            padding: 0 0.75rem;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+    </style>
+    {% endblock %}

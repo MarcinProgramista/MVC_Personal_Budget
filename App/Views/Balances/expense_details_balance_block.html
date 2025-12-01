@@ -1,0 +1,93 @@
+<div class="border border-warning bg-dark rounded shadow-lg ">
+    {% if expenseDetails %}
+    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
+        <button id="toggleListExpensesDetailsBalanceBtn"
+            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
+            <span><i class="fas fa-money-bill-wave me-1"></i> Expenses details</span>
+            <span id="toggleExpensesDetailsBalanceArrow"><i class="fas fa-arrow-down text-warning"></i></span>
+        </button>
+    </div>
+    <!-- 🔽 Sekcja z listą -->
+    <div id="expenseDetailsBalanceListContainer" class="fade-section hidden d-flex align-items-center flex-column"
+        style="width: 100%;">
+
+        <!-- 🔹 Lista przychodów -->
+        <ul id="expenseDetailsBalanceCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
+            {% for expenseDetail in expenseDetails %}
+            <li data-expense-id="{{ expenseDetail.id }}" class=" list-group-item d-flex justify-content-between border border-warning align-items-center
+                text-light">
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="fas fa-circle me-2 text-success"></i>
+                        <span class="fw-bold">{{ expenseDetail.Category }} </span>
+                    </div>
+
+                    {% if expenseDetail.info %}
+                    <div class="ms-4 text-start"> <!-- odsunęliśmy ikonę od lewej, dopasowując do poprzedniej ikony -->
+                        <small class="text-warning">
+                            <i class="bi bi-journal-text me-1"></i>{{ expenseDetail.info }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <div class="ms-4">
+                        <small class="text-info">
+                            <i class="fas fa-calendar-alt me-1"></i>{{ expenseDetail.Data|date('l, d F Y') }}
+                        </small>
+                    </div>
+                    <div class="ms-4 text-start">
+                        <small class="text-primary">
+                            <i class="bi bi-credit-card me-1"></i>{{ expenseDetail.Method_Payment }}
+                        </small>
+                    </div>
+                </div>
+
+                <span class="d-flex flex-row">
+                    <span class="d-flex align-items-center">
+
+                        <strong class="text-light text-center mx-2">{{ expenseDetail.Amount }} PLN</strong>
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                            <i class="fas fa-pencil-alt text-success open-edit-expense-details-balance-modal"
+                                data-id="{{ expenseDetail.id }}"
+                                data-id_category_expense="{{ expenseDetail.expense_category_assigned_to_user_id }}"
+                                data-nameCategoryExpense="{{ expenseDetail.Category|escape }}"
+                                data-id_payment_expense="{{ expenseDetail.payment_method_assigned_to_user_id }}"
+                                data-namePaymentExpense="{{ expenseDetail.Method_Payment|escape }}"
+                                data-amount_expense="{{ expenseDetail.Amount }}"
+                                data-info_expense="{{ expenseDetail.info }}"
+                                data-date="{{ expenseDetail.Data|date('Y-m-d') }}" data-dateFirst="{{ dateFirst}}"
+                                data-dateSecond="{{ dateSecond}}"></i>
+                        </button>
+                        <button
+                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
+                            <i class="fas fa-trash-alt text-danger open-delete-expense-details-balance-modal"
+                                data-id="{{ expenseDetail.id }}"
+                                data-id_category_expense="{{ expenseDetail.expense_category_assigned_to_user_id }}"
+                                data-nameCategoryExpense="{{ expenseDetail.Category|escape }}"
+                                data-id_payment_expense="{{ expenseDetail.payment_method_assigned_to_user_id }}"
+                                data-namePaymentExpense="{{ expenseDetail.Method_Payment|escape }}"
+                                data-amount_expense="{{ expenseDetail.Amount }}"
+                                data-info_expense="{{ expenseDetail.info }}"
+                                data-date="{{ expenseDetail.Data|date('Y-m-d') }}" data-dateFirst="{{ dateFirst}}"
+                                data-dateSecond="{{ dateSecond}}"></i>
+                        </button>
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- 🔹 Suma przychodów -->
+        <div class="d-flex align-items-center" style="width: 95%;">
+            <div
+                class="border border-warning bg-success rounded shadow-lg d-flex align-items-end justify-content-center position-relative flex-grow-1 p-1">
+                SUM :<strong id="sumDetailsExpense" class="text-light m-0">{{ sumAllExpenses }} PLN</strong>
+            </div>
+        </div>
+
+
+    </div>
+    {% else %}
+    {% endif %}
+</div>
