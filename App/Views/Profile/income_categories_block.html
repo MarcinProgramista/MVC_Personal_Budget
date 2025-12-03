@@ -35,7 +35,7 @@
             <span class="fw-bold">{{ incomeCategory.name }}</span>
           </div>
 
-          {% if incomeCategory.cash_limit is not none %}
+          {% if incomeCategory.cash_limit %}
           <small class="text-info"
             >Limited: {{ incomeCategory.cash_limit }} PLN</small
           >

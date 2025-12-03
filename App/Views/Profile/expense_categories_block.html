@@ -1,62 +1,88 @@
 <div class="border border-warning rounded shadow-lg mb-2">
-    <div class="d-flex align-items-center p-1" style="width: 100%; column-gap: 10px;">
-        <button id="toggleListBtn"
-            class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1">
-            <span><i class="fas fa-shopping-basket me-1"></i> Expense categories</span>
-            <span id="toggleArrow"><i class="fas fa-arrow-down text-warning"></i></span>
-        </button>
-    </div>
-    <div id="expenseListContainer" class="fade-section hidden d-flex align-items-center  d-flex flex-column"
-        style="width: 100%;">
+  <div
+    class="d-flex align-items-center p-1"
+    style="width: 100%; column-gap: 10px"
+  >
+    <button
+      id="toggleListBtn"
+      class="btn btn-outline-secondary text-warning d-flex justify-content-between align-items-center flex-grow-1"
+    >
+      <span
+        ><i class="fas fa-shopping-basket me-1"></i> Expense categories</span
+      >
+      <span id="toggleArrow"
+        ><i class="fas fa-arrow-down text-warning"></i
+      ></span>
+    </button>
+  </div>
+  <div
+    id="expenseListContainer"
+    class="fade-section hidden d-flex align-items-center d-flex flex-column"
+    style="width: 100%"
+  >
+    <ul
+      id="expenseCategoriesList"
+      class="list-group custom-list"
+      style="width: 95%; margin: 0 auto"
+    >
+      {% for expenseCategory in expenseCategories %}
+      <li
+        class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light"
+      >
+        <div class="d-flex flex-column">
+          <div class="d-flex flex-row align-items-center">
+            <i class="fas fa-circle me-2 text-success"></i>
 
-
-        <ul id="expenseCategoriesList" class="list-group custom-list" style="width: 95%; margin: 0 auto;">
-            {% for expenseCategory in expenseCategories %}
-            <li
-                class="list-group-item d-flex justify-content-between border border-warning align-items-center text-light">
-
-
-                <div class="d-flex flex-column">
-                    <div class="d-flex flex-row   align-items-center ">
-                        <i class="fas fa-circle me-2 text-success"></i>
-
-                        <span class="fw-bold">{{ expenseCategory.name }}</span>
-                    </div>
-                    {% if expenseCategory.cash_limit is not none %}
-                    <small class="text-info">Limited: {{ expenseCategory.cash_limit }} PLN</small>
-                    {% endif %}
-
-                </div>
-                <span class="d-flex flex-row">
-                    <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                        <i class="fas fa-pencil-alt text-success open-edit-expense-category-modal" role="button"
-                            data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
-                            data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"
-                            data-is_limit_active="{{ expenseCategory.is_limit_active}}"
-                            data-user_id="{{ expenseCategory.user_id }}" data-type="expense">
-                        </i>
-                    </button>
-                    <button
-                        class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                        <i class="fas fa-trash-alt text-danger open-delete-expense-category-modal" data-type="expense"
-                            data-id="{{ expenseCategory.id }}" data-name="{{ expenseCategory.name }}"
-                            data-user_id="{{ expenseCategory.user_id }}"></i></button>
-                </span>
-            </li>
-            {% endfor %}
-        </ul>
-
-        <div class="d-flex align-items-center " style="width: 95%;">
-
-
-            <button
-                class="btn  btn-outline-secondary  border border-warning text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1 open-add-category-expense-modal"
-                data-type="expense"> <span class="position-absolute start-0 ms-3">
-                    <i class="fas fa-plus"></i>
-                </span>
-                <span>Add category</span></button>
-
+            <span class="fw-bold">{{ expenseCategory.name }}</span>
+          </div>
+          {% if expenseCategory.cash_limit %}
+          <small class="text-info"
+            >Limited: {{ expenseCategory.cash_limit }} PLN</small
+          >
+          {% endif %}
         </div>
+        <span class="d-flex flex-row">
+          <button
+            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1"
+          >
+            <i
+              class="fas fa-pencil-alt text-success open-edit-expense-category-modal"
+              role="button"
+              data-id="{{ expenseCategory.id }}"
+              data-name="{{ expenseCategory.name }}"
+              data-cash_limit="{{ expenseCategory.cash_limit | default('') }}"
+              data-is_limit_active="{{ expenseCategory.is_limit_active}}"
+              data-user_id="{{ expenseCategory.user_id }}"
+              data-type="expense"
+            >
+            </i>
+          </button>
+          <button
+            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1"
+          >
+            <i
+              class="fas fa-trash-alt text-danger open-delete-expense-category-modal"
+              data-type="expense"
+              data-id="{{ expenseCategory.id }}"
+              data-name="{{ expenseCategory.name }}"
+              data-user_id="{{ expenseCategory.user_id }}"
+            ></i>
+          </button>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="d-flex align-items-center" style="width: 95%">
+      <button
+        class="btn btn-outline-secondary border border-warning text-warning d-flex align-items-center justify-content-center position-relative flex-grow-1 open-add-category-expense-modal"
+        data-type="expense"
+      >
+        <span class="position-absolute start-0 ms-3">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span>Add category</span>
+      </button>
     </div>
+  </div>
 </div>
