@@ -1,201 +1,224 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const modalEl = document.getElementById('editCategoryMethodPyamentModal');
-    if (!modalEl) {
-        console.error('❌ Modal element not found: #editCategoryMethodPyamentModal');
-        return;
+document.addEventListener("DOMContentLoaded", () => {
+  // ================================================
+  //  ELEMENTY DOM
+  // ================================================
+  const modalEl = document.getElementById("editCategoryMethodPyamentModal");
+  if (!modalEl)
+    return console.error("❌ Modal not found: #editCategoryMethodPyamentModal");
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  const form = document.getElementById("editCategoryMethodPyamentForm");
+  const nameInput = document.getElementById("categoryEditMethodPyamentName");
+  const checkbox = document.getElementById(
+    "categoryEditMethodPyamentLimitActive"
+  );
+  const cashLimitInput = document.getElementById(
+    "categoryEditMethodPyamentCashLimit"
+  );
+  const categoryError = document.getElementById(
+    "categoryEditMethodPyamentError"
+  );
+  const userIdInput = document.getElementById(
+    "categoryEditMethodPyamentUserId"
+  );
+  const csrfToken = document.getElementById("editPaymentCsrf").value;
+  const list = document.getElementById("paymentMethodList");
+
+  const safeToast = (msg, type = "info") =>
+    typeof showToast === "function" ? showToast(msg, type) : console.log(msg);
+
+  // ================================================================
+  // 1️⃣ Zamknij inne modale
+  // ================================================================
+  function closeAllOtherModals() {
+    document.querySelectorAll(".modal.show").forEach((m) => {
+      const instance = bootstrap.Modal.getInstance(m);
+      if (instance) instance.hide();
+    });
+  }
+
+  // ================================================================
+  // 2️⃣ Checkbox logic — aktywacja limitu
+  // ================================================================
+  checkbox.addEventListener("change", () => {
+    cashLimitInput.disabled = !checkbox.checked;
+
+    if (checkbox.checked) {
+      cashLimitInput.placeholder = "Enter limit or leave empty";
+    } else {
+      cashLimitInput.placeholder = "Limit is blocked now";
+      cashLimitInput.value = "";
+    }
+  });
+
+  // ================================================================
+  // 3️⃣ EVENT DELEGATION → obsłuży także nowe elementy
+  // ================================================================
+  list.addEventListener("click", (e) => {
+    const btn = e.target.closest(".edit-payment-method-category-modal");
+    if (!btn) return;
+
+    openModalWithData(btn.dataset);
+  });
+
+  // ================================================================
+  // 4️⃣ Funkcja otwierająca modal z danymi
+  // ================================================================
+  function openModalWithData(data) {
+    const { id, name, cash_limit, is_limit_active, user_id } = data;
+
+    nameInput.value = name || "";
+    checkbox.checked = Number(is_limit_active) === 1;
+
+    if (checkbox.checked) {
+      cashLimitInput.disabled = false;
+      cashLimitInput.placeholder = "Enter limit or leave empty";
+      cashLimitInput.value = cash_limit || "";
+    } else {
+      cashLimitInput.disabled = true;
+      cashLimitInput.placeholder = "Limit is blocked now";
+      cashLimitInput.value = "";
     }
 
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    const form = document.getElementById('editCategoryMethodPyamentForm');
-    const nameInput = document.getElementById('categoryEditMethodPyamentName');
-    const checkbox = document.getElementById('categoryEditMethodPyamentLimitActive'); // poprawione
-    const cashLimitInput = document.getElementById('categoryEditMethodPyamentCashLimit'); // poprawione
-    const categoryError = document.getElementById('categoryEditMethodPyamentError');
-    const safeToast = (msg, type = "info") => {
-        if (typeof showToast === "function") showToast(msg, type);
-        else console.log(msg);
-    };
-    // Zamknij wszystkie inne otwarte modale przed otwarciem nowego
-    function closeAllOtherModals() {
-        const openModals = document.querySelectorAll('.modal.show');
-        openModals.forEach(m => {
-            const modalInstance = bootstrap.Modal.getInstance(m);
-            if (modalInstance) modalInstance.hide();
-        });
+    form.dataset.id = id;
+    userIdInput.value = user_id;
+
+    nameInput.classList.remove("is-invalid");
+    categoryError.textContent = "";
+
+    closeAllOtherModals();
+    modal.show();
+  }
+
+  // ================================================================
+  // 5️⃣ SUBMIT — wysyłanie formularza (async + timeout)
+  // ================================================================
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = nameInput.value.trim();
+    const isLimitActive = checkbox.checked ? 1 : 0;
+    const cashLimit =
+      checkbox.checked && cashLimitInput.value
+        ? parseFloat(cashLimitInput.value)
+        : "";
+
+    if (!name) {
+      nameInput.classList.add("is-invalid");
+      categoryError.textContent = "Please enter a name.";
+      return;
     }
 
-    // Checkbox - aktywacja/ dezaktywacja pola limitu
-    checkbox.addEventListener('change', () => {
-        cashLimitInput.disabled = !checkbox.checked;
-        cashLimitInput.placeholder = checkbox.checked
-            ? "Enter limit or leave empty"
-            : "Limit is blocked now";
-        if (!checkbox.checked) cashLimitInput.value = '';
+    nameInput.classList.remove("is-invalid");
+    categoryError.textContent = "";
+
+    const submitBtn = form.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.textContent;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving...";
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 9000);
+
+    let res;
+    try {
+      res = await fetch("/method-payment/edit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRF-Token": csrfToken,
+        },
+        credentials: "include",
+        signal: controller.signal,
+        body: new URLSearchParams({
+          id: form.dataset.id,
+          user_id: userIdInput.value,
+          name,
+          is_limit_active: isLimitActive,
+          cash_limit: cashLimit,
+          csrf_token: csrfToken,
+        }),
+      });
+    } catch (err) {
+      if (err.name === "AbortError") {
+        safeToast("⏳ Request timed out. Try again.", "error");
+      } else {
+        safeToast("Network error.", "error");
+      }
+      resetBtn(submitBtn, originalBtnText);
+      return;
+    }
+
+    clearTimeout(timeout);
+
+    if (res.status === 403) {
+      safeToast("Access denied. Please log in again.", "error");
+      setTimeout(() => (window.location.href = "/login"), 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      safeToast("Server error. Try later.", "error");
+      resetBtn(submitBtn, originalBtnText);
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data.success) {
+      categoryError.textContent = data.message || "Error updating category.";
+      resetBtn(submitBtn, originalBtnText);
+      return;
+    }
+
+    updateListItem(data.category);
+
+    safeToast("Payment method updated!", "success");
+    modal.hide();
+    form.reset();
+
+    resetBtn(submitBtn, originalBtnText);
+  });
+
+  // ================================================================
+  // 6️⃣ Aktualizacja <li> BEZ niszczenia eventów
+  // ================================================================
+  function updateListItem(category) {
+    const item = list.querySelector(`[data-id="${category.id}"]`);
+    if (!item) return;
+
+    const li = item.closest("li");
+    const col = li.querySelector(".d-flex.flex-column");
+
+    // 💥 Usuń WSZYSTKIE elementy, które mają tekst "Limited:"
+    col.querySelectorAll("small").forEach((el) => {
+      if (el.textContent.trim().startsWith("Limited:")) {
+        el.remove();
+      }
     });
 
-    // Otwierania modala 
-    document.querySelectorAll('.edit-payment-method-category-modal[data-type="payment"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            closeAllOtherModals();
+    // 🟢 Zaktualizuj nazwę
+    li.querySelector(".fw-bold").textContent = category.name;
 
-            const { id, name, cash_limit, is_limit_active, user_id } = btn.dataset;
-            console.log("✏️ Dane z ikony:", { id, name, cash_limit, is_limit_active, user_id });
+    // 🟢 Dodaj jeden właściwy limit
+    if (category.is_limit_active && category.cash_limit) {
+      const small = document.createElement("small");
+      small.className = "text-info category-limit-info";
+      small.textContent = `Limited: ${category.cash_limit} PLN`;
+      col.appendChild(small);
+    }
 
-            nameInput.value = name || '';
-            checkbox.checked = (is_limit_active == 1 || is_limit_active === true || is_limit_active === 'true');
+    // 🟢 Zaktualizuj dataset ikony edycji
+    const editBtn = li.querySelector(".edit-payment-method-category-modal");
+    editBtn.dataset.name = category.name;
+    editBtn.dataset.cash_limit = category.cash_limit ?? "";
+    editBtn.dataset.is_limit_active = category.is_limit_active;
+    editBtn.dataset.user_id = category.user_id;
+  }
 
-            if (checkbox.checked) {
-                cashLimitInput.disabled = false;
-                cashLimitInput.placeholder = 'Enter limit or leave empty';
-                cashLimitInput.value = cash_limit || '';
-            } else {
-                cashLimitInput.disabled = true;
-                cashLimitInput.placeholder = 'Limit is blocked now';
-                cashLimitInput.value = '';
-            }
-
-            form.dataset.id = id;
-            document.getElementById('categoryEditMethodPyamentUserId').value = user_id;
-            categoryError.textContent = '';
-            nameInput.classList.remove('is-invalid');
-            modal.show();
-        });
-    });
-
-    // 🔹 Wysłanie formularza
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const name = nameInput.value.trim();
-        const isLimitActive = checkbox.checked ? 1 : 0;
-        const cashLimit = checkbox.checked && cashLimitInput.value
-            ? parseFloat(cashLimitInput.value)
-            : null;
-
-        if (!name) {
-            nameInput.classList.add('is-invalid');
-            categoryError.textContent = 'Please enter a name.';
-            return;
-        }
-
-        nameInput.classList.remove('is-invalid');
-        categoryError.textContent = '';
-
-        try {
-            const id = form.dataset.id;
-            const user_id = document.getElementById('categoryEditMethodPyamentUserId').value;
-            const csrfToken = document.getElementById('editPaymentCsrf').value;
-            // ⏳ Timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-            const res = await fetch('/method-payment/edit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRF-Token': csrfToken
-                },
-                credentials: 'include',
-                body: new URLSearchParams({
-                    id,
-                    user_id,
-                    name,
-                    is_limit_active: isLimitActive,
-                    cash_limit: cashLimit ?? '',
-                    csrf_token: csrfToken
-                }),
-                signal: controller.signal,
-            });
-            clearTimeout(timeoutId);
-            if (res.status === 403) {
-                showToast("Access denied. Please log in again.", "error");
-                setTimeout(() => (window.location.href = "/login"), 1500);
-                return;
-            }
-
-            if (res.status >= 500) {
-                showToast("Server error. Try again later.", "error");
-                return;
-            }
-
-            let data = await res.json();
-
-            if (!data.success) {
-                showToast(data.message || "Failed to edit method payment.", "error");
-                return;
-            }
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-
-
-            if (data.success) {
-                // ✅ Znajdź istniejący element <li> po ID
-                const existingLi = document.querySelector(`#paymentMethodList [data-id="${data.category.id}"]`);
-
-
-                if (existingLi) {
-                    // 🔹 Znajdź najbliższy <li> — ikony są wewnątrz <span>, więc musimy wejść wyżej
-                    const li = existingLi.closest('li');
-                    if (li) {
-                        // 🔹 Zaktualizuj zawartość elementu
-                        li.innerHTML = `
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-bold">${data.category.name}</span>
-                                            ${data.category.is_limit_active && data.category.cash_limit
-                                ? `<small class="text-info">Limited: ${data.category.cash_limit} PLN</small>`
-                                : ''}
-                                        </div>
-                                        <span class="d-flex flex-row">
-                                        <button
-                                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                                            <i class="fas fa-pencil-alt text-success edit-payment-method-category-modal"
-                                                role="button"
-                                                data-id="${data.category.id}"
-                                                data-name="${data.category.name}"
-                                                data-cash_limit="${data.category.cash_limit || ''}"
-                                                data-is_limit_active="${data.category.is_limit_active}"
-                                                data-user_id="${data.category.user_id}"
-                                                data-type="payment"></i>
-                                        </button>
-                                         <button
-                                            class="btn btn-outline-warning d-flex align-items-center justify-content-center icon-btn m-1">
-                                            <i class="fas fa-trash-alt text-danger open-delete-category-modal"
-                                                role="button"
-                                                data-type="payment"
-                                                data-id="${data.category.id}"
-                                                data-name="${data.category.name}"
-                                                data-user_id="${data.category.user_id}"></i></button>
-                                        </span>
-                                    `;
-                        // 🔹 Podłącz ponownie event do nowo wstawionej ikony edycji
-                        li.querySelector('.edit-payment-method-category-modal')
-                            ?.addEventListener('click', () => {
-                                closeAllOtherModals();
-                                modal.show();
-                                showToast('You just edited this item — reopen to edit again!');
-                            });
-                    }
-                } else {
-                    console.warn('⚠️ Nie znaleziono elementu li o id:', data.category.id);
-                }
-
-                modal.hide();
-                showToast('Payment Method updated successfully!');
-                form.reset();
-            } else {
-                // ❌ Obsługa błędów
-                if (data.field === 'name') {
-                    nameInput.classList.add('is-invalid');
-                    categoryError.textContent = data.message || 'Invalid name.';
-                } else {
-                    showToast(data.message || 'An error occurred.', 'error');
-                }
-            }
-        } catch (error) {
-            console.error('❌ Error sending request:', error);
-            categoryError.textContent = 'Server error.';
-        }
-    });
-
+  function resetBtn(btn, text) {
+    btn.disabled = false;
+    btn.textContent = text;
+  }
 });
