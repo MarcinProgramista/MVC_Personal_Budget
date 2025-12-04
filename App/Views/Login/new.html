@@ -1,111 +1,223 @@
-{% extends "base.html" %}
-
-{% block title %}Home{% endblock %}
-{% block footer %}
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block footer %}
 <script src="/js/hideShowPassword.min.js"></script>
 <script>
-    $(document).ready(function () {
-        // Show/hide password plugin
-        $('#inputPassword').hideShowPassword({
-            show: false,
-            innerToggle: true,
-            toggle: {
-                className: 'btn btn-sm btn-dark hide-password-btn hideShowPassword-toggle',
-                content: '<i class="fa fa-eye"></i>',
-                attr: {
-                    'aria-label': 'Show password',
-                    title: 'Show password'
-                }
-            },
-            states: {
-                shown: { toggle: { content: '<i class="fa fa-eye-slash"></i>', attr: { title: 'Hide password' } } },
-                hidden: { toggle: { content: '<i class="fa fa-eye"></i>', attr: { title: 'Show password' } } }
-            }
-        });
+  $(document).ready(function () {
+    // Show/hide password plugin
+    $("#inputPassword").hideShowPassword({
+      show: false,
+      innerToggle: true,
+      toggle: {
+        className:
+          "btn btn-sm btn-dark hide-password-btn hideShowPassword-toggle",
+        content: '<i class="fa fa-eye"></i>',
+        attr: {
+          "aria-label": "Show password",
+          title: "Show password",
+        },
+      },
+      states: {
+        shown: {
+          toggle: {
+            content: '<i class="fa fa-eye-slash"></i>',
+            attr: { title: "Hide password" },
+          },
+        },
+        hidden: {
+          toggle: {
+            content: '<i class="fa fa-eye"></i>',
+            attr: { title: "Show password" },
+          },
+        },
+      },
     });
+  });
 </script>
 
 <style>
-    .hideShowPassword-wrapper {
-        position: relative !important;
-        display: inline-block !important;
-        width: 100% !important;
-        height: 70px;
+  #leftColumn {
+    background: rgba(28, 28, 28, 0.85);
+    border: 1px solid #ffc107;
+    border-radius: 16px;
+    padding: 25px;
+    width: 100%;
+    max-width: 500px;
+    z-index: 2;
+  }
+  .hideShowPassword-wrapper {
+    position: relative !important;
+    display: inline-block !important;
+    width: 100% !important;
+    height: 70px;
+  }
+
+  .hideShowPassword-toggle {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 12px;
+    z-index: 10;
+  }
+  #leftColumn:hover {
+    box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+    transform: scale(1.02);
+    opacity: 1;
+  }
+
+  .input-group-text {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 0 0.75rem;
+  }
+
+  .page-wrapper {
+    min-height: 100vh;
+    background: url("/images/02.jpg") center center no-repeat;
+    background-size: cover;
+    position: relative;
+    padding: 40px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px; /* odstęp między cytatem a formularzem */
+  }
+
+  /* Cytat */
+  .info-card {
+    background: rgba(28, 28, 28, 0.85);
+    border: 1px solid #ffc107;
+    border-radius: 16px;
+    padding: 20px 30px;
+    color: #ffc107;
+    max-width: 700px;
+    text-align: center;
+    z-index: 2;
+  }
+
+  /* Formularz */
+  #leftColumn {
+    background: rgba(28, 28, 28, 0.85);
+    border: 1px solid #ffc107;
+    border-radius: 16px;
+    padding: 25px;
+    width: 100%;
+    max-width: 500px;
+    z-index: 2;
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
     }
 
-
-    .hideShowPassword-toggle {
-        position: absolute !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        right: 12px;
-        z-index: 10;
+    25% {
+      transform: translateX(-5px);
     }
+
+    75% {
+      transform: translateX(5px);
+    }
+  }
+
+  .shake {
+    animation: shake 0.4s ease;
+  }
 </style>
-{% endblock %}
-{% block body %}
+{% endblock %} {% block body %}
 
-<div class="container my-5">
-    <div class="row justify-content-center align-items-center g-4" style="gap: 200px;">
+<div class="page-wrapper">
+  <!-- CYTAT NAD TAPETĄ -->
+  <div class="info-card">
+    “Don’t tell me where your priorities are. Show me where you spend your money
+    and I’ll tell you what they are.” <br />
+    — <span class="fw-bold">James W. Frick</span>
+  </div>
 
-        <!-- LEWA KOLUMNA Z OBRAZEM -->
-        <div class="col-md-5">
-            <div class="container pb-3 text-danger">
-                {% if user.errors is not empty %}
-                <p>Errors:</p>
-                <ul>
-                    {% for error in user.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
+  <!-- FORMULARZ NAD TAPETĄ -->
+  <div id="leftColumn">
+    <h1 class="mb-4 text-center"><i class="fas fa-user"></i> Log in</h1>
 
-            <form method="post" action="/login/create" class="registration-form text-warning bg-dark" id="fromLogin">
-
-                <h1 class="mb-4 text-center p-4">Log in</h1>
-
-                <div class="form-group" style="padding: 10px;">
-                    <label for="inputEmail"><i class="far fa-envelope"></i></label>
-                    <input type="email" class="form-control p-2 w-100" id="inputEmail" name="email" value="{{email }}"
-                        placeholder="E-mail address" required>
-                </div>
-
-                <!-- Pole hasła -->
-                <div class="form-group" style="padding: 10px;">
-                    <label for="inputPassword"><i class="fas fa-key"></i></label>
-                    <input type="password" class="form-control p-2 w-100" id="inputPassword" name="password"
-                        placeholder="Password" required>
-
-                </div>
-                <div class="form-group" style="padding: 10px;">
-                    <label> <input type="checkbox" name="remember_me" {% if remember_me %} checked="checked" {% endif
-                            %} />
-                        Remember me</label>
-
-                </div>
-                <div class="text-center">
-
-                    <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">Log in</button>
-                </div>
-                <div class="text-center">
-                    <a class="text-center p-2 text-light" href="/password/forgot">Fogot password?</a>
-                </div>
-
-            </form>
-        </div>
-
-
-        <!-- PRAWA KOLUMNA Z FORMULARZEM -->
-        <div class="col-md-5 text-center border border-warning rounded shadow-lg p-4">
-            <p class="fst-italic text-light mb-4">
-                “Don’t tell me where your priorities are. Show me where you spend your money
-                and I’ll tell you what they are.” <br> — <span class="fw-bold">James W. Frick</span>
-            </p>
-            <img src="/images/02.jpg" alt="Motywacyjny obraz"
-                class="img-fluid border border-warning rounded shadow-lg form-image">
-        </div>
+    <div class="container pb-3 text-danger">
+      {% if user.errors is not empty %}
+      <p>Errors:</p>
+      <ul>
+        {% for error in user.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
+
+    <form
+      method="post"
+      action="/login/create"
+      class="text-warning"
+      id="fromLogin"
+    >
+      <div class="input-group mb-3 flex-nowrap">
+        <span class="input-group-text bg-dark text-warning border-warning">
+          <i class="far fa-envelope"></i>
+        </span>
+        <input
+          type="email"
+          class="form-control bg-dark text-light border-warning"
+          id="inputEmail"
+          name="email"
+          value="{{email}}"
+          placeholder="E-mail address"
+          required
+        />
+      </div>
+
+      <div class="input-group mb-3 flex-nowrap">
+        <span class="input-group-text bg-dark text-warning border-warning">
+          <i class="fas fa-key"></i>
+        </span>
+        <input
+          type="password"
+          class="form-control bg-dark text-light border-warning"
+          id="inputPassword"
+          name="password"
+          placeholder="Password"
+          required
+        />
+      </div>
+
+      <div class="form-group" style="padding: 10px">
+        <label>
+          <input
+            type="checkbox"
+            name="remember_me"
+            {%
+            if
+            remember_me
+            %}
+            checked
+            {%
+            endif
+            %}
+          />
+          Remember me
+        </label>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-success btn-block m-3 w-50 p-2">
+          Log in
+        </button>
+      </div>
+
+      <div class="text-center">
+        <a class="text-center p-2 text-light" href="/password/forgot"
+          >Forgot password?</a
+        >
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
