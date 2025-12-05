@@ -34,15 +34,6 @@
 </script>
 
 <style>
-  #leftColumn {
-    background: rgba(28, 28, 28, 0.85);
-    border: 1px solid #ffc107;
-    border-radius: 16px;
-    padding: 25px;
-    width: 100%;
-    max-width: 500px;
-    z-index: 2;
-  }
   .hideShowPassword-wrapper {
     position: relative !important;
     display: inline-block !important;
@@ -70,6 +61,8 @@
     justify-content: center;
     font-size: 1.2rem;
     padding: 0 0.75rem;
+    background: #1c1c1c !important;
+    color: #f8f9fa !important;
   }
 
   .page-wrapper {
@@ -108,6 +101,16 @@
     z-index: 2;
   }
 
+  #leftColumn:hover {
+    box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  .form-control::placeholder {
+    color: #ffc107 !important;
+    opacity: 1;
+  }
+
   @keyframes shake {
     0%,
     100% {
@@ -125,6 +128,16 @@
 
   .shake {
     animation: shake 0.4s ease;
+  }
+  /* --- DODAJ TEN KOD NA SAMYM KOŃCU --- */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #1c1c1c inset !important;
+    -webkit-text-fill-color: #f8f9fa !important;
+    caret-color: #f8f9fa !important;
+    border: 1px solid #ffc107 !important;
   }
 </style>
 {% endblock %} {% block body %}
@@ -164,7 +177,7 @@
         </span>
         <input
           type="email"
-          class="form-control bg-dark text-light border-warning"
+          class="form-control bg-dark text-warning border-warning"
           id="inputEmail"
           name="email"
           value="{{email}}"
@@ -179,7 +192,7 @@
         </span>
         <input
           type="password"
-          class="form-control bg-dark text-light border-warning"
+          class="form-control bg-dark text-warning border-warning"
           id="inputPassword"
           name="password"
           placeholder="Password"
