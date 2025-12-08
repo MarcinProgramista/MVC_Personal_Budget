@@ -1,4 +1,5 @@
 <h1>Personal Budget — MVC Web Application</h1>
+<img width="1832" height="921" alt="image" src="https://github.com/user-attachments/assets/40aaca04-93ff-4d89-bc82-2abbaa3579a8" />
 
 A lightweight and fully functional personal budget management application built with a custom PHP MVC framework.
 The project allows users to track income and expenses, analyze financial data, and visualize spending habits through interactive charts.
@@ -6,14 +7,16 @@ It also includes modern features such as email notifications and an AI assistant
 More details, screenshots, and feature highlights below.
 
 <h3>Sign Up — Clean and Modern Registration Page</h3>
-<img width="1832" height="793" alt="image" src="https://github.com/user-attachments/assets/a9728077-30c8-43f6-b4e3-783578ede990" />
+<img width="1832" height="921" alt="image" src="https://github.com/user-attachments/assets/ae7d2ad2-0ebb-4bef-bd15-56ef7c5fde39" />
+
 This screenshot presents the Sign Up page of the Personal Budget application. The interface is designed for simplicity and clarity, featuring a clean dark theme with bright accent colors for improved visibility. Users can quickly create an account by entering their name, email, and password, with built-in validation ensuring correct input.
 
 After registering, the user receives an activation link sent to the provided email address. The account must be confirmed via this link before logging in — ensuring safe and verified access.
 A motivational quote and illustration on the right create a friendly and engaging onboarding experience.
 
 <h3>Log In — Secure and User-Friendly Authentication</h3>
-<img width="1832" height="793" alt="image" src="https://github.com/user-attachments/assets/8754fe36-4f69-45ad-958b-f132092ef4d2" />
+<img width="1832" height="921" alt="image" src="https://github.com/user-attachments/assets/d51e0a50-1812-4af4-870b-f6d7e390f9cc" />
+
 This screenshot shows the Log In page of the Personal Budget application.
 Users can sign in using their email and password, with built-in validation ensuring proper input.
 The form includes a “Remember me” option for extended sessions and a password visibility toggle for improved usability.
